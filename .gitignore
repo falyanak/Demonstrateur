@@ -1,0 +1,12 @@
+# Demonstrateur : rien de généré, aucune donnée locale n'est versionné.
+.vs/
+[Bb]in/
+[Oo]bj/
+*.user
+TestResults/
+ExpressionBesoin/coverage-report/
+**/wwwroot/dist/
+*.db
+*.db-shm
+*.db-wal
+*.zip
