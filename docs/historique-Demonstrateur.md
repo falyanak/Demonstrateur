@@ -59,3 +59,10 @@
   tests avec xunit.v3 3.2.2, xunit.runner.visualstudio 3.1.5 et Microsoft.NET.Test.Sdk 18.10.1 ensemble,
   `SanteContratTests` (version informative `0.1.0+<commit>`).
 - P0b : prompt de reprise (ÉTAT, §0, §1, §7) et historique. Documents seuls. Chantier P clos ; prochain : B1.
+
+## 20/11/2026 — P0c : commande d'ouverture à chaque réponse, point de terminaison de la V1
+
+- Demande du développeur : donner à chaque réponse la commande d'ouverture de la prochaine session (DEB-D3) ; fixer
+  un point de terminaison même pour une première version simplifiée (DEB-D4 : lot R1, critère du plan §1, périmètre
+  gelé, évolutions V2 listées au prompt §6).
+- P0c : plan v1.2 (§1, §7, §8), prompt de reprise (ÉTAT, §0, §3, §6, §7), historique. Documents seuls.

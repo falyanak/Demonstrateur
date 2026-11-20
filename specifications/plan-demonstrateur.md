@@ -1,6 +1,6 @@
 # Plan du démonstrateur « Expression de besoin » (version simplifiée)
 
-> Version 1.1 du 20/11/2026 (lot P0 ; 1.0 au lot P0a). Arbitrages DEB-Q1 à DEB-Q8, DEB-Q11, DEB-Q12 : « recommandations
+> Version 1.2 du 20/11/2026 (lot P0c ; 1.1 au lot P0, 1.0 au lot P0a). Arbitrages DEB-Q1 à DEB-Q8, DEB-Q11, DEB-Q12 : « recommandations
 > ok » (20/11/2026). Décisions :
 > §8. Documents d'origine, **hors dépôt** (DEB-D2) : cahier des charges « Document de cadrage » (novembre 2026) et
 > modèle de fiche d'expression de besoin (FEB), tenus par le développeur.
@@ -20,11 +20,18 @@ validée est produite au format Word, au modèle FEB. Données fictives uniqueme
 | **Génération et téléchargement du .docx** au modèle FEB après validation | Export PDF |
 | Page **Liste** des fiches avec leur statut | |
 
-**Critère de fin du démonstrateur** : sur le poste, le scénario du cahier des charges (§7, partie agent et chef de
+**Point de terminaison de la version 1 (V1 simplifiée, DEB-D4)** : la V1 s'arrête au lot R1, quand le critère
+ci-dessous est prouvé sur le poste ; l'assistant le dit alors en clair (« objectif atteint, on arrête »). Son
+périmètre est **gelé** : la colonne de droite du tableau ci-dessus, et toute idée née en cours de route, rejoignent
+la liste des évolutions (prompt de reprise §6) et ne s'ouvrent qu'en V2, par décision du développeur, en chantier
+propre avec son propre critère de fin. Un lot correctif de la V1 ne corrige que l'écart au critère.
+
+**Critère de fin du démonstrateur (V1)** : sur le poste, le scénario du cahier des charges (§7, partie agent et chef de
 service) est joué de bout en bout : la demande vague « contrôle des plates-formes e-commerce et prélèvements à
 distance » devient une fiche complète sans information inventée ; l'agent corrige une rubrique, confirme et soumet ; la
 validation est simulée ; le .docx s'ouvre dans Word au modèle FEB ; la liste affiche « Validée ». Variante jouée
-aussi : retour pour complément, puis nouvelle soumission. Tests verts, couverture conforme.
+aussi : retour pour complément, puis nouvelle soumission. Tests verts, couverture conforme ; dernier commit publié et
+sauvegardé.
 
 ## 2. Partage IA / automatisation déterministe
 
@@ -132,7 +139,7 @@ Liste : N°, intitulé, demandeur, date, statut (badge), actions *Reprendre* et 
 | F1 | Front (gabarit Vite) et page Dialogue | parcours complet avec l'IA scénarisée |
 | F2 | Page Liste | statuts conformes après chaque transition |
 | A1 | Adaptateur IA réel et prompt système (DEB-Q2) | scénario e-commerce joué avec l'IA réelle, sans invention |
-| R1 | Fiche de recette : nominal et retour pour complément | critère de fin du démonstrateur (§1) |
+| R1 | Fiche de recette : nominal et retour pour complément | critère de fin du démonstrateur (§1) : **point de terminaison de la V1** |
 
 L'IA scénarisée précède l'IA réelle : la démonstration reste jouable sans réseau le jour du séminaire. Dépendance :
 l'étape `TestsFront` d'`Appliquer-Lot` arrive avec le lot OT2 du harnais central ; sans lui, les tests Vitest de F1 et
@@ -153,6 +160,8 @@ F2 sont lancés à la main (`npm test`) et leur sortie jointe au compte rendu.
 | DEB-D1 | Dépôt `Demonstrateur`, nommé comme le distant `https://github.com/falyanak/Demonstrateur.git` ; racine `C:\Dev\Demonstrateur` (au lieu de `C:\Dev\ExpressionBesoin` envisagé par DEB-Q1) ; solution dans le dossier `ExpressionBesoin/`. |
 | DEB-Q11 | Paquets NuGet : `nuget.config` propre au projet, nuget.org seul. |
 | DEB-Q12 | Persistance (I1) : `Microsoft.Data.Sqlite` sans Entity Framework ; une table de fiches, contenu en JSON, colonnes de liste. |
+| DEB-D3 | Chaque réponse de l'assistant se termine par la commande `Ouvrir-Session` de la prochaine session, prête à copier (demande du développeur). |
+| DEB-D4 | Point de terminaison de la V1 : lot R1, critère du §1 ; périmètre gelé, le reste en évolutions V2 (demande du développeur). |
 | DEB-D2 | Dépôt **public** : aucun document interne versionné (cahier des charges, modèle FEB) tant que DEB-Q9 n'est pas tranchée ; le présent plan en tient lieu. |
 
 Questions ouvertes :

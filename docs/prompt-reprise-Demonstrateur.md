@@ -1,6 +1,6 @@
 # Prompt de reprise — Demonstrateur
 
-> Mis à jour le 20/11/2026 par le lot P0b. Règles génériques : harnais central, `regles\regles-de-travail.md` (v5) ;
+> Mis à jour le 20/11/2026 par le lot P0c. Règles génériques : harnais central, `regles\regles-de-travail.md` (v5) ;
 > modèle de projet : `regles\harnais-modele-generique.md` (v2) ; front : `regles\gabarit-frontend-vite-aspnet.md` ;
 > outillage : `C:\Dev\Harnais\docs\specification-harnais-central.md` (fait foi).
 > Historique détaillé : `docs/historique-Demonstrateur.md` (non envoyé par défaut). Documents hors dépôt dont dépend ce
@@ -8,12 +8,13 @@
 > `Expression_de_besoin_demonstrateur_IA_SICCRF.docx` (document de cadrage, novembre 2026) et modèle de fiche
 > `FEB.docx`.
 
-## ▶ ÉTAT AU 20/11/2026 (P0b) — À LIRE D'ABORD
+## ▶ ÉTAT AU 20/11/2026 (P0c) — À LIRE D'ABORD
 
 **Où on en est** : **P0 validé** sur le poste (commit `78ff21b`, base de couverture `a73cb7e`) : 75 tests MESURÉS
 (Domain 25, Web 30, Architecture 20), 0 échec ; couverture lignes 64/64 et branches 16/16 (100 %), base relevée.
-Chantier P (socle) clos par ce lot P0b (documents seuls).
-**Critère de fin de P0b** : lot appliqué, commité, branche `main` publiée et sauvegardée.
+Chantier P (socle) clos par P0b ; P0c inscrit DEB-D3 et DEB-D4 (documents seuls).
+**Critère de fin de P0b et P0c** : lots appliqués, commités, branche `main` publiée et sauvegardée.
+**Point de terminaison de la V1** (DEB-D4) : lot R1, critère du plan §1 ; périmètre gelé jusque-là.
 **Prochain pas** : chantier B, lot B1 (Domaine de la fiche : rubriques, fusion des propositions, complétude, prochaine
 rubrique, cycle des statuts, numérotation, lecture de la réponse de l'IA ; plan §2, §3, §7), avec son critère de fin
 énoncé à l'ouverture.
@@ -23,7 +24,7 @@ rubrique, cycle des statuts, numérotation, lecture de la réponse de l'IA ; pla
     # attendu : « SESSION PRÉPARÉE : 8 pièce(s) dans C:\Dev\Sessions\Demonstrateur\<horodatage> » ; joindre toutes les
     # pièces et donner leur compte.
 
-**Décisions récentes** : DEB-D1, DEB-D2 ; arbitrages DEB-Q1 à DEB-Q8, DEB-Q11, DEB-Q12. **Anomalies ouvertes** :
+**Décisions récentes** : DEB-D3, DEB-D4, DEB-D1, DEB-D2 ; arbitrages DEB-Q1 à DEB-Q8, DEB-Q11, DEB-Q12. **Anomalies ouvertes** :
 aucune. **Questions ouvertes** : DEB-Q9 (modèle FEB versionné ?), DEB-Q10 (`node_modules` versionné ?).
 
 ## §0. Protocole (propre au projet)
@@ -39,7 +40,7 @@ aucune. **Questions ouvertes** : DEB-Q9 (modèle FEB versionné ?), DEB-Q10 (`no
 | Tests du front | à partir de F1 : `ExpressionBesoin/src/ExpressionBesoin.Web/ClientApp/tests` |
 | Données | fictives, jamais réelles ; jeux d'essai hors dépôt |
 | Dépôt distant | `https://github.com/falyanak/Demonstrateur.git`, **public**, branche `main` ; publication par le développeur seul (`Publier-Branche -Confirmer`, Git Credential Manager) |
-| Identifiants | `DEB-D…`, `DEB-A…`, `DEB-Q…` ; pris : DEB-D1, DEB-D2, DEB-Q1 à DEB-Q12 |
+| Identifiants | `DEB-D…`, `DEB-A…`, `DEB-Q…` ; pris : DEB-D1 à DEB-D4, DEB-Q1 à DEB-Q12 |
 
 Ligne enchaînée du projet (zip portant `DEPOT.txt` = « Demonstrateur ») :
 
@@ -86,6 +87,8 @@ page de liste des fiches et de leur statut. Plan, périmètre et critère de fin
 | DEB-Q1 à DEB-Q8 | Arbitrages du 20/11/2026, « recommandations ok » : plan §8. |
 | DEB-D1 | Dépôt `Demonstrateur` (nom du distant GitHub), racine `C:\Dev\Demonstrateur`, solution `ExpressionBesoin/`, préfixe `DEB` ; révise DEB-Q1 pour la racine (20/11/2026). |
 | DEB-D2 | Dépôt public : aucun document interne versionné (cahier des charges, modèle FEB) tant que DEB-Q9 n'est pas tranchée ; le plan en tient lieu (20/11/2026). |
+| DEB-D3 | Chaque réponse de l'assistant se termine par la commande `Ouvrir-Session` de la prochaine session, prête à copier, avec le compte de pièces attendu (demande du développeur, 20/11/2026). |
+| DEB-D4 | Point de terminaison de la V1 : lot R1, critère du plan §1 prouvé sur le poste ; périmètre gelé ; toute idée nouvelle rejoint les évolutions V2 (§6), ouvertes seulement par décision du développeur (demande du développeur, 20/11/2026 ; règle « Converger »). |
 | DEB-Q11 | `nuget.config` propre au projet : nuget.org seul (« recommandation ok », 20/11/2026). |
 | DEB-Q12 | Persistance par `Microsoft.Data.Sqlite`, sans Entity Framework : fiche en JSON + colonnes de liste (« recommandation ok », 20/11/2026). |
 
@@ -127,13 +130,14 @@ ExpressionBesoin/
 
 ## §6. Reliquat, hygiène, leçons
 
-Aucune anomalie du projet. Évolutions hors périmètre (plan §1) : courriel, habilitations, instruction XA / SICCRF,
-rapprochement, tableau de bord, export PDF.
+Aucune anomalie du projet. **Évolutions V2** (hors V1, DEB-D4 ; ouvertes seulement par décision du développeur) :
+courriel au chef de service, habilitations, instruction XA / SICCRF, rapprochement de demandes, tableau de bord,
+synthèse CODIR / COPIL, export PDF ; toute idée née pendant la V1 s'ajoute ici.
 
 ## §7. Prochaine session
 
 Acquis : plan v1.1, dépôt publié, socle P0 validé sur le poste (75 tests, couverture 100 %). Audit honnête : chez
 l'assistant, NuGet est inaccessible : les tests y tournent sur une réplique locale de l'API xUnit (compilation des
 projets de tests et `WebApplicationFactory` vérifiées sur le poste seulement). Plan ordonné : B1, B2, I1, I2, F1, F2,
-A1, R1. Pièces à envoyer : toutes celles
+A1, R1 (point de terminaison de la V1, DEB-D4). Pièces à envoyer : toutes celles
 d'`Ouvrir-Session` (8), avec leur compte ; pour I2, le modèle `FEB.docx` (hors dépôt, DEB-D2).
