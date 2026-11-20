@@ -1,7 +1,7 @@
 # Plan du démonstrateur « Expression de besoin » (version simplifiée)
 
-> Version 1.4 du 20/11/2026 (lot B1b ; 1.3 au lot B1, 1.2 au lot P0c, 1.1 au lot P0, 1.0 au lot P0a). Arbitrages DEB-Q1 à DEB-Q8, DEB-Q11 à
-> DEB-Q20 : « recommandations ok » (20/11/2026). Décisions :
+> Version 1.5 du 20/11/2026 (lot B2 ; 1.4 au lot B1b, 1.3 au lot B1, 1.2 au lot P0c, 1.1 au lot P0, 1.0 au lot P0a). Arbitrages
+> DEB-Q1 à DEB-Q8, DEB-Q11 à DEB-Q27 : « recommandations ok » (20/11/2026). Décisions :
 > §8. Documents d'origine, **hors dépôt** (DEB-D2) : cahier des charges « Document de cadrage » (novembre 2026) et
 > modèle de fiche d'expression de besoin (FEB), tenus par le développeur.
 
@@ -80,8 +80,11 @@ ExpressionBesoin/src/
                                    Completude.Manquantes, Dialogue.ProchaineRubrique, Cycle.Soumettre, Cycle.Decider,
                                    Cycle.Reprendre (une fonction par transition, horloge en paramètre),
                                    Numerotation.Suivant(annee, dernier), ReponseIA.Lire ; ContenuDocument.Construire (I2)
-  ExpressionBesoin.Application     cas d'usage lire -> décider -> écrire ; ports IDepotFiches, IAssistantIA,
-                                   IGenerateurDocument, IReferentielOrganisation ; TimeProvider en paramètre
+  ExpressionBesoin.Application     cas d'usage lire -> décider -> écrire (B2) : ServiceFiches (coquille, une méthode par
+                                   route du §5), DecisionsFiches (pures) ; ports IDepotFiches (fiche + historique du
+                                   dialogue, écrits ensemble), IAssistantIA (contexte du tour -> texte brut, relu par
+                                   ReponseIA.Lire), IGenerateurDocument, IReferentielOrganisation ; TimeProvider, fuseau
+                                   et générateur d'identifiants injectés
   ExpressionBesoin.Infrastructure  SQLite (fiche en JSON + colonnes de liste) ; OpenXML sur le gabarit FEB ;
                                    AssistantIA réel ; AssistantIA scénarisé (démonstration et tests hors réseau)
   ExpressionBesoin.Web             API minimale, deux vues Razor ; ClientApp Vite + TypeScript (features/dialogue,
@@ -101,13 +104,17 @@ Performance :
 | Verbe | Route | Rôle |
 | --- | --- | --- |
 | `POST` / `GET` | `api/fiches` | créer un brouillon ; lister (résumés) |
-| `GET` | `api/fiches/{id}` | fiche complète |
-| `POST` | `api/fiches/{id}/messages` | un tour de dialogue → `{ message, fiche }` |
+| `GET` | `api/agents` | agents fictifs du sélecteur de l'en-tête (DEB-Q6) |
+| `GET` | `api/fiches/{id}` | fiche complète et historique du dialogue (DEB-Q21) |
+| `POST` | `api/fiches/{id}/messages` | un tour de dialogue → `{ message, horsPerimetre, fiche }` (DEB-Q22, DEB-Q23) |
 | `PUT` | `api/fiches/{id}/champs/{rubrique}` | saisie manuelle |
 | `POST` | `api/fiches/{id}/propositions/{rubrique}/accepter`, `…/rejeter` | décision sur une proposition |
 | `POST` | `api/fiches/{id}/soumettre` | confirmation et soumission (contrôle de complétude) |
 | `POST` | `api/fiches/{id}/decision` | simulation du chef de service `{ decision, commentaire }` |
 | `GET` | `api/fiches/{id}/document` | .docx ; 409 si la fiche n'est pas validée |
+
+Refus de l'Application (B2), en plus de ceux du Domaine : `fiche.introuvable`, `agent.inconnu`, `rubrique.inconnue`
+(DEB-Q27), `message.vide`, `document.nonValidee` (409).
 
 Identité : sélecteur d'agent fictif dans l'en-tête, sans connexion (DEB-Q6) ; l'API reçoit l'agent courant par un
 en-tête simple, jamais pris pour une autorisation.
@@ -175,6 +182,13 @@ F2 sont lancés à la main (`npm test`) et leur sortie jointe au compte rendu.
 | DEB-Q20 | Mutations de B1 sur une copie jetable du poste (`%TEMP%`), par une commande fournie avec le lot. |
 | DEB-D5 | Adaptateur IA (A1) : Microsoft Agent Framework (`ChatClientAgent`) sur un `IChatClient` compatible OpenAI, derrière `IAssistantIA` ; une réponse structurée par tour, relue par `ReponseIA.Lire` ; ni outils, ni workflows, ni multi-agents (« cadrage ok »). |
 | DEB-D2 | Dépôt **public** : aucun document interne versionné (cahier des charges, modèle FEB) tant que DEB-Q9 n'est pas tranchée ; le présent plan en tient lieu. |
+| DEB-Q21 | Historique du dialogue : `Echange(Auteur, Texte, Le)` de l'Application, persisté par `IDepotFiches` à part de la fiche, transmis en entier à l'IA ; une troncature éventuelle relève d'A1. |
+| DEB-Q22 | Un tour est atomique : réponse de l'IA refusée par `ReponseIA.Lire` → rien n'est écrit (ni message, ni fiche) ; fiche et échanges écrits ensemble ; panne technique d'un port = exception propagée (Web : 503), pas un refus. |
+| DEB-Q23 | `horsPerimetre = true` : message affiché, indicateur renvoyé, propositions du tour ignorées. |
+| DEB-Q24 | Année du numéro en heure de Paris : fuseau en paramètre de la décision (composé au Web) ; l'instant stocké reste en UTC. |
+| DEB-Q25 | Auteur de la décision simulée : le valideur de l'en-tête de la fiche, jamais l'agent courant. |
+| DEB-Q26 | Pas de version optimiste en V1 ; unicité du numéro par index unique (I1) ; la version optimiste rejoint les évolutions V2. |
+| DEB-Q27 | Code de rubrique des routes : casse ignorée (`Catalogue.EssayerTrouver`) ; inconnu → `rubrique.inconnue`. |
 
 Questions ouvertes :
 

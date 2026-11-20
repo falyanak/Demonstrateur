@@ -14,6 +14,7 @@
   </Folder>
   <Folder Name="/tests/">
     <Project Path="tests/ExpressionBesoin.Domain.Tests/ExpressionBesoin.Domain.Tests.csproj" />
+    <Project Path="tests/ExpressionBesoin.Application.Tests/ExpressionBesoin.Application.Tests.csproj" />
     <Project Path="tests/ExpressionBesoin.Web.Tests/ExpressionBesoin.Web.Tests.csproj" />
     <Project Path="tests/ExpressionBesoin.Architecture.Tests/ExpressionBesoin.Architecture.Tests.csproj" />
   </Folder>

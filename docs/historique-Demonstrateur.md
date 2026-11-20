@@ -94,3 +94,20 @@
 - Le développeur retient Microsoft Agent Framework (1.0 GA, avril 2026) ; cadrage proposé (MAF sur `IChatClient`, usage
   limité à l'adaptateur) : « cadrage ok » → DEB-D5. DEB-Q2 ne porte plus que sur le fournisseur.
 - B1b : plan v1.4 (§8), prompt de reprise (ÉTAT, §0, §1, §2, §3, §7), historique. Documents seuls.
+
+## 20/11/2026 — B2 : Application (cas d'usage, ports, doublures)
+
+- Session ouverte sur `17f3a8d1a6d2` : 8 pièces reçues, tailles et SHA-256 conformes à `PIECES.txt`, archive à 63
+  entrées comme l'annonce `MASQUAGE.txt` (0 fichier masqué). Critère de fin de B1b constaté au journal (0 commit à
+  publier, sauvegarde à HEAD).
+- Plan de B2 présenté avant rédaction, critère de fin énoncé ; arbitrages DEB-Q21 à DEB-Q27 : « recommandations ok »
+  (plan v1.5, §8).
+- B2 : `ExpressionBesoin.Application` (ports `IDepotFiches`, `IAssistantIA`, `IGenerateurDocument`,
+  `IReferentielOrganisation` ; modèles `Agent`, `Echange`, `ResumeFiche`, `ContexteTour`, `TourDialogue`… ; décisions
+  pures `DecisionsFiches` ; coquille `ServiceFiches` ; aide `ResultatOuvert`) ; projet
+  `ExpressionBesoin.Application.Tests` (doublures en mémoire, attente différée en option pour exercer les deux issues
+  de chaque `await` ; parcours du critère de la V1 joué deux fois) ; configuration du harnais (projet de tests,
+  assembly attendue) et solution. 65 tests ESTIMÉS (total 239 → 304). Vérifié chez l'assistant : syntaxe C#
+  (tree-sitter, contrôle d'abord mis en échec sur un fichier fautif), attendus recalculés par une réplique Python
+  (numérotation selon le fuseau, rubriques manquantes, prochaine rubrique, 19 écritures du parcours). Non vérifié :
+  compilation, tests, couverture (branches des machines asynchrones notamment), mutations M3 et M4 (poste).

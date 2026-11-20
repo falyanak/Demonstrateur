@@ -23,14 +23,14 @@
 
     Lot = @{
         Racines        = @('ExpressionBesoin', 'docs', 'specifications', 'harnais.config.psd1', '.gitignore', '.gitattributes', 'README.md')
-        ProjetsTests   = @('ExpressionBesoin/tests/ExpressionBesoin.Domain.Tests', 'ExpressionBesoin/tests/ExpressionBesoin.Web.Tests', 'ExpressionBesoin/tests/ExpressionBesoin.Architecture.Tests')
-        TestsUnitaires = @('ExpressionBesoin/tests/ExpressionBesoin.Domain.Tests', 'ExpressionBesoin/tests/ExpressionBesoin.Web.Tests', 'ExpressionBesoin/tests/ExpressionBesoin.Architecture.Tests')
+        ProjetsTests   = @('ExpressionBesoin/tests/ExpressionBesoin.Domain.Tests', 'ExpressionBesoin/tests/ExpressionBesoin.Application.Tests', 'ExpressionBesoin/tests/ExpressionBesoin.Web.Tests', 'ExpressionBesoin/tests/ExpressionBesoin.Architecture.Tests')
+        TestsUnitaires = @('ExpressionBesoin/tests/ExpressionBesoin.Domain.Tests', 'ExpressionBesoin/tests/ExpressionBesoin.Application.Tests', 'ExpressionBesoin/tests/ExpressionBesoin.Web.Tests', 'ExpressionBesoin/tests/ExpressionBesoin.Architecture.Tests')
     }
 
     Couverture = @{
         Solution            = 'ExpressionBesoin/ExpressionBesoin.slnx'
-        ProjetsTests        = @('ExpressionBesoin/tests/ExpressionBesoin.Domain.Tests', 'ExpressionBesoin/tests/ExpressionBesoin.Web.Tests')
-        AssembliesAttendues = @('ExpressionBesoin.Domain', 'ExpressionBesoin.Web')
+        ProjetsTests        = @('ExpressionBesoin/tests/ExpressionBesoin.Domain.Tests', 'ExpressionBesoin/tests/ExpressionBesoin.Application.Tests', 'ExpressionBesoin/tests/ExpressionBesoin.Web.Tests')
+        AssembliesAttendues = @('ExpressionBesoin.Domain', 'ExpressionBesoin.Application', 'ExpressionBesoin.Web')
         Instrumentees       = '.*ExpressionBesoin\.(Domain|Application|Infrastructure|Web)\.dll$'
         Exclusions          = @('Program', 'AspNetCoreGeneratedDocument.*')
         Base                = 'ExpressionBesoin/coverage-baseline.json'
