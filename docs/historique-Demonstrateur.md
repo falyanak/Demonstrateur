@@ -111,3 +111,18 @@
   (tree-sitter, contrôle d'abord mis en échec sur un fichier fautif), attendus recalculés par une réplique Python
   (numérotation selon le fuseau, rubriques manquantes, prochaine rubrique, 19 écritures du parcours). Non vérifié :
   compilation, tests, couverture (branches des machines asynchrones notamment), mutations M3 et M4 (poste).
+
+## 20/11/2026 — B2 validé, B2b : comptes et mesures
+
+- Session ouverte sur `9007adf87501` (B2 commité) : 8 pièces reçues, tailles et SHA-256 conformes à `PIECES.txt`,
+  archive à 74 entrées comme l'annonce `MASQUAGE.txt` (0 fichier masqué). Journal : arbre propre, 1 commit à publier,
+  sauvegarde à `17f3a8d`.
+- `Compter-Tests -Compiler` (journal de session) : 304 tests (Domain 189, Application 65, Web 30, Architecture 20),
+  0 échec. Les 304 ESTIMÉS au lot B2 sont confirmés par la mesure.
+- `Lancer-Couverture -UpdateBaseline` : Domain, Application, Web ; lignes 580/580, branches 202/202 (100 %),
+  « COUVERTURE CONFORME », base inchangée (déjà à 100 / 100), rien à commiter.
+- Mutations sur clone jetable dans `%TEMP%` (DEB-Q20), `DecisionsFiches.cs` : la commande M3/M4 du compte rendu de B2
+  n'étant pas disponible dans la session, deux mutations équivalentes, nommées M5 et M6 pour éviter l'homonymie :
+  M5 (année du numéro lue en UTC, fuseau ignoré, DEB-Q24) → 2 échecs ; M6 (propositions gardées hors périmètre,
+  DEB-Q23) → 1 échec ; 2 sur 2 détectées. Critère de fin de B2 atteint ; chantier B clos.
+- B2b : prompt de reprise (ÉTAT, §1, §7), historique. Documents seuls.

@@ -1,6 +1,6 @@
 # Prompt de reprise — Demonstrateur
 
-> Mis à jour le 20/11/2026 par le lot B2. Règles génériques : harnais central, `regles\regles-de-travail.md` (v5) ;
+> Mis à jour le 20/11/2026 par le lot B2b. Règles génériques : harnais central, `regles\regles-de-travail.md` (v5) ;
 > modèle de projet : `regles\harnais-modele-generique.md` (v2) ; front : `regles\gabarit-frontend-vite-aspnet.md` ;
 > outillage : `C:\Dev\Harnais\docs\specification-harnais-central.md` (fait foi).
 > Historique détaillé : `docs/historique-Demonstrateur.md` (non envoyé par défaut). Documents hors dépôt dont dépend ce
@@ -8,19 +8,15 @@
 > `Expression_de_besoin_demonstrateur_IA_SICCRF.docx` (document de cadrage, novembre 2026) et modèle de fiche
 > `FEB.docx`.
 
-## ▶ ÉTAT AU 20/11/2026 (B2) — À LIRE D'ABORD
+## ▶ ÉTAT AU 20/11/2026 (B2b) — À LIRE D'ABORD
 
-**Où on en est** : **B2 livré, à valider sur le poste** : Application (ports `IDepotFiches`, `IAssistantIA`,
-`IGenerateurDocument`, `IReferentielOrganisation` ; décisions pures `DecisionsFiches` ; coquille `ServiceFiches`, une
-méthode par route du plan §5) et projet `ExpressionBesoin.Application.Tests` (doublures en mémoire). Comptes ESTIMÉS :
-304 tests (Domain 189, Application 65, Web 30, Architecture 20). B1 validé (`3ee722c`) ; B1b commité (`17f3a8d`), publié,
-sauvegardé.
-**Critère de fin de B2** : `Appliquer-Lot B2` vert et commité ; `Compter-Tests -Compiler` compte Application.Tests ;
-`Lancer-Couverture -UpdateBaseline` conforme avec l'assembly Application (cible 100 / 100) ; mutations M3 et M4
-détectées (commande du compte rendu de B2) ; B2b reporte ensuite les mesures.
+**Où on en est** : **chantier B clos** (Domaine et Application). B2 validé sur le poste (`9007adf`) : 304 tests MESURÉS
+(Domain 189, Application 65, Web 30, Architecture 20), 0 échec ; couverture Domain, Application, Web : lignes 580/580,
+branches 202/202 (100 %), base inchangée ; mutations M5 et M6 détectées (2 et 1 échecs). B2b : documents seuls.
+**Critère de fin de B2b** : `Appliquer-Lot B2b` vert et commité ; `Publier-Branche -Confirmer` puis
+`Sauvegarder-Depots` ; `Ouvrir-Session` suivante sans point d'ATTENTION (0 commit à publier, sauvegarde à HEAD).
 **Point de terminaison de la V1** (DEB-D4) : lot R1, critère du plan §1 ; périmètre gelé jusque-là.
-**Prochain pas** : validation de B2 sur le poste, puis B2b (comptes mesurés) ; ensuite I1 (SQLite, référentiel fictif ;
-plan §4, §7), avec son critère de fin énoncé à l'ouverture.
+**Prochain pas** : I1 (SQLite, référentiel fictif ; plan §4, §7), avec son critère de fin énoncé à l'ouverture.
 **Ouverture de la session suivante** :
 
     Set-Location C:\Dev\Demonstrateur; . C:\Dev\Harnais\outillage\Charger-Harnais.ps1; Ouvrir-Session -BrancheAttendue main
@@ -60,20 +56,20 @@ page de liste des fiches et de leur statut. Plan, périmètre et critère de fin
 | Chantier | Lots | État |
 | --- | --- | --- |
 | P — socle | P0a, P0, P0b | clos le 20/11/2026 : P0a (`56388a3`), P0 (`78ff21b`, base `a73cb7e`), P0b |
-| B — métier (Domain, Application) | B1, B1b, B2, B2b | B1 validé le 20/11/2026 (`3ee722c`) ; B2 livré le 20/11/2026, à valider ; B2b à suivre |
+| B — métier (Domain, Application) | B1, B1b, B2, B2b | clos le 20/11/2026 : B1 (`3ee722c`), B1b (`17f3a8d`), B2 (`9007adf`), B2b |
 | I — infrastructure | I1 (SQLite), I2 (.docx) | à faire |
 | F — front | F1 (Dialogue), F2 (Liste) | à faire ; étape `TestsFront` attendue du lot OT2 du harnais |
 | A — IA réelle | A1 | à faire ; fournisseur à trancher (DEB-Q2) |
 | R — recette | R1 | à faire |
 
-| Projet de tests | P0, poste (20/11/2026) | B1, poste (20/11/2026) | B2, ESTIMÉ (20/11/2026) |
+| Projet de tests | P0, poste (20/11/2026) | B1, poste (20/11/2026) | B2, poste (20/11/2026) |
 | --- | --- | --- | --- |
 | ExpressionBesoin.Domain.Tests | 25 | 189 | 189 |
 | ExpressionBesoin.Application.Tests | — | — | 65 |
 | ExpressionBesoin.Web.Tests | 30 | 30 | 30 |
 | ExpressionBesoin.Architecture.Tests | 20 | 20 | 20 |
-| **Total** | **75** (Release et Debug, 0 échec) | **239** (Release et Debug, 0 échec) | **304** (non mesuré) |
-| Couverture | Domain, Web : lignes 64/64, branches 16/16 = 100 % | Domain, Web : lignes 410/410, branches 156/156 = 100 % | Domain, Application, Web : non mesurée |
+| **Total** | **75** (Release et Debug, 0 échec) | **239** (Release et Debug, 0 échec) | **304** (Debug, 0 échec) |
+| Couverture | Domain, Web : lignes 64/64, branches 16/16 = 100 % | Domain, Web : lignes 410/410, branches 156/156 = 100 % | Domain, Application, Web : lignes 580/580, branches 202/202 = 100 % |
 
 ## §2. Points ouverts
 
@@ -152,9 +148,9 @@ synthèse CODIR / COPIL, export PDF, version optimiste des fiches (DEB-Q26) ; to
 
 ## §7. Prochaine session
 
-Acquis : plan v1.5, socle P0 et Domaine B1 validés sur le poste (239 tests, couverture 100 %, mutations détectées) ;
-Application B2 livrée, à valider (304 tests ESTIMÉS).
+Acquis : plan v1.5 ; socle P0, Domaine B1 et Application B2 validés sur le poste (304 tests, couverture 100 %,
+mutations détectées).
 Audit honnête : chez l'assistant, ni SDK .NET ni NuGet ; un lot C# y est vérifié par analyse syntaxique (tree-sitter)
 et réplique Python des attendus, le poste tranchant compilation, tests, couverture et mutations (B1 : tout conforme
-au premier essai). Plan ordonné : validation de B2 et B2b, I1, I2, F1, F2, A1, R1 (point de terminaison de la V1, DEB-D4). Pièces à
+au premier essai ; B2 de même). Plan ordonné : I1, I2, F1, F2, A1, R1 (point de terminaison de la V1, DEB-D4). Pièces à
 envoyer : toutes celles d'`Ouvrir-Session` (8), avec leur compte ; pour I2, le modèle `FEB.docx` (hors dépôt, DEB-D2).
