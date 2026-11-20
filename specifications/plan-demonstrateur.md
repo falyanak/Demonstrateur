@@ -1,7 +1,7 @@
 # Plan du démonstrateur « Expression de besoin » (version simplifiée)
 
-> Version 1.2 du 20/11/2026 (lot P0c ; 1.1 au lot P0, 1.0 au lot P0a). Arbitrages DEB-Q1 à DEB-Q8, DEB-Q11, DEB-Q12 : « recommandations
-> ok » (20/11/2026). Décisions :
+> Version 1.3 du 20/11/2026 (lot B1 ; 1.2 au lot P0c, 1.1 au lot P0, 1.0 au lot P0a). Arbitrages DEB-Q1 à DEB-Q8, DEB-Q11 à
+> DEB-Q20 : « recommandations ok » (20/11/2026). Décisions :
 > §8. Documents d'origine, **hors dépôt** (DEB-D2) : cahier des charges « Document de cadrage » (novembre 2026) et
 > modèle de fiche d'expression de besoin (FEB), tenus par le développeur.
 
@@ -45,7 +45,8 @@ sauvegardé.
 
 Réponse de l'IA : **JSON structuré** `{ message, propositions: [{ rubrique, valeur, justification }], horsPerimetre }`,
 lu par une fonction pure (`ReponseIA.Lire`) : rubrique inconnue → proposition écartée et signalée ; JSON invalide →
-refus explicite, la fiche reste inchangée. Ce contrat est figé par des tests sur des réponses d'exemple.
+refus explicite, la fiche reste inchangée. Ce contrat est figé par des tests sur des réponses d'exemple ; ses règles de
+tolérance sont fixées par DEB-Q19. Codes de rubrique (camelCase, `situationActuelle`…) : `Catalogue.cs` du Domaine.
 
 ## 3. Modèle de la fiche (d'après le modèle FEB)
 
@@ -62,21 +63,23 @@ refus explicite, la fiche reste inchangée. Ce contrat est figé par des tests s
 | Confirmation | Case « je confirme… », date de confirmation | Agent (DEB-Q5) |
 | Circuit | Décision du chef de service, auteur, date, commentaire | Simulation (DEB-Q3) |
 
-Chaque champ porte `Valeur`, `Origine` (`Vide`, `ProposeeIA`, `AccepteeIA`, `Manuelle`) et au plus une
-`PropositionEnAttente`. Une fiche est **complète** quand toutes les rubriques obligatoires ont une valeur acceptée ou
-manuelle.
+Soit 17 rubriques, dont 10 obligatoires. Chaque champ porte `Valeur`, `Origine` (`Vide`, `AccepteeIA`, `Manuelle` ;
+`ProposeeIA` retirée par DEB-Q13) et au plus une `PropositionEnAttente` ; « Proposée » = vide avec une proposition en
+attente. Une fiche est **complète** quand toutes les rubriques obligatoires ont une valeur acceptée ou manuelle.
 
 **Statuts** : `Brouillon → Soumise → Validee | ACompleter | Refusee` ; `ACompleter → Brouillon` (l'agent reprend la
-fiche). Refus et demande de compléments exigent un commentaire. Une fiche `Validee` ou `Refusee` n'est plus modifiable.
+fiche). Refus et demande de compléments exigent un commentaire. Seule une fiche `Brouillon` est modifiable (DEB-Q16) ; la
+reprise d'une fiche `ACompleter` demande une nouvelle confirmation.
 
 ## 4. Architecture (modèle générique du harnais central)
 
 ```
 ExpressionBesoin/src/
-  ExpressionBesoin.Domain          FicheBesoin, Rubrique, Champ, Statut, Resultat<T> ; fonctions pures :
-                                   Fiche.AppliquerPropositions, Fiche.ModifierChamp, Completude.Manquantes,
-                                   Dialogue.ProchaineRubrique, Cycle.Appliquer(fiche, evenement, maintenant),
-                                   Numerotation.Suivant(annee, dernier), ReponseIA.Lire, ContenuDocument.Construire
+  ExpressionBesoin.Domain          FicheBesoin, Rubrique, Champ, Statut, Resultat<T> ; fonctions pures (B1) :
+                                   Fiche.AppliquerPropositions, ModifierChamp, AccepterProposition, RejeterProposition,
+                                   Completude.Manquantes, Dialogue.ProchaineRubrique, Cycle.Soumettre, Cycle.Decider,
+                                   Cycle.Reprendre (une fonction par transition, horloge en paramètre),
+                                   Numerotation.Suivant(annee, dernier), ReponseIA.Lire ; ContenuDocument.Construire (I2)
   ExpressionBesoin.Application     cas d'usage lire -> décider -> écrire ; ports IDepotFiches, IAssistantIA,
                                    IGenerateurDocument, IReferentielOrganisation ; TimeProvider en paramètre
   ExpressionBesoin.Infrastructure  SQLite (fiche en JSON + colonnes de liste) ; OpenXML sur le gabarit FEB ;
@@ -112,7 +115,7 @@ en-tête simple, jamais pris pour une autorisation.
 ## 6. Les deux pages
 
 ```
-┌ Dialogue ───────────────────────────┬ Fiche EB-…  [Brouillon]  ▓▓▓▓▓░░ 11/13 ┐
+┌ Dialogue ───────────────────────────┬ Fiche EB-…  [Brouillon]  ▓▓▓▓▓░░  7/10 ┐
 │ Agent : La DGCCRF doit contrôler…   │ 2. Situation actuelle  [IA acceptée]  │
 │ IA : Comment les contrôles se       │ 2. Difficultés         [Proposée ✓ ✗] │
 │      déroulent-ils aujourd'hui ?    │ 3. Résultat recherché  [Manuelle]     │
@@ -162,6 +165,14 @@ F2 sont lancés à la main (`npm test`) et leur sortie jointe au compte rendu.
 | DEB-Q12 | Persistance (I1) : `Microsoft.Data.Sqlite` sans Entity Framework ; une table de fiches, contenu en JSON, colonnes de liste. |
 | DEB-D3 | Chaque réponse de l'assistant se termine par la commande `Ouvrir-Session` de la prochaine session, prête à copier (demande du développeur). |
 | DEB-D4 | Point de terminaison de la V1 : lot R1, critère du §1 ; périmètre gelé, le reste en évolutions V2 (demande du développeur). |
+| DEB-Q13 | Origine d'un champ : `Vide`, `AccepteeIA`, `Manuelle` ; une proposition vit toujours dans la proposition en attente ; « Proposée » se calcule (vide + proposition). |
+| DEB-Q14 | Ordre de questionnement : obligatoires dans l'ordre du modèle, Résumé en dernier ; une rubrique vide avec une proposition en attente est sautée. |
+| DEB-Q15 | Fusion : toute proposition va en attente (la nouvelle remplace l'ancienne), la valeur retenue n'est jamais touchée ; proposition égale à la valeur ignorée ; acceptation possible sur une rubrique manuelle ; saisie vide → `Vide` ; valeurs sans espaces de bord ; saisie égale à la proposition → proposition retirée. |
+| DEB-Q16 | Seule une fiche `Brouillon` est modifiable ; `ACompleter` passe par la reprise, qui remet la confirmation à zéro. |
+| DEB-Q17 | Soumission : fiche complète, confirmation cochée, aucune proposition en attente (même facultative) ; numéro attribué à la première soumission, gardé ensuite. |
+| DEB-Q18 | Circuit : liste des décisions, on ne fait qu'ajouter ; le .docx lira la dernière. |
+| DEB-Q19 | `ReponseIA.Lire` : codes de rubrique casse ignorée ; une seule clôture ```` ```json ```` tolérée ; `horsPerimetre` booléen ; justification obligatoire ; doublon → la première gardée. |
+| DEB-Q20 | Mutations de B1 sur une copie jetable du poste (`%TEMP%`), par une commande fournie avec le lot. |
 | DEB-D2 | Dépôt **public** : aucun document interne versionné (cahier des charges, modèle FEB) tant que DEB-Q9 n'est pas tranchée ; le présent plan en tient lieu. |
 
 Questions ouvertes :
@@ -169,4 +180,5 @@ Questions ouvertes :
 | N° | Question | Recommandation |
 | --- | --- | --- |
 | DEB-Q9 | Le modèle FEB vierge (gabarit du générateur .docx) peut-il être versionné dans ce dépôt public ? | Oui au lot I2 s'il ne contient aucune donnée (modèle de formulaire) ; sinon, gabarit lu hors dépôt par un chemin configuré |
+| DEB-Q2 | Fournisseur et technologie de l'IA (à trancher avant A1) | `Microsoft.Extensions.AI` (`IChatClient`) dans Infrastructure, derrière `IAssistantIA` ; client compatible OpenAI, adresse, modèle et clé en configuration (clé hors dépôt) ; un appel par tour, sortie contrainte par schéma JSON quand le fournisseur le permet, toujours relue par `ReponseIA.Lire` ; ni agent ni appel d'outils. Fournisseur : Albert API (DINUM) si le ministère y a accès, sinon API Mistral ; repli hors réseau : IA scénarisée |
 | DEB-Q10 | `node_modules` versionné (gabarit F3) ? | Non : dépôt public, poste avec accès npm ; `package-lock.json` versionné, `npm ci` |

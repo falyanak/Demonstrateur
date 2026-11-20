@@ -66,3 +66,19 @@
   un point de terminaison même pour une première version simplifiée (DEB-D4 : lot R1, critère du plan §1, périmètre
   gelé, évolutions V2 listées au prompt §6).
 - P0c : plan v1.2 (§1, §7, §8), prompt de reprise (ÉTAT, §0, §3, §6, §7), historique. Documents seuls.
+
+## 20/11/2026 — B1 : Domaine de la fiche
+
+- Session ouverte sur `8b64c420dc0c` : 8 pièces reçues, tailles et SHA-256 conformes à `PIECES.txt`, archive à 46
+  entrées comme l'annonce `MASQUAGE.txt`.
+- Plan de B1 présenté avant rédaction ; arbitrages DEB-Q13 à DEB-Q20 : « recommandations ok ». Écarts au plan v1.2
+  tracés en v1.3 : origine `ProposeeIA` retirée (DEB-Q13) ; `Cycle.Appliquer(fiche, evenement, maintenant)` remplacé par
+  une fonction par transition (`Soumettre`, `Decider`, `Reprendre`), sans hiérarchie d'événements (un record abstrait
+  laisse des membres non couverts, règles annexe « Couverture ») ; maquette du §6 corrigée (10 obligatoires).
+- Question du développeur sur le chatbot et la technologie du dialogue : recommandation inscrite pour DEB-Q2 (plan §8),
+  décision attendue avant A1.
+- B1 : `ListeImmuable<T>` (égalité structurelle, pour que les records se comparent champ par champ) ; `Fiches/` :
+  `Catalogue`, types de la fiche, `Fiche`, `Completude`, `Dialogue`, `Cycle`, `Numerotation`, `ReponseIA` ; 164 tests
+  ESTIMÉS (Domain 25 → 189). Vérifié chez l'assistant : syntaxe C# (tree-sitter, contrôle d'abord mis en échec sur un
+  fichier fautif), attendus recalculés par une réplique Python. Non vérifié : compilation, tests, couverture,
+  mutations (poste).
