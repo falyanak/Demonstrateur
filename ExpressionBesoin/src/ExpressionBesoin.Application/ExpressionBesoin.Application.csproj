@@ -1,0 +1,10 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- Application : aucune entrée/sortie. Domaine seul ; aucun paquet, framework ni assembly
+       (ExpressionBesoin.Architecture.Tests). Un besoin d'E/S s'exprime par un port, jamais par une référence. -->
+  <ItemGroup>
+    <ProjectReference Include="..\ExpressionBesoin.Domain\ExpressionBesoin.Domain.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <InternalsVisibleTo Include="ExpressionBesoin.Application.Tests" />
+  </ItemGroup>
+</Project>

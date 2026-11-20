@@ -1,0 +1,6 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- Domaine : aucune référence de projet, de paquet, de framework ni d'assembly (ExpressionBesoin.Architecture.Tests). -->
+  <ItemGroup>
+    <InternalsVisibleTo Include="ExpressionBesoin.Domain.Tests" />
+  </ItemGroup>
+</Project>

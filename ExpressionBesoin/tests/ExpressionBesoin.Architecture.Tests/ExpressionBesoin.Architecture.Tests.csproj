@@ -1,0 +1,3 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- Aucune référence de projet : les règles se lisent dans les .csproj de src (modèle générique §4.3). -->
+</Project>

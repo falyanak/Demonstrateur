@@ -1,0 +1,14 @@
+<Project>
+  <!-- Propriétés communes à tous les projets de la solution (modèle générique du harnais, §4.1). -->
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <LangVersion>latest</LangVersion>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <WarningsAsErrors>$(WarningsAsErrors);nullable</WarningsAsErrors>
+    <Deterministic>true</Deterministic>
+    <IsPackable>false</IsPackable>
+    <!-- Version relue par GET api/sante (version informative de l'assembly). -->
+    <Version>0.1.0</Version>
+  </PropertyGroup>
+</Project>

@@ -1,6 +1,7 @@
 # Plan du démonstrateur « Expression de besoin » (version simplifiée)
 
-> Version 1.0 du 20/11/2026 (lot P0a). Arbitrages DEB-Q1 à DEB-Q8 : « recommandations ok » (20/11/2026). Décisions :
+> Version 1.1 du 20/11/2026 (lot P0 ; 1.0 au lot P0a). Arbitrages DEB-Q1 à DEB-Q8, DEB-Q11, DEB-Q12 : « recommandations
+> ok » (20/11/2026). Décisions :
 > §8. Documents d'origine, **hors dépôt** (DEB-D2) : cahier des charges « Document de cadrage » (novembre 2026) et
 > modèle de fiche d'expression de besoin (FEB), tenus par le développeur.
 
@@ -150,6 +151,8 @@ F2 sont lancés à la main (`npm test`) et leur sortie jointe au compte rendu.
 | DEB-Q7 | Pas de flux SSE en v1 : réponse entière, indicateur d'attente. |
 | DEB-Q8 | Démonstration sur le poste local, profil `Localhost` ; pas de livraison IIS. |
 | DEB-D1 | Dépôt `Demonstrateur`, nommé comme le distant `https://github.com/falyanak/Demonstrateur.git` ; racine `C:\Dev\Demonstrateur` (au lieu de `C:\Dev\ExpressionBesoin` envisagé par DEB-Q1) ; solution dans le dossier `ExpressionBesoin/`. |
+| DEB-Q11 | Paquets NuGet : `nuget.config` propre au projet, nuget.org seul. |
+| DEB-Q12 | Persistance (I1) : `Microsoft.Data.Sqlite` sans Entity Framework ; une table de fiches, contenu en JSON, colonnes de liste. |
 | DEB-D2 | Dépôt **public** : aucun document interne versionné (cahier des charges, modèle FEB) tant que DEB-Q9 n'est pas tranchée ; le présent plan en tient lieu. |
 
 Questions ouvertes :

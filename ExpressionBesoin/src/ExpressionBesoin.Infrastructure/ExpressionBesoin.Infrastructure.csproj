@@ -1,0 +1,11 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- Infrastructure : adaptateurs des ports (SQLite par Microsoft.Data.Sqlite sans Entity Framework, DEB-Q12 ;
+       génération .docx ; IA). Paquets permis. -->
+  <ItemGroup>
+    <ProjectReference Include="..\ExpressionBesoin.Domain\ExpressionBesoin.Domain.csproj" />
+    <ProjectReference Include="..\ExpressionBesoin.Application\ExpressionBesoin.Application.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <InternalsVisibleTo Include="ExpressionBesoin.Infrastructure.Tests" />
+  </ItemGroup>
+</Project>

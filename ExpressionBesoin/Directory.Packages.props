@@ -1,0 +1,16 @@
+<Project>
+  <!-- Une version par paquet (gestion centralisée). Versions publiées depuis plus de 14 jours au 20/11/2026. -->
+  <PropertyGroup>
+    <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+  </PropertyGroup>
+  <ItemGroup>
+    <!-- xUnit v3 retenu, pas la v4 (4.0.0 du 15/08/2026) : migration de tous les projets ensemble, après essai (règles,
+         annexe « xUnit »). 3.2.2 : version résolue sur le poste le 08/11/2026 (démonstration du harnais, lot OT1c). -->
+    <PackageVersion Include="xunit.v3" Version="3.2.2" />
+    <!-- 3.1.5 : dernière de la série 3, celle qui accompagne xunit.v3 3.x (la série 4 accompagne xUnit 4). -->
+    <PackageVersion Include="xunit.runner.visualstudio" Version="3.1.5" />
+    <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="18.10.1" />
+    <!-- Même version majeure que le framework partagé ASP.NET Core 10. -->
+    <PackageVersion Include="Microsoft.AspNetCore.Mvc.Testing" Version="10.0.12" />
+  </ItemGroup>
+</Project>

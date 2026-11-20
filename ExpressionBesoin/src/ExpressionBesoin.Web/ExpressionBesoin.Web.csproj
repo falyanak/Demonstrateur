@@ -1,0 +1,11 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+  <!-- Web : composition. Toutes les couches ; paquets permis. -->
+  <ItemGroup>
+    <ProjectReference Include="..\ExpressionBesoin.Domain\ExpressionBesoin.Domain.csproj" />
+    <ProjectReference Include="..\ExpressionBesoin.Application\ExpressionBesoin.Application.csproj" />
+    <ProjectReference Include="..\ExpressionBesoin.Infrastructure\ExpressionBesoin.Infrastructure.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <InternalsVisibleTo Include="ExpressionBesoin.Web.Tests" />
+  </ItemGroup>
+</Project>

@@ -1,0 +1,20 @@
+<Solution>
+  <Folder Name="/Elements de solution/">
+    <File Path="Directory.Build.props" />
+    <File Path="Directory.Packages.props" />
+    <File Path="global.json" />
+    <File Path="nuget.config" />
+    <File Path="tests/Directory.Build.props" />
+  </Folder>
+  <Folder Name="/src/">
+    <Project Path="src/ExpressionBesoin.Domain/ExpressionBesoin.Domain.csproj" />
+    <Project Path="src/ExpressionBesoin.Application/ExpressionBesoin.Application.csproj" />
+    <Project Path="src/ExpressionBesoin.Infrastructure/ExpressionBesoin.Infrastructure.csproj" />
+    <Project Path="src/ExpressionBesoin.Web/ExpressionBesoin.Web.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/ExpressionBesoin.Domain.Tests/ExpressionBesoin.Domain.Tests.csproj" />
+    <Project Path="tests/ExpressionBesoin.Web.Tests/ExpressionBesoin.Web.Tests.csproj" />
+    <Project Path="tests/ExpressionBesoin.Architecture.Tests/ExpressionBesoin.Architecture.Tests.csproj" />
+  </Folder>
+</Solution>
