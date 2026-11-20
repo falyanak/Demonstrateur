@@ -152,3 +152,17 @@
       Set-Location C:\Dev\Demonstrateur; & { $ErrorActionPreference = 'Stop'; $copie = Join-Path $env:TEMP ('deb-mut-I1-' + [guid]::NewGuid().ToString('N')); git clone -q C:\Dev\Demonstrateur $copie; if ($LASTEXITCODE) { throw 'clonage' }; $projet = Join-Path $copie 'ExpressionBesoin\tests\ExpressionBesoin.Infrastructure.Tests\ExpressionBesoin.Infrastructure.Tests.csproj'; $mutations = @(@{ Nom = 'M7'; Fichier = 'ExpressionBesoin\src\ExpressionBesoin.Infrastructure\Fiches\SchemaFiches.cs'; Avant = 'ORDER BY CreeeLe DESC, rowid DESC'; Apres = 'ORDER BY CreeeLe ASC, rowid ASC' }, @{ Nom = 'M8'; Fichier = 'ExpressionBesoin\src\ExpressionBesoin.Infrastructure\Sqlite\ConnexionsSqlite.cs'; Avant = 'DqsDml, 0, out _'; Apres = 'DqsDml, 1, out _' }); foreach ($m in $mutations) { $chemin = Join-Path $copie $m.Fichier; $texte = [IO.File]::ReadAllText($chemin); if (-not $texte.Contains($m.Avant)) { throw ($m.Nom + ' : motif absent') }; [IO.File]::WriteAllText($chemin, $texte.Replace($m.Avant, $m.Apres)); dotnet build $projet -c Debug -v q -nologo | Out-Null; if ($LASTEXITCODE) { throw ($m.Nom + ' : compilation') }; $dll = (dotnet msbuild $projet -getProperty:TargetPath -p:Configuration=Debug | Out-String).Trim(); $sortie = & ([IO.Path]::ChangeExtension($dll, '.exe')) | Out-String -Width 200; $code = $LASTEXITCODE; $total = ($sortie -split "`r?`n") | Where-Object { $_ -match 'Total:' } | Select-Object -Last 1; Write-Host ($m.Nom + ' : code ' + $code + ' ;' + $total); git -C $copie checkout -q -- $m.Fichier }; Remove-Item -Recurse -Force $copie }
 
   Attendu : `M7 : code 1 ; … Failed: 1 …` puis `M8 : code 1 ; … Failed: 1 …`.
+
+## 20/11/2026 — I1 validé, I1b : comptes et mesures
+
+- `Appliquer-Lot I1` : 18 fichiers écrits et relus, compilation Release, 352 tests (Domain 189, Application 65,
+  Infrastructure 48, Web 30, Architecture 20), 0 échec ; « LOT I1 APPLIQUÉ » ; commit `f42de12`. Les 48 tests ESTIMÉS
+  au lot I1 sont confirmés par la mesure ; les points non vérifiés chez l'assistant (compilation, appel natif
+  `sqlite3_db_config`, JSON de `Utf8JsonWriter` à l'octet) sont levés par ces tests verts.
+- Mutations sur clone jetable dans `%TEMP%` (DEB-Q20), par la commande de l'entrée I1 : M7 → 1 échec ; M8 → 1 échec ;
+  2 sur 2 détectées.
+- `Lancer-Couverture -UpdateBaseline` : Domain, Application, Infrastructure, Web ; lignes 918/918, branches 266/266
+  (100 %), « COUVERTURE CONFORME », base inchangée, rien à commiter. Critère de fin d'I1 atteint.
+- `Ouvrir-Session` (20261120-234006) : 352 tests (Debug), 2 points d'ATTENTION attendus avant clôture (1 commit à
+  publier, sauvegarde à `e66d248`), levés par I1b.
+- I1b : prompt de reprise (ÉTAT, §0, §1, §2, §3, §4, §5, §7), historique. Documents seuls.
