@@ -329,7 +329,18 @@ public sealed class ServiceFichesTests
 
         Assert.Equal("EB-2026-0001.docx", document.NomFichier);
         Assert.Equal(Encoding.UTF8.GetBytes("docx de EB-2026-0001"), document.Contenu);
-        Assert.Equal(Validee(), Assert.Single(banc.Generateur.Recues));
+        Assert.Equal(ContenuDocument.Construire(Validee(), FuseauPlusUneHeure), Assert.Single(banc.Generateur.Recus));
+    }
+
+    [Fact]
+    public async Task Telecharger_date_le_document_dans_le_fuseau_du_service()
+    {
+        var banc = Monter();
+        banc.Depot.Placer(Validee() with { EnTete = EnTeteFictif with { CreeeLe = VeilleDuNouvelAn } });
+
+        Valeur(await banc.Service.Telecharger(Id, Annulation));
+
+        Assert.Equal("01/01/2027", Assert.Single(banc.Generateur.Recus).DateDemande);
     }
 
     [Fact]
@@ -340,7 +351,7 @@ public sealed class ServiceFichesTests
 
         Assert.Equal("document.nonValidee", CodeRefus(await banc.Service.Telecharger(Id, Annulation)));
         Assert.Equal("fiche.introuvable", CodeRefus(await banc.Service.Telecharger(IdAbsent, Annulation)));
-        Assert.Empty(banc.Generateur.Recues);
+        Assert.Empty(banc.Generateur.Recus);
     }
 
     // --- Parcours du critère de fin de la V1 (plan §1), attentes terminées puis différées ---

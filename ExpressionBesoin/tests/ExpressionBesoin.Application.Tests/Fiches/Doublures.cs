@@ -108,17 +108,17 @@ internal sealed class AssistantScenarise(bool differe, params string[] reponses)
 
 internal sealed class GenerateurFactice(bool differe = false) : IGenerateurDocument
 {
-    public List<FicheBesoin> Recues { get; } = [];
+    public List<ContenuDocument> Recus { get; } = [];
 
-    public async ValueTask<byte[]> Generer(FicheBesoin fiche, CancellationToken annulation)
+    public async ValueTask<byte[]> Generer(ContenuDocument contenu, CancellationToken annulation)
     {
         if (differe)
         {
             await Task.Yield();
         }
 
-        Recues.Add(fiche);
-        return Encoding.UTF8.GetBytes("docx de " + fiche.Numero);
+        Recus.Add(contenu);
+        return Encoding.UTF8.GetBytes("docx de " + contenu.Numero);
     }
 }
 

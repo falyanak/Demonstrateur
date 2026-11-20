@@ -40,10 +40,14 @@ public interface IAssistantIA
     ValueTask<string> Repondre(ContexteTour contexte, CancellationToken annulation);
 }
 
-/// <summary>Production du .docx au modèle FEB depuis une fiche validée (lot I2).</summary>
+/// <summary>
+/// Production du .docx au modèle FEB (lot I2) depuis le contenu construit par le Domaine
+/// (<see cref="ContenuDocument.Construire"/>, DEB-Q36) : l'adaptateur ne fait que la mise en page. Mêmes entrées, mêmes
+/// octets (DEB-Q37).
+/// </summary>
 public interface IGenerateurDocument
 {
-    ValueTask<byte[]> Generer(FicheBesoin fiche, CancellationToken annulation);
+    ValueTask<byte[]> Generer(ContenuDocument contenu, CancellationToken annulation);
 }
 
 /// <summary>Référentiel fictif agent → service → chef de service (plan §3, DEB-Q6).</summary>

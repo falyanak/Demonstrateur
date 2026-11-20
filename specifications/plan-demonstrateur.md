@@ -1,9 +1,10 @@
 # Plan du démonstrateur « Expression de besoin » (version simplifiée)
 
-> Version 1.6 du 20/11/2026 (lot I1 ; 1.5 au lot B2, 1.4 au lot B1b, 1.3 au lot B1, 1.2 au lot P0c, 1.1 au lot P0, 1.0 au
-> lot P0a). Arbitrages DEB-Q1 à DEB-Q8, DEB-Q11 à DEB-Q32 : « recommandations ok » (20/11/2026). Décisions :
-> §8. Documents d'origine, **hors dépôt** (DEB-D2) : cahier des charges « Document de cadrage » (novembre 2026) et
-> modèle de fiche d'expression de besoin (FEB), tenus par le développeur.
+> Version 1.7 du 20/11/2026 (lot I2 ; 1.6 au lot I1, 1.5 au lot B2, 1.4 au lot B1b, 1.3 au lot B1, 1.2 au lot P0c, 1.1 au
+> lot P0, 1.0 au lot P0a). Arbitrages DEB-Q1 à DEB-Q8, DEB-Q11 à DEB-Q32 : « recommandations ok » (20/11/2026) ; DEB-Q9 :
+> « ok » (20/11/2026) ; DEB-Q33 à DEB-Q37 : proposées au lot I2, à confirmer. Décisions : §8. Document d'origine **hors
+> dépôt** (DEB-D2) : cahier des charges « Document de cadrage » (novembre 2026), tenu par le développeur ; le modèle de
+> fiche (FEB) est versionné, nettoyé de ses métadonnées (DEB-Q9, DEB-Q33).
 
 ## 1. Objet et périmètre
 
@@ -79,13 +80,15 @@ ExpressionBesoin/src/
                                    Fiche.AppliquerPropositions, ModifierChamp, AccepterProposition, RejeterProposition,
                                    Completude.Manquantes, Dialogue.ProchaineRubrique, Cycle.Soumettre, Cycle.Decider,
                                    Cycle.Reprendre (une fonction par transition, horloge en paramètre),
-                                   Numerotation.Suivant(annee, dernier), ReponseIA.Lire ; ContenuDocument.Construire (I2)
+                                   Numerotation.Suivant(annee, dernier), ReponseIA.Lire ; ContenuDocument.Construire
+                                   (I2 : textes du .docx, dates dans le fuseau, dernière décision)
   ExpressionBesoin.Application     cas d'usage lire -> décider -> écrire (B2) : ServiceFiches (coquille, une méthode par
                                    route du §5), DecisionsFiches (pures) ; ports IDepotFiches (fiche + historique du
                                    dialogue, écrits ensemble), IAssistantIA (contexte du tour -> texte brut, relu par
                                    ReponseIA.Lire), IGenerateurDocument, IReferentielOrganisation ; TimeProvider, fuseau
                                    et générateur d'identifiants injectés
-  ExpressionBesoin.Infrastructure  SQLite (fiche en JSON + colonnes de liste) ; OpenXML sur le gabarit FEB ;
+  ExpressionBesoin.Infrastructure  SQLite (fiche en JSON + colonnes de liste) ; .docx sur le gabarit FEB embarqué
+                                   (zip + XML, sans SDK OpenXML, DEB-Q34 ; placement par libellé, DEB-Q35) ;
                                    AssistantIA réel ; AssistantIA scénarisé (démonstration et tests hors réseau)
   ExpressionBesoin.Web             API minimale, deux vues Razor ; ClientApp Vite + TypeScript (features/dialogue,
                                    features/liste)
@@ -97,7 +100,8 @@ Performance :
 - Le prompt place en tête sa partie fixe (consignes, modèle de fiche) pour profiter du cache du fournisseur ; chaque
   tour n'ajoute que l'historique, l'état de la fiche et les rubriques manquantes.
 - Le .docx est produit à la demande depuis la fiche validée, devenue immuable ; métadonnées du paquet fixées pour que
-  la génération soit **déterministe** (testée à l'octet).
+  la génération soit **déterministe** (testée à l'octet, DEB-Q37). Gabarit lu, décompressé et vérifié une seule fois, au
+  démarrage ; image recopiée sans recompression.
 
 ## 5. Contrat de l'API
 
@@ -194,11 +198,16 @@ F2 sont lancés à la main (`npm test`) et leur sortie jointe au compte rendu.
 | DEB-Q30 | Référentiel fictif agent → bureau → chef de service : en code (`ReferentielOrganisationFictif`), sans table. |
 | DEB-Q31 | Fichier de la base : hors dépôt, `%LOCALAPPDATA%\Demonstrateur\fiches.db`, chemin lu dans `appsettings.Localhost.json` (posé au lot F1, avec la composition) ; `*.db` ignoré par git. |
 | DEB-Q32 | Composition des adaptateurs dans `Program` (enregistrement, `Initialiser` au démarrage, création du dossier) : au lot F1, avec les routes ; I1 se limite à l'Infrastructure et à ses tests. |
+| DEB-Q9 | Le modèle FEB vierge est versionné (« ok », 20/11/2026), à la condition qu'il ne porte aucune donnée : voir DEB-Q33. |
+| DEB-Q33 | *Proposée au lot I2, à confirmer.* Gabarit versionné = modèle FEB reçu le 20/11/2026, **métadonnées nettoyées** : nom réel du dernier modificateur et titre d'origine (`core.xml`), modèle d'origine (`app.xml`), lien vers un `.dotx` du profil Windows d'un autre agent (`settings.xml` et sa relation) ; corps, en-tête, pied et logo inchangés. Ressource embarquée de l'Infrastructure ; empreinte figée par un test, absence de métadonnée personnelle vérifiée par un test. |
+| DEB-Q34 | *Proposée au lot I2, à confirmer.* .docx produit par `System.IO.Compression` et `System.Xml.Linq`, sans SDK OpenXML : aucun paquet ajouté, octets entièrement maîtrisés. |
+| DEB-Q35 | *Proposée au lot I2, à confirmer.* Placement par libellé : le modèle n'a ni signet ni contrôle de contenu ; un paragraphe est repéré par le début de son premier run (libellé en gras → le texte remplace l'aide ; ligne d'en-tête → réécrite avec son préfixe) ; ligne « Chef de service » du circuit : décision et observations ; case ☒ si la fiche est confirmée ; saut de ligne → retour à la ligne Word ; caractères interdits en XML retirés. Gabarit écarté du plan → panne au démarrage (`InvalidDataException`), jamais au téléchargement. |
+| DEB-Q36 | *Proposée au lot I2, à confirmer.* `ContenuDocument.Construire(fiche, fuseau)` (Domaine) : dates jj/mm/aaaa dans le fuseau du numéro (DEB-Q24), culture invariante ; rubrique sans valeur retenue → « Non renseigné » ; décision = la dernière (DEB-Q18), observations « auteur, le date : commentaire ». Le port `IGenerateurDocument` reçoit ce contenu, plus la fiche. |
+| DEB-Q37 | *Proposée au lot I2, à confirmer.* Octets stables : parties recopiées dans l'ordre du gabarit, horodatage fixe des entrées (01/01/1980), métadonnées tirées du contenu (création de la fiche, dernière décision), aucune lecture d'horloge ; vérifié par deux générations identiques à l'octet, culture indifférente. |
 
 Questions ouvertes :
 
 | N° | Question | Recommandation |
 | --- | --- | --- |
-| DEB-Q9 | Le modèle FEB vierge (gabarit du générateur .docx) peut-il être versionné dans ce dépôt public ? | Oui au lot I2 s'il ne contient aucune donnée (modèle de formulaire) ; sinon, gabarit lu hors dépôt par un chemin configuré |
 | DEB-Q2 | Fournisseur de l'IA (à trancher avant A1 ; technologie : DEB-D5) | Albert API (DINUM) si le ministère y a accès (hébergement SecNumCloud, modèles Mistral ; sortie contrainte par schéma à vérifier en A1), sinon API Mistral ; repli hors réseau : IA scénarisée |
 | DEB-Q10 | `node_modules` versionné (gabarit F3) ? | Non : dépôt public, poste avec accès npm ; `package-lock.json` versionné, `npm ci` |

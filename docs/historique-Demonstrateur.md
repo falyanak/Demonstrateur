@@ -166,3 +166,49 @@
 - `Ouvrir-Session` (20261120-234006) : 352 tests (Debug), 2 points d'ATTENTION attendus avant clôture (1 commit à
   publier, sauvegarde à `e66d248`), levés par I1b.
 - I1b : prompt de reprise (ÉTAT, §0, §1, §2, §3, §4, §5, §7), historique. Documents seuls.
+
+## 20/11/2026 — I2 : document .docx au modèle FEB
+
+- Session ouverte sur `d70cc7ff17d9` (I1b commité) : 8 pièces reçues, tailles et SHA-256 conformes à `PIECES.txt`,
+  archive à 86 entrées comme l'annonce `MASQUAGE.txt` (0 fichier masqué). Critère de fin d'I1b constaté au journal
+  (0 commit à publier, sauvegarde à HEAD).
+- DEB-Q9 : « ok ». Le modèle `FEB.docx` reçu (272 056 octets) n'a ni signet ni contrôle de contenu ; son corps ne porte
+  aucune donnée, mais ses MÉTADONNÉES en portaient : nom réel du dernier modificateur (`core.xml`), chemin d'un `.dotx`
+  dans le profil Windows d'un autre agent (`settings.xml.rels`), titre et modèle d'origine. Gabarit versionné nettoyé de
+  ces seules parties (270 277 octets, SHA-256 `9A754375…D87B77B4`), corps identique à l'octet. Arbitrages DEB-Q33 à
+  DEB-Q37 proposés et appliqués (plan v1.7, §8), à confirmer.
+- I2 : Domaine `ContenuDocument` (contenu pur : dates dans le fuseau, culture invariante, dernière décision) ; port
+  `IGenerateurDocument` qui reçoit ce contenu ; `ServiceFiches.Telecharger` le construit avec son fuseau ; Infrastructure
+  `Documents/` : `PlanFeb` (marqueurs et remplacements, purs), `GabaritFeb` (vérification, remplissage, sérialisation,
+  purs), `MetadonneesFeb` (core.xml, pur), `GenerateurDocumentFeb` (adaptateur : gabarit décompressé et vérifié une
+  fois ; parties recopiées dans l'ordre, horodatage fixe, image stockée sans recompression) ; `FEB.docx` en ressource
+  embarquée ; `*.docx binary` dans `.gitattributes`. 80 tests ESTIMÉS (total 352 → 432 : Domain +18, Application +1,
+  Infrastructure +61). Test faible, nommé comme tel : `Outil_exemplaire_pour_Word_…` (n'écrit que si `DEB_I2_SORTIE` est
+  posée).
+- Vérifié chez l'assistant : syntaxe C# (tree-sitter, contrôle d'abord mis en échec sur un fichier fautif) ; nettoyage du
+  gabarit déterministe, recherche des métadonnées personnelles vide sur le gabarit nettoyé et positive (7) sur
+  l'original ; placement rejoué par une réplique Python (55 paragraphes, 26 modifiés), document d'essai ouvert et rendu
+  par LibreOffice (libellés en gras, retours à la ligne, emoji, case ☒, ligne du chef) ; attendus des tests recalculés
+  par cette réplique. Non vérifié : compilation, tests, couverture, sérialisation exacte de `XmlWriter` et de
+  `ZipArchive` (méthode « stockée » pour `NoCompression`), ouverture dans Word (poste).
+- Mutations prévues (DEB-Q20), sur clone jetable, après le commit d'I2 : M9 (`ContenuDocument` lit la PREMIÈRE décision)
+  → 1 échec attendu (Domain) ; M10 (`GabaritFeb` écrit la valeur À LA PLACE du libellé) → 5 échecs ESTIMÉS
+  (Infrastructure). Commande, depuis une console Windows PowerShell :
+
+      Set-Location C:\Dev\Demonstrateur; & { $ErrorActionPreference = 'Stop'; $copie = Join-Path $env:TEMP ('deb-mut-I2-' + [guid]::NewGuid().ToString('N')); git clone -q C:\Dev\Demonstrateur $copie; if ($LASTEXITCODE) { throw 'clonage' }; $mutations = @(@{ Nom = 'M9'; Projet = 'ExpressionBesoin\tests\ExpressionBesoin.Domain.Tests\ExpressionBesoin.Domain.Tests.csproj'; Fichier = 'ExpressionBesoin\src\ExpressionBesoin.Domain\Fiches\ContenuDocument.cs'; Avant = 'fiche.Decisions[^1]'; Apres = 'fiche.Decisions[0]' }, @{ Nom = 'M10'; Projet = 'ExpressionBesoin\tests\ExpressionBesoin.Infrastructure.Tests\ExpressionBesoin.Infrastructure.Tests.csproj'; Fichier = 'ExpressionBesoin\src\ExpressionBesoin.Infrastructure\Documents\GabaritFeb.cs'; Avant = 'remplacement.Marqueur.Forme == Forme.Libelle ? 1 : 0'; Apres = '0' }); foreach ($m in $mutations) { $projet = Join-Path $copie $m.Projet; $chemin = Join-Path $copie $m.Fichier; $texte = [IO.File]::ReadAllText($chemin); if (-not $texte.Contains($m.Avant)) { throw ($m.Nom + ' : motif absent') }; [IO.File]::WriteAllText($chemin, $texte.Replace($m.Avant, $m.Apres)); dotnet build $projet -c Debug -v q -nologo | Out-Null; if ($LASTEXITCODE) { throw ($m.Nom + ' : compilation') }; $dll = (dotnet msbuild $projet -getProperty:TargetPath -p:Configuration=Debug | Out-String).Trim(); $sortie = & ([IO.Path]::ChangeExtension($dll, '.exe')) | Out-String -Width 200; $code = $LASTEXITCODE; $total = ($sortie -split "`r?`n") | Where-Object { $_ -match 'Total:' } | Select-Object -Last 1; Write-Host ($m.Nom + ' : code ' + $code + ' ;' + $total); git -C $copie checkout -q -- $m.Fichier }; Remove-Item -Recurse -Force $copie }
+
+  Attendu : `M9 : code 1 ; … Failed: 1 …` puis `M10 : code 1 ; … Failed: 5 …` (5 estimé ; au moins 1).
+- Exemplaire pour Word (critère de fin d'I2), après le commit : la commande lance les tests de l'Infrastructure avec
+  `DEB_I2_SORTIE` posée, puis ouvre le fichier écrit (fiche fictive EB-2026-0007 validée) :
+
+      Set-Location C:\Dev\Demonstrateur; & { $ErrorActionPreference = 'Stop'; $projet = 'C:\Dev\Demonstrateur\ExpressionBesoin\tests\ExpressionBesoin.Infrastructure.Tests\ExpressionBesoin.Infrastructure.Tests.csproj'; dotnet build $projet -c Debug -v q -nologo | Out-Null; if ($LASTEXITCODE) { throw 'compilation' }; $dll = (dotnet msbuild $projet -getProperty:TargetPath -p:Configuration=Debug | Out-String).Trim(); $fichier = Join-Path $env:TEMP 'EB-2026-0007.docx'; $env:DEB_I2_SORTIE = $fichier; try { & ([IO.Path]::ChangeExtension($dll, '.exe')) | Out-Null; if ($LASTEXITCODE) { throw 'tests en échec' } } finally { Remove-Item Env:DEB_I2_SORTIE }; Invoke-Item $fichier }
+
+  Attendu : Word s'ouvre sans message de réparation, en-tête DGCCRF et logo du modèle, rubriques renseignées, case ☒,
+  « Validée » dans la ligne « Chef de service ».
+- 21/11/2026 : `Appliquer-Lot I2` : 21 fichiers écrits, compilation Release, 432 tests (Domain 207, Application 66,
+  Infrastructure 109, Web 30, Architecture 20) — les comptes ESTIMÉS sont confirmés — dont 1 échec :
+  `GabaritFebTests.Octets_echappe_les_caracteres_speciaux_du_texte` ; pas de commit (ligne enchaînée). Cause retenue
+  (hypothèse, message d'échec non relevé) : `Assert.DoesNotContain(string, string)` de xUnit compare selon la culture ;
+  sous ICU, « \u0001 » est ignorable et se trouve dans tout texte. Défaut du test, pas du code. Lot I2a : I2 complet,
+  ce test en comparaison ordinale et sans exigence sur « > » (XML n'impose que « & » et « < »). Leçon générique à verser
+  aux règles par un lot du harnais : assertion sur une sous-chaîne → `StringComparison.Ordinal`.

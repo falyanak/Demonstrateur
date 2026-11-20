@@ -9,6 +9,10 @@
     <PackageReference Include="Microsoft.Data.Sqlite" />
   </ItemGroup>
   <ItemGroup>
+    <!-- Modèle FEB nettoyé de ses métadonnées (DEB-Q9, DEB-Q33), lu par GenerateurDocumentFeb.DepuisRessource. -->
+    <EmbeddedResource Include="Documents\FEB.docx" LogicalName="ExpressionBesoin.Infrastructure.Documents.FEB.docx" />
+  </ItemGroup>
+  <ItemGroup>
     <InternalsVisibleTo Include="ExpressionBesoin.Infrastructure.Tests" />
   </ItemGroup>
 </Project>

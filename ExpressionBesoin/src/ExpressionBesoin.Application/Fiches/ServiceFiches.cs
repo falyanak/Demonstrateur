@@ -6,7 +6,8 @@ namespace ExpressionBesoin.Application.Fiches;
 
 /// <summary>
 /// Cas d'usage des fiches, un par route du plan §5 : coquille lire → décider → écrire, sans décision (elles sont dans
-/// <see cref="DecisionsFiches"/> et le Domaine). <paramref name="fuseau"/> : fuseau de l'année du numéro (DEB-Q24) ;
+/// <see cref="DecisionsFiches"/> et le Domaine). <paramref name="fuseau"/> : fuseau de l'année du numéro (DEB-Q24) et des
+/// dates du document (DEB-Q36) ;
 /// <paramref name="nouvelIdentifiant"/> : identifiant d'une fiche créée. Une exception d'un port (panne technique) se
 /// propage : rien n'est écrit après elle (DEB-Q22).
 /// </summary>
@@ -103,8 +104,8 @@ public sealed class ServiceFiches(
             return refus!;
         }
 
-        var contenu = await generateur.Generer(fiche, annulation);
-        return Resultat.Succes(new DocumentFiche(DecisionsFiches.NomDocument(fiche), contenu));
+        var octets = await generateur.Generer(ContenuDocument.Construire(fiche, fuseau), annulation);
+        return Resultat.Succes(new DocumentFiche(DecisionsFiches.NomDocument(fiche), octets));
     }
 
     private async ValueTask<Resultat<FicheBesoin>> Modifier(
