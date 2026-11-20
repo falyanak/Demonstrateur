@@ -1,0 +1,5 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\ExpressionBesoin.Infrastructure\ExpressionBesoin.Infrastructure.csproj" />
+  </ItemGroup>
+</Project>

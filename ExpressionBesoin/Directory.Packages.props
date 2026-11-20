@@ -13,4 +13,9 @@
     <!-- Même version majeure que le framework partagé ASP.NET Core 10. -->
     <PackageVersion Include="Microsoft.AspNetCore.Mvc.Testing" Version="10.0.12" />
   </ItemGroup>
+  <ItemGroup>
+    <!-- Infrastructure (lot I1, DEB-Q12) : SQLite sans Entity Framework ; série 10.0 du framework, 10.0.11 relevée sur
+         nuget.org le 20/11/2026 (SQLitePCLRaw 2.1.x, appel natif sqlite3_db_config de ConnexionsSqlite). -->
+    <PackageVersion Include="Microsoft.Data.Sqlite" Version="10.0.11" />
+  </ItemGroup>
 </Project>

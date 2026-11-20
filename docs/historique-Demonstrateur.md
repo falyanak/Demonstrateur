@@ -126,3 +126,29 @@
   M5 (année du numéro lue en UTC, fuseau ignoré, DEB-Q24) → 2 échecs ; M6 (propositions gardées hors périmètre,
   DEB-Q23) → 1 échec ; 2 sur 2 détectées. Critère de fin de B2 atteint ; chantier B clos.
 - B2b : prompt de reprise (ÉTAT, §1, §7), historique. Documents seuls.
+
+## 20/11/2026 — I1 : Infrastructure SQLite et référentiel fictif
+
+- Session ouverte sur `e66d24892f2e` (B2b commité) : 8 pièces reçues, tailles et SHA-256 conformes à `PIECES.txt`,
+  archive à 74 entrées comme l'annonce `MASQUAGE.txt` (0 fichier masqué). Critère de fin de B2b constaté au journal
+  (0 commit à publier, sauvegarde à HEAD).
+- Plan d'I1 présenté avant rédaction, critère de fin énoncé ; arbitrages DEB-Q28 à DEB-Q32 : « recommandations ok »
+  (plan v1.6, §8).
+- I1 : `ExpressionBesoin.Infrastructure` (`CodecFiche` pur : JSON écrit et lu à la main, sans réflexion ;
+  `SchemaFiches` : schéma et requêtes, `DoitCreer` pur ; `ConnexionsSqlite` : clés étrangères, guillemets doubles
+  refusés par `sqlite3_db_config` ; `DepotFichesSqlite` : coquille, tour atomique en une transaction `BEGIN IMMEDIATE`,
+  appels synchrones rendus en `ValueTask` terminée ; `ReferentielOrganisationFictif` : 4 agents, 2 bureaux) ; paquet
+  `Microsoft.Data.Sqlite` 10.0.11 ; projet `ExpressionBesoin.Infrastructure.Tests` (fichier temporaire au schéma de
+  production ; JSON de référence figé à l'octet ; plans de requête vérifiés sans tri) ; configuration du harnais (projet
+  de tests, assembly attendue) et solution. 48 tests ESTIMÉS (total 304 → 352).
+- Vérifié chez l'assistant : syntaxe C# (tree-sitter, contrôle d'abord mis en échec sur un fichier fautif) ; schéma et
+  requêtes rejoués dans sqlite3 3.53 (contraintes, ordre de la liste, MAX ordinal, rang suivant, plans d'exécution) ;
+  JSON de référence, ticks et octets du BLOB recalculés par une réplique Python. Non vérifié : compilation, tests,
+  couverture, appel natif `sqlite3_db_config` de SQLitePCLRaw, échappement exact de `Utf8JsonWriter` (poste).
+- Mutations prévues (DEB-Q20), sur clone jetable, après le commit d'I1 : M7 (liste triée du plus ancien au plus récent)
+  et M8 (guillemets doubles de nouveau lus comme des chaînes), un échec attendu chacune. Commande, depuis une console
+  Windows PowerShell :
+
+      Set-Location C:\Dev\Demonstrateur; & { $ErrorActionPreference = 'Stop'; $copie = Join-Path $env:TEMP ('deb-mut-I1-' + [guid]::NewGuid().ToString('N')); git clone -q C:\Dev\Demonstrateur $copie; if ($LASTEXITCODE) { throw 'clonage' }; $projet = Join-Path $copie 'ExpressionBesoin\tests\ExpressionBesoin.Infrastructure.Tests\ExpressionBesoin.Infrastructure.Tests.csproj'; $mutations = @(@{ Nom = 'M7'; Fichier = 'ExpressionBesoin\src\ExpressionBesoin.Infrastructure\Fiches\SchemaFiches.cs'; Avant = 'ORDER BY CreeeLe DESC, rowid DESC'; Apres = 'ORDER BY CreeeLe ASC, rowid ASC' }, @{ Nom = 'M8'; Fichier = 'ExpressionBesoin\src\ExpressionBesoin.Infrastructure\Sqlite\ConnexionsSqlite.cs'; Avant = 'DqsDml, 0, out _'; Apres = 'DqsDml, 1, out _' }); foreach ($m in $mutations) { $chemin = Join-Path $copie $m.Fichier; $texte = [IO.File]::ReadAllText($chemin); if (-not $texte.Contains($m.Avant)) { throw ($m.Nom + ' : motif absent') }; [IO.File]::WriteAllText($chemin, $texte.Replace($m.Avant, $m.Apres)); dotnet build $projet -c Debug -v q -nologo | Out-Null; if ($LASTEXITCODE) { throw ($m.Nom + ' : compilation') }; $dll = (dotnet msbuild $projet -getProperty:TargetPath -p:Configuration=Debug | Out-String).Trim(); $sortie = & ([IO.Path]::ChangeExtension($dll, '.exe')) | Out-String -Width 200; $code = $LASTEXITCODE; $total = ($sortie -split "`r?`n") | Where-Object { $_ -match 'Total:' } | Select-Object -Last 1; Write-Host ($m.Nom + ' : code ' + $code + ' ;' + $total); git -C $copie checkout -q -- $m.Fichier }; Remove-Item -Recurse -Force $copie }
+
+  Attendu : `M7 : code 1 ; … Failed: 1 …` puis `M8 : code 1 ; … Failed: 1 …`.

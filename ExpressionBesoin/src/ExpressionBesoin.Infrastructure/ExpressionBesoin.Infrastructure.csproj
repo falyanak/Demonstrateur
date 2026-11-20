@@ -6,6 +6,9 @@
     <ProjectReference Include="..\ExpressionBesoin.Application\ExpressionBesoin.Application.csproj" />
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="Microsoft.Data.Sqlite" />
+  </ItemGroup>
+  <ItemGroup>
     <InternalsVisibleTo Include="ExpressionBesoin.Infrastructure.Tests" />
   </ItemGroup>
 </Project>

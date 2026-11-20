@@ -1,7 +1,7 @@
 # Plan du démonstrateur « Expression de besoin » (version simplifiée)
 
-> Version 1.5 du 20/11/2026 (lot B2 ; 1.4 au lot B1b, 1.3 au lot B1, 1.2 au lot P0c, 1.1 au lot P0, 1.0 au lot P0a). Arbitrages
-> DEB-Q1 à DEB-Q8, DEB-Q11 à DEB-Q27 : « recommandations ok » (20/11/2026). Décisions :
+> Version 1.6 du 20/11/2026 (lot I1 ; 1.5 au lot B2, 1.4 au lot B1b, 1.3 au lot B1, 1.2 au lot P0c, 1.1 au lot P0, 1.0 au
+> lot P0a). Arbitrages DEB-Q1 à DEB-Q8, DEB-Q11 à DEB-Q32 : « recommandations ok » (20/11/2026). Décisions :
 > §8. Documents d'origine, **hors dépôt** (DEB-D2) : cahier des charges « Document de cadrage » (novembre 2026) et
 > modèle de fiche d'expression de besoin (FEB), tenus par le développeur.
 
@@ -189,6 +189,11 @@ F2 sont lancés à la main (`npm test`) et leur sortie jointe au compte rendu.
 | DEB-Q25 | Auteur de la décision simulée : le valideur de l'en-tête de la fiche, jamais l'agent courant. |
 | DEB-Q26 | Pas de version optimiste en V1 ; unicité du numéro par index unique (I1) ; la version optimiste rejoint les évolutions V2. |
 | DEB-Q27 | Code de rubrique des routes : casse ignorée (`Catalogue.EssayerTrouver`) ; inconnu → `rubrique.inconnue`. |
+| DEB-Q28 | Contenu JSON de la fiche (I1) : rubriques indexées par leur code du `Catalogue` (jamais par l'ordinal), énumérations par leur nom exact, instants ISO 8601, version `v: 1` ; propriétés nulles et champs initiaux omis ; contenu illisible = panne (`InvalidDataException`), jamais un refus. |
+| DEB-Q29 | Colonnes SQLite (I1) : instants en `INTEGER` (ticks UTC), identifiant en `BLOB` de 16 octets, statut en entier ; tables `STRICT`, historique `WITHOUT ROWID` par (fiche, rang). |
+| DEB-Q30 | Référentiel fictif agent → bureau → chef de service : en code (`ReferentielOrganisationFictif`), sans table. |
+| DEB-Q31 | Fichier de la base : hors dépôt, `%LOCALAPPDATA%\Demonstrateur\fiches.db`, chemin lu dans `appsettings.Localhost.json` (posé au lot F1, avec la composition) ; `*.db` ignoré par git. |
+| DEB-Q32 | Composition des adaptateurs dans `Program` (enregistrement, `Initialiser` au démarrage, création du dossier) : au lot F1, avec les routes ; I1 se limite à l'Infrastructure et à ses tests. |
 
 Questions ouvertes :
 
