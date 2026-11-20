@@ -48,3 +48,14 @@
   chacune détectée (1 à 6 échecs) ; octets, BOM et fins de ligne relevés par Python.
 - NON vérifié : restauration NuGet et compilation des projets de tests contre le vrai xUnit, `SanteContratTests`
   (`WebApplicationFactory`), Windows, SDK 10.0.403, couverture.
+
+## 20/11/2026 — P0 validé ; P0b : mesures inscrites, chantier P clos
+
+- Poste : `Appliquer-Lot P0` (« type Documents → Projet », 42 fichiers, compilation Release, Domain 25, Web 30,
+  Architecture 20, 0 échec), commit `78ff21b` ; `Compter-Tests -Compiler` : 75 tests dans 3 projets, 0 échec ;
+  `Lancer-Couverture -UpdateBaseline` : outils restaurés, lignes 64/64 et branches 16/16 (100 %), « COUVERTURE
+  CONFORME », base relevée et commitée (`a73cb7e`). Les 75 ESTIMÉS au lot P0 sont confirmés par la mesure.
+- Points non vérifiables chez l'assistant et tranchés par le poste : restauration NuGet, compilation des projets de
+  tests avec xunit.v3 3.2.2, xunit.runner.visualstudio 3.1.5 et Microsoft.NET.Test.Sdk 18.10.1 ensemble,
+  `SanteContratTests` (version informative `0.1.0+<commit>`).
+- P0b : prompt de reprise (ÉTAT, §0, §1, §7) et historique. Documents seuls. Chantier P clos ; prochain : B1.
