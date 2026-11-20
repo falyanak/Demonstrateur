@@ -1,6 +1,6 @@
 # Prompt de reprise — Demonstrateur
 
-> Mis à jour le 20/11/2026 par le lot B1. Règles génériques : harnais central, `regles\regles-de-travail.md` (v5) ;
+> Mis à jour le 20/11/2026 par le lot B1b. Règles génériques : harnais central, `regles\regles-de-travail.md` (v5) ;
 > modèle de projet : `regles\harnais-modele-generique.md` (v2) ; front : `regles\gabarit-frontend-vite-aspnet.md` ;
 > outillage : `C:\Dev\Harnais\docs\specification-harnais-central.md` (fait foi).
 > Historique détaillé : `docs/historique-Demonstrateur.md` (non envoyé par défaut). Documents hors dépôt dont dépend ce
@@ -8,27 +8,26 @@
 > `Expression_de_besoin_demonstrateur_IA_SICCRF.docx` (document de cadrage, novembre 2026) et modèle de fiche
 > `FEB.docx`.
 
-## ▶ ÉTAT AU 20/11/2026 (B1 livré, NON VÉRIFIÉ) — À LIRE D'ABORD
+## ▶ ÉTAT AU 20/11/2026 (B1b) — À LIRE D'ABORD
 
-**Où on en est** : P0 validé (75 tests mesurés, couverture 100 / 100). **B1 livré** : Domaine de la fiche (catalogue de
-17 rubriques dont 10 obligatoires, fusion des propositions, saisie, acceptation, complétude, prochaine rubrique, cycle
-des statuts, numérotation, lecture de la réponse de l'IA) et 164 tests, comptes **ESTIMÉS** (Domain 189, total 239) ;
-compilation et couverture non vérifiées chez l'assistant (aucun SDK .NET) : le poste tranche.
-**Critère de fin de B1** : lot appliqué par la ligne enchaînée (compilation, tests, couverture conforme : Domaine à
-100 % lignes et branches, dette vide) ; deux mutations sur copie jetable, chacune détectée (DEB-Q20) ; puis lot **B1b**
-(documents seuls) : comptes MESURÉS, base relevée et commitée.
+**Où on en est** : **B1 validé** sur le poste (commit `3ee722c`) : Domaine de la fiche (catalogue de 17 rubriques dont 10
+obligatoires, fusion des propositions, saisie, acceptation, complétude, prochaine rubrique, cycle des statuts,
+numérotation, lecture de la réponse de l'IA). 239 tests MESURÉS (Domain 189, Web 30, Architecture 20), 0 échec ;
+couverture lignes 410/410, branches 156/156 (100 %), base inchangée ; mutations M1 et M2 détectées (16 et 4 échecs).
+Technologie de l'adaptateur IA fixée (DEB-D5) ; fournisseur ouvert (DEB-Q2).
+**Critère de fin de B1b** : lot appliqué et commité ; branche `main` publiée et sauvegardée.
 **Point de terminaison de la V1** (DEB-D4) : lot R1, critère du plan §1 ; périmètre gelé jusque-là.
-**Prochain pas** : sortie d'`Appliquer-Lot B1` et des mutations, puis B1b ; ensuite B2 (Application : cas d'usage,
-ports, doublures).
+**Prochain pas** : lot B2 (Application : cas d'usage lire → décider → écrire, ports `IDepotFiches`, `IAssistantIA`,
+`IGenerateurDocument`, `IReferentielOrganisation`, doublures ; plan §4, §7), avec son critère de fin énoncé à
+l'ouverture.
 **Ouverture de la session suivante** :
 
     Set-Location C:\Dev\Demonstrateur; . C:\Dev\Harnais\outillage\Charger-Harnais.ps1; Ouvrir-Session -BrancheAttendue main
     # attendu : « SESSION PRÉPARÉE : 8 pièce(s) dans C:\Dev\Sessions\Demonstrateur\<horodatage> » ; joindre toutes les
     # pièces et donner leur compte.
 
-**Décisions récentes** : arbitrages DEB-Q13 à DEB-Q20 (« recommandations ok », 20/11/2026) ; DEB-D3, DEB-D4.
-**Anomalies ouvertes** : aucune. **Questions ouvertes** : DEB-Q2 (fournisseur d'IA, recommandation au plan §8),
-DEB-Q9 (modèle FEB versionné ?), DEB-Q10 (`node_modules` versionné ?).
+**Décisions récentes** : DEB-D5 ; arbitrages DEB-Q13 à DEB-Q20 (20/11/2026). **Anomalies ouvertes** : aucune.
+**Questions ouvertes** : DEB-Q2 (fournisseur d'IA), DEB-Q9 (modèle FEB versionné ?), DEB-Q10 (`node_modules` versionné ?).
 
 ## §0. Protocole (propre au projet)
 
@@ -43,7 +42,7 @@ DEB-Q9 (modèle FEB versionné ?), DEB-Q10 (`node_modules` versionné ?).
 | Tests du front | à partir de F1 : `ExpressionBesoin/src/ExpressionBesoin.Web/ClientApp/tests` |
 | Données | fictives, jamais réelles ; jeux d'essai hors dépôt |
 | Dépôt distant | `https://github.com/falyanak/Demonstrateur.git`, **public**, branche `main` ; publication par le développeur seul (`Publier-Branche -Confirmer`, Git Credential Manager) |
-| Identifiants | `DEB-D…`, `DEB-A…`, `DEB-Q…` ; pris : DEB-D1 à DEB-D4, DEB-Q1 à DEB-Q20 |
+| Identifiants | `DEB-D…`, `DEB-A…`, `DEB-Q…` ; pris : DEB-D1 à DEB-D5, DEB-Q1 à DEB-Q20 |
 
 Ligne enchaînée du projet (zip portant `DEPOT.txt` = « Demonstrateur ») :
 
@@ -60,25 +59,24 @@ page de liste des fiches et de leur statut. Plan, périmètre et critère de fin
 | Chantier | Lots | État |
 | --- | --- | --- |
 | P — socle | P0a, P0, P0b | clos le 20/11/2026 : P0a (`56388a3`), P0 (`78ff21b`, base `a73cb7e`), P0b |
-| B — métier (Domain, Application) | B1, B2 | B1 livré le 20/11/2026, à vérifier sur le poste ; B2 à faire |
+| B — métier (Domain, Application) | B1, B1b, B2 | B1 validé le 20/11/2026 (`3ee722c`) ; B2 à faire |
 | I — infrastructure | I1 (SQLite), I2 (.docx) | à faire |
 | F — front | F1 (Dialogue), F2 (Liste) | à faire ; étape `TestsFront` attendue du lot OT2 du harnais |
 | A — IA réelle | A1 | à faire ; fournisseur à trancher (DEB-Q2) |
 | R — recette | R1 | à faire |
 
-| Projet de tests | P0, poste (20/11/2026) | B1, ESTIMÉ |
+| Projet de tests | P0, poste (20/11/2026) | B1, poste (20/11/2026) |
 | --- | --- | --- |
 | ExpressionBesoin.Domain.Tests | 25 | 189 |
 | ExpressionBesoin.Web.Tests | 30 | 30 |
 | ExpressionBesoin.Architecture.Tests | 20 | 20 |
-| **Total** | **75** (Release et Debug, 0 échec) | **239** |
-| Couverture (Domain, Web) | lignes 64/64, branches 16/16 = 100 % |
+| **Total** | **75** (Release et Debug, 0 échec) | **239** (Release et Debug, 0 échec) |
+| Couverture (Domain, Web) | lignes 64/64, branches 16/16 = 100 % | lignes 410/410, branches 156/156 = 100 % |
 
 ## §2. Points ouverts
 
-1. Fournisseur d'IA (DEB-Q2) : à trancher avant A1 ; l'IA scénarisée suffit jusque-là. Recommandation (plan §8) :
-   `Microsoft.Extensions.AI` derrière `IAssistantIA`, client compatible OpenAI configurable ; Albert API (DINUM) si le
-   ministère y a accès, sinon API Mistral.
+1. Fournisseur d'IA (DEB-Q2) : à trancher avant A1 ; l'IA scénarisée suffit jusque-là. Recommandation : Albert API
+   (DINUM) si le ministère y a accès, sinon API Mistral. Technologie : DEB-D5.
 2. DEB-Q9 et DEB-Q10 (plan §8), à trancher au plus tard à I2 et F1.
 3. OT2 du harnais central (`TestsFront`) : sans lui, Vitest est lancé à la main pour F1 et F2.
 4. Côté harnais : HAR-A8 relevée le 20/11/2026 (`Publier-Branche` ne peut pas demander d'identifiant ; échec tardif et
@@ -94,6 +92,7 @@ page de liste des fiches et de leur statut. Plan, périmètre et critère de fin
 | DEB-D2 | Dépôt public : aucun document interne versionné (cahier des charges, modèle FEB) tant que DEB-Q9 n'est pas tranchée ; le plan en tient lieu (20/11/2026). |
 | DEB-D3 | Chaque réponse de l'assistant se termine par la commande `Ouvrir-Session` de la prochaine session, prête à copier, avec le compte de pièces attendu (demande du développeur, 20/11/2026). |
 | DEB-D4 | Point de terminaison de la V1 : lot R1, critère du plan §1 prouvé sur le poste ; périmètre gelé ; toute idée nouvelle rejoint les évolutions V2 (§6), ouvertes seulement par décision du développeur (demande du développeur, 20/11/2026 ; règle « Converger »). |
+| DEB-D5 | Adaptateur IA (A1) : Microsoft Agent Framework (`ChatClientAgent`, 1.0 GA depuis avril 2026) sur un `IChatClient` compatible OpenAI, derrière `IAssistantIA` (Infrastructure) ; une réponse structurée par tour, relue par `ReponseIA.Lire` ; ni outils, ni workflows, ni multi-agents : le dialogue reste déterministe dans le Domaine ; MAF sert à l'historique, aux middlewares, à l'observabilité (« cadrage ok », 20/11/2026). |
 | DEB-Q11 | `nuget.config` propre au projet : nuget.org seul (« recommandation ok », 20/11/2026). |
 | DEB-Q12 | Persistance par `Microsoft.Data.Sqlite`, sans Entity Framework : fiche en JSON + colonnes de liste (« recommandation ok », 20/11/2026). |
 | DEB-Q13 à DEB-Q20 | Règles du Domaine de la fiche (origines, ordre de questionnement, fusion, modification au seul Brouillon, contrôles de soumission, liste des décisions, tolérance de lecture de la réponse de l'IA, mutations sur copie jetable) : plan §8 (« recommandations ok », 20/11/2026). |
@@ -147,10 +146,8 @@ synthèse CODIR / COPIL, export PDF ; toute idée née pendant la V1 s'ajoute ic
 
 ## §7. Prochaine session
 
-Acquis : plan v1.3, socle P0 validé (75 tests, couverture 100 %), B1 livré. Audit honnête : chez l'assistant, ni SDK
-.NET ni NuGet ; B1 y a été vérifié par analyse syntaxique réelle (tree-sitter C#, contrôle éprouvé sur un fichier
-fautif) et par une réplique Python des attendus (numérotation, clôture, ordres) ; compilation, exécution des tests,
-couverture et mutations : sur le poste seulement. Plan ordonné : B1 (vérification), B1b, B2, I1, I2, F1, F2, A1, R1
-(point de terminaison de la V1, DEB-D4). Pièces à envoyer : la sortie d'`Appliquer-Lot B1` et de la commande des
-mutations ; pour une nouvelle session, toutes celles d'`Ouvrir-Session` (8), avec leur compte ; pour I2, le modèle
-`FEB.docx` (hors dépôt, DEB-D2).
+Acquis : plan v1.4, socle P0 et Domaine B1 validés sur le poste (239 tests, couverture 100 %, mutations détectées).
+Audit honnête : chez l'assistant, ni SDK .NET ni NuGet ; un lot C# y est vérifié par analyse syntaxique (tree-sitter)
+et réplique Python des attendus, le poste tranchant compilation, tests, couverture et mutations (B1 : tout conforme
+au premier essai). Plan ordonné : B2, I1, I2, F1, F2, A1, R1 (point de terminaison de la V1, DEB-D4). Pièces à
+envoyer : toutes celles d'`Ouvrir-Session` (8), avec leur compte ; pour I2, le modèle `FEB.docx` (hors dépôt, DEB-D2).

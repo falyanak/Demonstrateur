@@ -1,6 +1,6 @@
 # Plan du démonstrateur « Expression de besoin » (version simplifiée)
 
-> Version 1.3 du 20/11/2026 (lot B1 ; 1.2 au lot P0c, 1.1 au lot P0, 1.0 au lot P0a). Arbitrages DEB-Q1 à DEB-Q8, DEB-Q11 à
+> Version 1.4 du 20/11/2026 (lot B1b ; 1.3 au lot B1, 1.2 au lot P0c, 1.1 au lot P0, 1.0 au lot P0a). Arbitrages DEB-Q1 à DEB-Q8, DEB-Q11 à
 > DEB-Q20 : « recommandations ok » (20/11/2026). Décisions :
 > §8. Documents d'origine, **hors dépôt** (DEB-D2) : cahier des charges « Document de cadrage » (novembre 2026) et
 > modèle de fiche d'expression de besoin (FEB), tenus par le développeur.
@@ -173,6 +173,7 @@ F2 sont lancés à la main (`npm test`) et leur sortie jointe au compte rendu.
 | DEB-Q18 | Circuit : liste des décisions, on ne fait qu'ajouter ; le .docx lira la dernière. |
 | DEB-Q19 | `ReponseIA.Lire` : codes de rubrique casse ignorée ; une seule clôture ```` ```json ```` tolérée ; `horsPerimetre` booléen ; justification obligatoire ; doublon → la première gardée. |
 | DEB-Q20 | Mutations de B1 sur une copie jetable du poste (`%TEMP%`), par une commande fournie avec le lot. |
+| DEB-D5 | Adaptateur IA (A1) : Microsoft Agent Framework (`ChatClientAgent`) sur un `IChatClient` compatible OpenAI, derrière `IAssistantIA` ; une réponse structurée par tour, relue par `ReponseIA.Lire` ; ni outils, ni workflows, ni multi-agents (« cadrage ok »). |
 | DEB-D2 | Dépôt **public** : aucun document interne versionné (cahier des charges, modèle FEB) tant que DEB-Q9 n'est pas tranchée ; le présent plan en tient lieu. |
 
 Questions ouvertes :
@@ -180,5 +181,5 @@ Questions ouvertes :
 | N° | Question | Recommandation |
 | --- | --- | --- |
 | DEB-Q9 | Le modèle FEB vierge (gabarit du générateur .docx) peut-il être versionné dans ce dépôt public ? | Oui au lot I2 s'il ne contient aucune donnée (modèle de formulaire) ; sinon, gabarit lu hors dépôt par un chemin configuré |
-| DEB-Q2 | Fournisseur et technologie de l'IA (à trancher avant A1) | `Microsoft.Extensions.AI` (`IChatClient`) dans Infrastructure, derrière `IAssistantIA` ; client compatible OpenAI, adresse, modèle et clé en configuration (clé hors dépôt) ; un appel par tour, sortie contrainte par schéma JSON quand le fournisseur le permet, toujours relue par `ReponseIA.Lire` ; ni agent ni appel d'outils. Fournisseur : Albert API (DINUM) si le ministère y a accès, sinon API Mistral ; repli hors réseau : IA scénarisée |
+| DEB-Q2 | Fournisseur de l'IA (à trancher avant A1 ; technologie : DEB-D5) | Albert API (DINUM) si le ministère y a accès (hébergement SecNumCloud, modèles Mistral ; sortie contrainte par schéma à vérifier en A1), sinon API Mistral ; repli hors réseau : IA scénarisée |
 | DEB-Q10 | `node_modules` versionné (gabarit F3) ? | Non : dépôt public, poste avec accès npm ; `package-lock.json` versionné, `npm ci` |

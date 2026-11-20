@@ -82,3 +82,15 @@
   ESTIMÉS (Domain 25 → 189). Vérifié chez l'assistant : syntaxe C# (tree-sitter, contrôle d'abord mis en échec sur un
   fichier fautif), attendus recalculés par une réplique Python. Non vérifié : compilation, tests, couverture,
   mutations (poste).
+
+## 20/11/2026 — B1 validé, B1b : comptes mesurés, technologie de l'IA
+
+- `Appliquer-Lot B1` : 20 fichiers écrits et relus, compilation Release, 239 tests (Domain 189, Web 30,
+  Architecture 20), 0 échec ; commit `3ee722c`. Les 239 ESTIMÉS au lot B1 sont confirmés par la mesure.
+- Mutations sur copies jetables (DEB-Q20) : M1 (saisie manuelle écrasée par la proposition) → 16 échecs ; M2
+  (numérotation décalée d'un rang) → 4 échecs ; 2 sur 2 détectées.
+- `Lancer-Couverture -UpdateBaseline` : lignes 410/410, branches 156/156 (100 %), « COUVERTURE CONFORME », base
+  inchangée (déjà à 100 / 100), rien à commiter. Critère de fin de B1 atteint.
+- Le développeur retient Microsoft Agent Framework (1.0 GA, avril 2026) ; cadrage proposé (MAF sur `IChatClient`, usage
+  limité à l'adaptateur) : « cadrage ok » → DEB-D5. DEB-Q2 ne porte plus que sur le fournisseur.
+- B1b : plan v1.4 (§8), prompt de reprise (ÉTAT, §0, §1, §2, §3, §7), historique. Documents seuls.
