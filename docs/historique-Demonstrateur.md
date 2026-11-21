@@ -624,3 +624,27 @@
 - Vérifié chez l'assistant : syntaxe C# (tree-sitter), équilibre des accolades ; consignes reconstruites depuis les
   fragments du code par une réplique Python, 20 assertions des tests rejouées, contrôle éprouvé sur une mutation
   (2 échecs) ; octets (CRLF sans BOM). Non vérifié : compilation, tests, couverture, réponses de l'IA réelle.
+
+## 21/11/2026 — Choix du modèle par mesure (sondes) ; A5 et A6 planifiés ; A4b (clôture)
+
+- A4 appliqué au poste (question type visible au navigateur) ; commit et comptes à confirmer par `Ouvrir-Session`
+  (estimés : 639 tests, Infrastructure 188).
+- Développeur : « le modèle n'est pas assez évolué ». Sondes hors dépôt (PowerShell, clé jamais affichée), même
+  deuxième tour de « mon pc ne s'allume plus », consignes d'A4 :
+  - `Sonder-Tour2` : gpt-oss (`openweight-large`) rend `content: null` 3 fois sur 3 (~103 jetons générés, `stop`) ;
+  - `Sonder-Variantes` : vide dès qu'une réponse de l'assistant est dans l'historique avec un format imposé (schéma,
+    `json_object`, raisonnement `low`) ; contrat respecté sans historique (23 à 31 s) ou sans format (20 s) ;
+    quotas : 10 requêtes et 128 000 jetons par minute ;
+  - `Sonder-Variantes2` : sans historique, raisonnement `low` : 5,6 à 7,9 s, mais sept rubriques remplies d'une seule
+    phrase (invention) ; `openweight-medium` sans historique invente aussi, avec historique il est juste ;
+  - `Sonder-Consignes` : consignes resserrées sans effet (12 essais) ; tour 2 juste 6/6 ; tour 1 : propositions justes,
+    question sur la rubrique tout juste proposée 6/6 ;
+  - `Sonder-Tour1` : une précision au premier message sans effet (6/6) ;
+  - `Sonder-Modeles` (42 réponses) : question juste au premier tour mistral-small 1/10, gemma-4-31b 4/10,
+    deepseek-v4-flash 10/10 (27,3 s en moyenne, raisonnement explicite qui retire les rubriques proposées) ;
+    catalogue d'Albert : mistral-small retiré le 01/12/2026.
+- DEB-Q95 à DEB-Q99 (mesures), DEB-Q100 (« option a » : question déterministe), DEB-Q101 à DEB-Q104 (« recommandations
+  ok »), DEB-D8 (bascule de fournisseur par configuration, demande du développeur), DEB-Q105 à DEB-Q107 posées.
+  Leçon : la mécanique de questionnement relève du déterministe ; mesurer un modèle sur la requête exacte de
+  l'adaptateur, cas du critère compris, avant tout lot.
+- A4b : documents seuls (plan 1.23, historique, prompt de reprise), appliqué seulement si A4 est commité.
