@@ -1,6 +1,6 @@
 # Prompt de reprise — Demonstrateur
 
-> Mis à jour le 21/11/2026 par le lot F1. Règles génériques : harnais central, `regles\regles-de-travail.md` (v5) ;
+> Mis à jour le 21/11/2026 par le lot F1b. Règles génériques : harnais central, `regles\regles-de-travail.md` (v5) ;
 > modèle de projet : `regles\harnais-modele-generique.md` (v2) ; front : `regles\gabarit-frontend-vite-aspnet.md` ;
 > outillage : `C:\Dev\Harnais\docs\specification-harnais-central.md` (fait foi).
 > Historique détaillé : `docs/historique-Demonstrateur.md` (non envoyé par défaut). Documents hors dépôt dont dépend ce
@@ -8,10 +8,12 @@
 > `Expression_de_besoin_demonstrateur_IA_SICCRF.docx` (document de cadrage, novembre 2026). Le modèle `FEB.docx` est
 > versionné depuis I2, nettoyé de ses métadonnées (DEB-Q9, DEB-Q33).
 
-## ▶ ÉTAT AU 21/11/2026 (F1 livré, NON appliqué) — À LIRE D'ABORD
+## ▶ ÉTAT AU 21/11/2026 (F1 commité, F1b livré) — À LIRE D'ABORD
 
-**Où on en est** : chantiers P, B, I clos (I2a `e28a964`, 432 tests, couverture 100 %). **F1 livré** (socle du front,
-composition dans `Program`, routes du plan §5, IA scénarisée) ; comptes ESTIMÉS, à mesurer : Infrastructure 109 → 135,
+**Où on en est** : chantiers P, B, I clos (I2a `e28a964`, 432 tests, couverture 100 %). **F1 commité** (`bfaaf97`, ligne
+enchaînée : `Appliquer-Lot` vert ; 2 257 fichiers de `node_modules` suivis = 2 233 installés + 24 raccourcis `.bin`) ;
+`npm test` a ensuite laissé 13 fichiers de cache (`node_modules/.vitest-cache/`) : **F1b** ignore tout dossier en point au
+premier niveau de `node_modules` sauf `.bin`. Comptes ESTIMÉS de F1, à mesurer : Infrastructure 109 → 135,
 Web 30 → 97, total 432 → 525 ; Vitest 58 (mesuré chez l'assistant, Node 26.13.1).
 **Prérequis du poste avant F1** : Node.js **26.13.1** (LTS, DEB-D7) dans le `PATH` (`node -v`) ; la première
 compilation lance `npm ci` (accès npm), puis `node_modules` entre dans le commit (DEB-D6).
@@ -19,7 +21,8 @@ compilation lance `npm ci` (accès npm), puis `node_modules` entre dans le commi
 jointe, OT2 absent) ; `node_modules` commité et `git status` propre ; sur 5080 : `GET api/agents`, création d'une fiche,
 un tour scénarisé.
 **Point de terminaison de la V1** (DEB-D4) : lot R1, critère du plan §1 ; périmètre gelé jusque-là.
-**Prochain pas** : vérifier F1 (sorties du poste) ; puis F2 (page Dialogue), avec son critère.
+**Critère de fin de F1b** : cache supprimé, `Appliquer-Lot F1b` vert et commité, `npm test` relancé puis `git status`
+vide. **Prochain pas** : vérifier F1 (comptes de `Compter-Tests`, sortie de `npm test`, parcours sur 5080) ; puis F2.
 **Ouverture de la session suivante** :
 
     Set-Location C:\Dev\Demonstrateur; . C:\Dev\Harnais\outillage\Charger-Harnais.ps1; Ouvrir-Session -BrancheAttendue main

@@ -251,3 +251,16 @@
   produit par une réplique Python (3 267 octets). Non vérifié : compilation C#, tests .NET (93 ajoutés, ESTIMÉS : 26
   Infrastructure, 67 Web), couverture .NET, cibles MSBuild sous Windows (SDK .NET et nuget.org refusés par la politique
   réseau de l'assistant).
+
+## 21/11/2026 — F1 commité, F1b : caches de node_modules ignorés
+
+- `Appliquer-Lot F1` puis commit par la ligne enchaînée : `bfaaf97` (2 312 fichiers ; 2 257 sous `node_modules` = 2 233
+  installés + 24 raccourcis Windows de `.bin`, 8 commandes × `.cmd`, `.ps1`, sans extension). Sortie d'`Appliquer-Lot` non
+  transmise : comptes mesurés attendus de `Compter-Tests` à la session suivante.
+- `Ouvrir-Session` : « SESSION NON PRÉPARÉE », 13 fichiers non suivis, tous sous `node_modules/.vitest-cache/` (cache de
+  Vitest 5, écrit par `npm test`). Défaut de F1 : le `.gitignore` n'avait été essayé que sur un `node_modules` fraîchement
+  installé, sans y lancer les outils (Vitest n'écrit pas ce cache chez l'assistant).
+- F1b : `**/ClientApp/node_modules/.*/` ignoré, `.bin` ré-autorisé. Contrôle sur les noms relevés au poste : ancien
+  `.gitignore` → 5 fichiers de cache visibles (`.vitest-cache`, `.vite-temp`, `.cache`), nouveau → 0 ; `.bin` et les `bin`
+  de paquets toujours suivis. Leçon pour le harnais (gabarit F3) : ignorer les dossiers en point de `node_modules`, pas une
+  liste de caches.

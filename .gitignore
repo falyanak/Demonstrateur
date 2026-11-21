@@ -14,7 +14,9 @@ ExpressionBesoin/coverage-report/
 # Front (DEB-D6) : node_modules VERSIONNÉ (build hors ligne, binaires Windows x64). Ses dossiers bin sont ré-autorisés
 # APRÈS la règle [Bb]in/ (sinon vite, tsc… manquent après un clone) ; ses caches et les sorties du front sont ignorés.
 !**/ClientApp/node_modules/**/[Bb]in/
-**/ClientApp/node_modules/.vite/
-**/ClientApp/node_modules/.tmp/
+# Dossiers en point au premier niveau = caches des outils (.vite, .tmp, .vitest-cache de Vitest 5…), sauf .bin
+# (raccourcis des commandes). Règle générale : un prochain cache ne se commite pas (F1b, 21/11/2026).
+**/ClientApp/node_modules/.*/
+!**/ClientApp/node_modules/.bin/
 **/ClientApp/coverage/
 *.tsbuildinfo
