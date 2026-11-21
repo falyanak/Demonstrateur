@@ -1,11 +1,12 @@
 # Plan du démonstrateur « Expression de besoin » (version simplifiée)
 
-> Version 1.13 du 21/11/2026 (lot HY2 ; 1.12 au lot F2, 1.11 au lot HY1b, 1.10 au lot HY1, 1.9 au lot F1, 1.8 au lot I2b, 1.7 au lot I2, 1.6 au lot I1, 1.5 au lot B2, 1.4 au lot B1b, 1.3 au lot B1, 1.2 au lot P0c, 1.1 au
+> Version 1.14 du 21/11/2026 (lot F2c ; 1.13 au lot HY2, 1.12 au lot F2, 1.11 au lot HY1b, 1.10 au lot HY1, 1.9 au lot F1, 1.8 au lot I2b, 1.7 au lot I2, 1.6 au lot I1, 1.5 au lot B2, 1.4 au lot B1b, 1.3 au lot B1, 1.2 au lot P0c, 1.1 au
 > lot P0, 1.0 au lot P0a). Arbitrages DEB-Q1 à DEB-Q8, DEB-Q11 à DEB-Q32 : « recommandations ok » (20/11/2026) ; DEB-Q9 :
 > « ok » (20/11/2026) ; DEB-Q33 à DEB-Q37 : « recommandations ok » (21/11/2026) ;
 > DEB-Q38 à DEB-Q44 : « recommandations ok » (21/11/2026) ; DEB-Q45, DEB-Q46 : « recommandations ok »
 > (21/11/2026) ; DEB-Q47 : tranchée par le développeur (21/11/2026) ; DEB-Q48 à DEB-Q53 : « recommandations ok » (21/11/2026) ;
-> DEB-Q54 à DEB-Q57 : « recommandations ok », DEB-Q55 précisée par le développeur (21/11/2026). Décisions : §8. Document d'origine **hors
+> DEB-Q54 à DEB-Q57 : « recommandations ok », DEB-Q55 précisée par le développeur (21/11/2026) ; DEB-Q58 : « maintenant,
+> avant F3 » (21/11/2026). Décisions : §8. Document d'origine **hors
 > dépôt** (DEB-D2) : cahier des charges « Document de cadrage » (novembre 2026), tenu par le développeur ; le modèle de
 > fiche (FEB) est versionné, nettoyé de ses métadonnées (DEB-Q9, DEB-Q33).
 
@@ -160,6 +161,7 @@ Liste : N°, intitulé, demandeur, date, statut (badge), actions *Reprendre* et 
 | HY1 | Hygiène DEB-HY1 : paquets NuGet, outils dotnet et SDK alignés sur DEB-D7 (DEB-Q45 à DEB-Q47) | `Appliquer-Lot` vert et commité (525 tests, couverture 100 / 100) ; `Compter-Tests` compte 525 à l'ouverture suivante |
 | F2 | Page Dialogue (DEB-Q48 à DEB-Q53) | `Appliquer-Lot` vert ; `npm test` vert ; parcours complet avec l'IA scénarisée, dans le navigateur : création, dialogue jusqu'à 10/10, proposition acceptée et rejetée, correction manuelle, soumission, compléments, reprise, validation, .docx ouvert dans Word |
 | HY2 | Hygiène DEB-HY2 : dossier de données fixé par environnement (DEB-Q54 à DEB-Q57) | `Appliquer-Lot HY2` vert et commité ; site lancé au profil `Localhost` : `C:\Dev\Demonstrateur-data\fiches.db` créé, `GET api/sante` « ok » |
+| HY3 | Correction de DEB-A2 (DEB-Q58) : `global.json` à la racine du dépôt, garde du SDK dans `Directory.Build.props`, tests d'architecture ; précédé de F2c (racine de lot) | `Appliquer-Lot HY3` vert et commité ; `dotnet --version` rend 10.0.403 à la racine ; garde éprouvée sur une version forcée ; `Compter-Tests` à l'ouverture suivante |
 | F3 | Page Liste | statuts conformes après chaque transition |
 | A1 | Adaptateur IA réel et prompt système (DEB-Q2) | scénario e-commerce joué avec l'IA réelle, sans invention |
 | R1 | Fiche de recette : nominal et retour pour complément | critère de fin du démonstrateur (§1) : **point de terminaison de la V1** |
@@ -235,6 +237,7 @@ sont lancés à la main (`npm test`) et leur sortie jointe au compte rendu.
 | DEB-Q55 | (21/11/2026, précisée par le développeur : « fixer les chemins du dossier de données pour chaque environnement ») Un fichier par environnement porte `Fiches:Base` : `appsettings.Localhost.json` (poste), `appsettings.Staging.json` (`D:\Donnees\Demonstrateur-data-staging\fiches.db`), `appsettings.Production.json` (`D:\Donnees\Demonstrateur-data\fiches.db`) ; chemins serveur distincts (recette et production peuvent cohabiter), à confirmer avec l'exploitation ; la variable d'environnement `Fiches__Base` les remplace si besoin (priorité .NET) ; `appsettings.json` n'en porte aucun : environnement sans valeur → arrêt au démarrage, jamais d'emplacement implicite. Sur le serveur : dossier hors du dossier publié, volume local (jamais un partage réseau : SQLite), droit Modification à l'identité du pool. Garde-fou : `ConfigurationEnvironnementsTests` |
 | DEB-Q56 | (21/11/2026, « recommandations ok ») La publication sur IIS reste hors V1 (DEB-Q8, DEB-D4) : les fichiers Staging et Production sont prêts, la mise en œuvre de la livraison est une évolution V2 |
 | DEB-Q57 | (21/11/2026, « recommandations ok ») Convention générique « dossier de données `C:\Dev\<Depot>-data` sur le poste, chemin par environnement » : versée au modèle générique du harnais (§3, §10) par un lot du harnais central, pas par ce projet |
+| DEB-Q58 | (21/11/2026, « maintenant, avant F3 », recommandation retenue) Anomalie DEB-A2 : `dotnet` cherche `global.json` depuis le dossier courant ; lancées depuis la racine du dépôt, les commandes du harnais ne voient pas `ExpressionBesoin/global.json` et compilent avec le SDK 11.0.100 (mesuré le 21/11/2026). Correction : `global.json` déplacé à la racine du dépôt (un seul fichier ; Visual Studio le trouve aussi, en remontant depuis la solution) ; `Lot.Racines` étendu d'abord (F2c), le déplacement ensuite (HY3) ; garde au build : erreur si `NETCoreSdkVersion` diffère de la version attendue ; tests d'architecture qui lient les deux. DEB-Q47 inchangée |
 
 Questions ouvertes :
 

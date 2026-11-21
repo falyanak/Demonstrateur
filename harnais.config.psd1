@@ -22,7 +22,7 @@
     }
 
     Lot = @{
-        Racines        = @('ExpressionBesoin', 'docs', 'specifications', 'harnais.config.psd1', '.gitignore', '.gitattributes', 'README.md')
+        Racines        = @('ExpressionBesoin', 'docs', 'specifications', 'harnais.config.psd1', '.gitignore', '.gitattributes', 'README.md', 'global.json')
         ProjetsTests   = @('ExpressionBesoin/tests/ExpressionBesoin.Domain.Tests', 'ExpressionBesoin/tests/ExpressionBesoin.Application.Tests', 'ExpressionBesoin/tests/ExpressionBesoin.Infrastructure.Tests', 'ExpressionBesoin/tests/ExpressionBesoin.Web.Tests', 'ExpressionBesoin/tests/ExpressionBesoin.Architecture.Tests')
         TestsUnitaires = @('ExpressionBesoin/tests/ExpressionBesoin.Domain.Tests', 'ExpressionBesoin/tests/ExpressionBesoin.Application.Tests', 'ExpressionBesoin/tests/ExpressionBesoin.Infrastructure.Tests', 'ExpressionBesoin/tests/ExpressionBesoin.Web.Tests', 'ExpressionBesoin/tests/ExpressionBesoin.Architecture.Tests')
     }

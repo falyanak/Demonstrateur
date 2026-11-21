@@ -361,3 +361,30 @@
 - Vérifié chez l'assistant : valeurs des trois fichiers par une réplique Python, qui échoue sur une copie mutée (chemin
   Staging égal à celui de Production, 1 échec) ; message attendu égal au message émis (réplique) ; octets (CRLF, sans
   BOM, comme les fichiers d'origine). Non vérifié : compilation C#, tests .NET, démarrage du site.
+
+## 21/11/2026 — HY2 et F2 prouvés et clos ; DEB-A2 relevée ; F2c : racine de lot et documents
+
+- Ouverture (20261121-161757) : 8 pièces conformes à `PIECES.txt` ; archive de 153 entrées au commit `9b21bdb` ;
+  `Compter-Tests` (Debug) : Domain 207, Application 66, Infrastructure 135, Web 107, Architecture 20, total 535, 0 échec,
+  égal à l'estimation de HY2 ; 1 commit à publier, 1 non sauvegardé.
+- Preuves du poste : `npm test` 165 tests verts (6 fichiers) ; site au profil `Localhost` : `fiches.db` créé dans
+  `C:\Dev\Demonstrateur-data`, `api/sante` « ok », version `0.1.0+9b21bdb…` ; parcours de la page Dialogue joué
+  (validation, compléments, refus), page rendue sur 5080 (capture). Publication `ba3aafd..9b21bdb`, sauvegarde des trois
+  dépôts « ok ». Objectif atteint, on arrête HY2 et F2.
+- Ouverture suivante (20261121-163017) : état conforme, archive de 153 entrées au même commit ; `Compter-Tests` en échec
+  de compilation (MSB3027/MSB3021) : DLL de `bin\Debug` verrouillées par le site encore lancé (processus
+  `ExpressionBesoin.Web`) et par Visual Studio. Pas une régression ; le site s'arrête avant toute commande qui compile.
+- DEB-A2 relevée dans ce journal : les erreurs citent `sdk\11.0.100`, malgré `global.json` (10.0.403,
+  `rollForward: disable`, DEB-Q47). Mesure du développeur : `dotnet --version` rend 11.0.100 dans
+  `C:\Dev\Demonstrateur` et 10.0.403 dans `ExpressionBesoin` ; SDK installés : 10.0.403 et 11.0.100. Cause : `dotnet`
+  cherche `global.json` depuis le dossier courant. Les comptes mesurés depuis HY1 viennent donc du SDK 11 (cible
+  `net10.0` inchangée). DEB-Q58 : correction maintenant, avant F3.
+- F2c : `global.json` ajouté à `Lot.Racines` (`harnais.config.psd1`), condition de HY3 (`Appliquer-Lot` contrôle les
+  chemins avec la configuration chargée avant l'écriture) ; prompt (bloc ÉTAT, comptes mesurés, DEB-A2, DEB-Q58, leçon
+  (d) pour le harnais), plan v1.14 (lot HY3, DEB-Q58). Vérifié chez l'assistant : octets (CRLF, BOM du seul `.psd1`
+  conservé), taille du prompt sous 30 720 octets. Non vérifié : chargement de la configuration par le harnais.
+- Premier envoi sous le nom F2b : 4 fichiers écrits, tests en échec (Web : 1 sur 107,
+  `ConfigurationEnvironnementsTests`, cas `Localhost`), commit retenu par `if ($?)`. Cause mesurée (`git diff`) :
+  `appsettings.Localhost.json` retouché à la main hors lot (`C:\DEV\demonstrateur-data`, casse changée) ; le garde-fou
+  de HY2 a mordu. Arbre remis à HEAD (`git checkout`), contenu relivré sous le nom F2c (règles §3). `global.json` copié
+  à la main dans le dossier du profil Windows : sans effet sur `C:\Dev` (recherche depuis le dossier courant), retiré.
