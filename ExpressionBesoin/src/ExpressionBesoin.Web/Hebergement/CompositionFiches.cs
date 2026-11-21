@@ -15,7 +15,12 @@ namespace ExpressionBesoin.Web.Hebergement;
 /// </summary>
 public static class CompositionFiches
 {
-    /// <summary>Clé du chemin de la base SQLite (<c>appsettings.Localhost.json</c>), variables d'environnement développées.</summary>
+    /// <summary>
+    /// Clé du chemin de la base SQLite, fixée par environnement (DEB-Q54, DEB-Q55) : <c>appsettings.Localhost.json</c>,
+    /// <c>appsettings.Staging.json</c>, <c>appsettings.Production.json</c> ; la variable d'environnement
+    /// <c>Fiches__Base</c> la remplace si besoin (priorité de la configuration .NET). Absente de <c>appsettings.json</c> :
+    /// aucun emplacement implicite.
+    /// </summary>
     public const string CleBase = "Fiches:Base";
 
     /// <summary>Fuseau de l'année du numéro et des dates du document (DEB-Q24, DEB-Q36) : identifiant IANA.</summary>
@@ -52,13 +57,14 @@ public static class CompositionFiches
         services.GetRequiredService<IGenerateurDocument>();
     }
 
-    /// <summary>Chemin configuré, variables développées (<c>%LOCALAPPDATA%</c>) ; absent ou relatif → arrêt explicite.</summary>
+    /// <summary>Chemin configuré, variables d'environnement développées ; absent ou relatif → arrêt explicite.</summary>
     internal static string CheminBase(string? configure)
     {
         var chemin = Environment.ExpandEnvironmentVariables(configure ?? "");
         return Path.IsPathFullyQualified(chemin)
             ? chemin
             : throw new InvalidOperationException(
-                $"Configuration {CleBase} : chemin ABSOLU du fichier SQLite attendu (reçu « {configure} ») ; voir appsettings.Localhost.json.");
+                $"Configuration {CleBase} : chemin ABSOLU du fichier SQLite attendu (reçu « {configure} ») ; " +
+                "voir appsettings.{environnement}.json (Localhost, Staging, Production) ou la variable Fiches__Base.");
     }
 }

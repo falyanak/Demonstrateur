@@ -20,7 +20,7 @@ public sealed class CompositionFichesTests
     {
         var exception = Assert.Throws<InvalidOperationException>(() => CompositionFiches.CheminBase(configure));
         Assert.Equal(
-            $"Configuration Fiches:Base : chemin ABSOLU du fichier SQLite attendu (reçu « {configure} ») ; voir appsettings.Localhost.json.",
+            $"Configuration Fiches:Base : chemin ABSOLU du fichier SQLite attendu (reçu « {configure} ») ; voir appsettings.{{environnement}}.json (Localhost, Staging, Production) ou la variable Fiches__Base.",
             exception.Message);
     }
 

@@ -1,10 +1,11 @@
 # Plan du démonstrateur « Expression de besoin » (version simplifiée)
 
-> Version 1.12 du 21/11/2026 (lot F2 ; 1.11 au lot HY1b, 1.10 au lot HY1, 1.9 au lot F1, 1.8 au lot I2b, 1.7 au lot I2, 1.6 au lot I1, 1.5 au lot B2, 1.4 au lot B1b, 1.3 au lot B1, 1.2 au lot P0c, 1.1 au
+> Version 1.13 du 21/11/2026 (lot HY2 ; 1.12 au lot F2, 1.11 au lot HY1b, 1.10 au lot HY1, 1.9 au lot F1, 1.8 au lot I2b, 1.7 au lot I2, 1.6 au lot I1, 1.5 au lot B2, 1.4 au lot B1b, 1.3 au lot B1, 1.2 au lot P0c, 1.1 au
 > lot P0, 1.0 au lot P0a). Arbitrages DEB-Q1 à DEB-Q8, DEB-Q11 à DEB-Q32 : « recommandations ok » (20/11/2026) ; DEB-Q9 :
 > « ok » (20/11/2026) ; DEB-Q33 à DEB-Q37 : « recommandations ok » (21/11/2026) ;
 > DEB-Q38 à DEB-Q44 : « recommandations ok » (21/11/2026) ; DEB-Q45, DEB-Q46 : « recommandations ok »
-> (21/11/2026) ; DEB-Q47 : tranchée par le développeur (21/11/2026) ; DEB-Q48 à DEB-Q53 : « recommandations ok » (21/11/2026). Décisions : §8. Document d'origine **hors
+> (21/11/2026) ; DEB-Q47 : tranchée par le développeur (21/11/2026) ; DEB-Q48 à DEB-Q53 : « recommandations ok » (21/11/2026) ;
+> DEB-Q54 à DEB-Q57 : « recommandations ok », DEB-Q55 précisée par le développeur (21/11/2026). Décisions : §8. Document d'origine **hors
 > dépôt** (DEB-D2) : cahier des charges « Document de cadrage » (novembre 2026), tenu par le développeur ; le modèle de
 > fiche (FEB) est versionné, nettoyé de ses métadonnées (DEB-Q9, DEB-Q33).
 
@@ -158,6 +159,7 @@ Liste : N°, intitulé, demandeur, date, statut (badge), actions *Reprendre* et 
 | F1 | Socle du front (gabarit Vite, DEB-D7), composition dans `Program`, routes du §5, IA scénarisée (DEB-Q38 à DEB-Q44) | `Appliquer-Lot` vert (tests, couverture) ; `npm test` vert ; `node_modules` commité ; parcours de l'API joué sur 5080 |
 | HY1 | Hygiène DEB-HY1 : paquets NuGet, outils dotnet et SDK alignés sur DEB-D7 (DEB-Q45 à DEB-Q47) | `Appliquer-Lot` vert et commité (525 tests, couverture 100 / 100) ; `Compter-Tests` compte 525 à l'ouverture suivante |
 | F2 | Page Dialogue (DEB-Q48 à DEB-Q53) | `Appliquer-Lot` vert ; `npm test` vert ; parcours complet avec l'IA scénarisée, dans le navigateur : création, dialogue jusqu'à 10/10, proposition acceptée et rejetée, correction manuelle, soumission, compléments, reprise, validation, .docx ouvert dans Word |
+| HY2 | Hygiène DEB-HY2 : dossier de données fixé par environnement (DEB-Q54 à DEB-Q57) | `Appliquer-Lot HY2` vert et commité ; site lancé au profil `Localhost` : `C:\Dev\Demonstrateur-data\fiches.db` créé, `GET api/sante` « ok » |
 | F3 | Page Liste | statuts conformes après chaque transition |
 | A1 | Adaptateur IA réel et prompt système (DEB-Q2) | scénario e-commerce joué avec l'IA réelle, sans invention |
 | R1 | Fiche de recette : nominal et retour pour complément | critère de fin du démonstrateur (§1) : **point de terminaison de la V1** |
@@ -229,6 +231,10 @@ sont lancés à la main (`npm test`) et leur sortie jointe au compte rendu.
 | DEB-Q51 | (21/11/2026, « recommandations ok ») Saisie manuelle d'une rubrique : zone de texte par rubrique et bouton « Enregistrer » actif quand le brouillon diffère de la valeur retenue (`PUT …/champs/{code}`) ; pas d'enregistrement automatique à la sortie du champ (chaque saisie manuelle est un acte explicite, DEB-Q15) ; une proposition en attente s'affiche sous la zone avec ✓ (accepter) et ✗ (rejeter) |
 | DEB-Q52 | (21/11/2026, « recommandations ok ») Contrat partagé des nouvelles réponses : `tour-reference.json` (`POST …/messages`) et `consultation-reference.json` (`GET api/fiches/{id}`) ajoutés à `ClientApp/tests/contrats/`, figés à l'octet par xUnit (comme `fiche-reference.json`) et lus par Vitest (`lireTour`, `lireConsultation`) |
 | DEB-Q53 | (21/11/2026, « recommandations ok ») Actions selon le statut : `Brouillon` : dialogue, saisie, propositions, case « Je confirme… » et Soumettre ; `Soumise` : simulation de la décision (Valider, Demander des compléments, Refuser ; commentaire) ; `ACompleter` : Reprendre ; `Validee` : lien de téléchargement du .docx (`Url.resolve`) ; réponse hors périmètre en alerte ; propositions écartées (`ecartees`) en note discrète sous la réponse de l'IA |
+| DEB-Q54 | (21/11/2026, « recommandations ok » ; révise DEB-Q31 pour le chemin) Dossier de données du poste : `C:\Dev\Demonstrateur-data\fiches.db` (nom du dépôt + `-data`), voisin du dépôt, jamais dedans ; l'ancienne base de `%LOCALAPPDATA%\Demonstrateur` n'est pas reprise (données fictives, à supprimer à la main) |
+| DEB-Q55 | (21/11/2026, précisée par le développeur : « fixer les chemins du dossier de données pour chaque environnement ») Un fichier par environnement porte `Fiches:Base` : `appsettings.Localhost.json` (poste), `appsettings.Staging.json` (`D:\Donnees\Demonstrateur-data-staging\fiches.db`), `appsettings.Production.json` (`D:\Donnees\Demonstrateur-data\fiches.db`) ; chemins serveur distincts (recette et production peuvent cohabiter), à confirmer avec l'exploitation ; la variable d'environnement `Fiches__Base` les remplace si besoin (priorité .NET) ; `appsettings.json` n'en porte aucun : environnement sans valeur → arrêt au démarrage, jamais d'emplacement implicite. Sur le serveur : dossier hors du dossier publié, volume local (jamais un partage réseau : SQLite), droit Modification à l'identité du pool. Garde-fou : `ConfigurationEnvironnementsTests` |
+| DEB-Q56 | (21/11/2026, « recommandations ok ») La publication sur IIS reste hors V1 (DEB-Q8, DEB-D4) : les fichiers Staging et Production sont prêts, la mise en œuvre de la livraison est une évolution V2 |
+| DEB-Q57 | (21/11/2026, « recommandations ok ») Convention générique « dossier de données `C:\Dev\<Depot>-data` sur le poste, chemin par environnement » : versée au modèle générique du harnais (§3, §10) par un lot du harnais central, pas par ce projet |
 
 Questions ouvertes :
 

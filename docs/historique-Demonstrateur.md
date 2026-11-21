@@ -338,3 +338,26 @@
   produites par réplique Python, compactes, sans BOM.
 - Non vérifié chez l'assistant : compilation C#, tests .NET, octets émis par `System.Text.Json` (« », `\n`), rendu
   Razor, parcours dans un navigateur réel : le poste tranche.
+
+## 21/11/2026 — HY2 : dossier de données par environnement (DEB-Q54 à DEB-Q57)
+
+- Ouverture de session : 8 pièces reçues, tailles et SHA-256 conformes à `PIECES.txt`, archive de 150 entrées au commit
+  `ba3aafd` ; F2 appliqué et commité (`Compter-Tests` : 531, 0 échec) ; `npm test` et parcours du navigateur de F2 non
+  encore transmis.
+- Demande du développeur : données par défaut dans `C:\Dev\<nomApplication>-data` sur le poste, dans un dossier du
+  serveur à la publication IIS ; puis « il faut simplement pouvoir fixer les chemins du dossier de données pour chaque
+  environnement : localhost, staging, production ». Questions DEB-Q54 à DEB-Q57 : « recommandations ok », DEB-Q55
+  précisée ainsi (un fichier `appsettings.{environnement}.json` par environnement, au lieu de la seule variable
+  d'environnement recommandée) ; plan v1.13.
+- Web : `appsettings.Localhost.json` → `C:\Dev\Demonstrateur-data\fiches.db` (révise DEB-Q31) ;
+  `appsettings.Staging.json` et `appsettings.Production.json` ajoutés (`D:\Donnees\Demonstrateur-data-staging`,
+  `D:\Donnees\Demonstrateur-data`, à confirmer avec l'exploitation) ; message d'arrêt de `CompositionFiches.CheminBase`
+  généralisé (fichier de l'environnement ou variable `Fiches__Base`). Aucun changement de comportement : le code lisait
+  déjà `Fiches:Base` de la configuration.
+- Tests : `ConfigurationEnvironnementsTests` (théorie des trois environnements, chemin exact et absolu ; `appsettings.json`
+  sans chemin), 4 tests ; message de `CompositionFichesTests` mis à jour ; total estimé 535. Les tests d'intégration
+  restent en `Production` : la source en mémoire de `UsineWeb`, ajoutée en dernier, remplace le chemin du fichier
+  (`null` compris pour `UsineSansBase`).
+- Vérifié chez l'assistant : valeurs des trois fichiers par une réplique Python, qui échoue sur une copie mutée (chemin
+  Staging égal à celui de Production, 1 échec) ; message attendu égal au message émis (réplique) ; octets (CRLF, sans
+  BOM, comme les fichiers d'origine). Non vérifié : compilation C#, tests .NET, démarrage du site.
