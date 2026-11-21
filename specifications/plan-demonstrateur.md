@@ -1,6 +1,6 @@
 # Plan du démonstrateur « Expression de besoin » (version simplifiée)
 
-> Version 1.17 du 21/11/2026 (lot L1 ; 1.16 au lot F3b, 1.15 au lot F3, 1.14 au lot F2c, 1.13 au lot HY2, 1.12 au lot F2, 1.11 au lot HY1b, 1.10 au lot HY1, 1.9 au lot F1, 1.8 au lot I2b, 1.7 au lot I2, 1.6 au lot I1, 1.5 au lot B2, 1.4 au lot B1b, 1.3 au lot B1, 1.2 au lot P0c, 1.1 au
+> Version 1.18 du 21/11/2026 (lot L2 ; 1.17 au lot L1, 1.16 au lot F3b, 1.15 au lot F3, 1.14 au lot F2c, 1.13 au lot HY2, 1.12 au lot F2, 1.11 au lot HY1b, 1.10 au lot HY1, 1.9 au lot F1, 1.8 au lot I2b, 1.7 au lot I2, 1.6 au lot I1, 1.5 au lot B2, 1.4 au lot B1b, 1.3 au lot B1, 1.2 au lot P0c, 1.1 au
 > lot P0, 1.0 au lot P0a). Arbitrages DEB-Q1 à DEB-Q8, DEB-Q11 à DEB-Q32 : « recommandations ok » (20/11/2026) ; DEB-Q9 :
 > « ok » (20/11/2026) ; DEB-Q33 à DEB-Q37 : « recommandations ok » (21/11/2026) ;
 > DEB-Q38 à DEB-Q44 : « recommandations ok » (21/11/2026) ; DEB-Q45, DEB-Q46 : « recommandations ok »
@@ -8,7 +8,7 @@
 > DEB-Q54 à DEB-Q57 : « recommandations ok », DEB-Q55 précisée par le développeur (21/11/2026) ; DEB-Q58 : « maintenant,
 > avant F3 » (21/11/2026) ; DEB-Q59 à DEB-Q63 : « recommandations ok » (21/11/2026) ; DEB-Q2, DEB-Q64 : « recommandations ok » (21/11/2026) ;
 > DEB-Q65, DEB-Q66 : « recommandations ok », DEB-Q67 à DEB-Q72 rendues sans objet par DEB-Q73 ; DEB-Q73 à DEB-Q78 :
-> « accord » du développeur (21/11/2026). Décisions : §8. Document d'origine **hors
+> « accord » du développeur (21/11/2026) ; DEB-Q79 à DEB-Q82 : « recommandations ok » (21/11/2026). Décisions : §8. Document d'origine **hors
 > dépôt** (DEB-D2) : cahier des charges « Document de cadrage » (novembre 2026), tenu par le développeur ; le modèle de
 > fiche (FEB) est versionné, nettoyé de ses métadonnées (DEB-Q9, DEB-Q33).
 
@@ -170,7 +170,7 @@ AG Grid inutile). Réponse de l'IA affichée entière, avec indicateur d'attente
 | HY3 | Correction de DEB-A2 (DEB-Q58) : `global.json` à la racine du dépôt, garde du SDK dans `Directory.Build.props`, tests d'architecture ; précédé de F2c (racine de lot) | `Appliquer-Lot HY3` vert et commité ; `dotnet --version` rend 10.0.403 à la racine ; garde éprouvée sur une version forcée ; `Compter-Tests` à l'ouverture suivante |
 | F3 | Page Liste à l'accueil (DEB-Q59 à DEB-Q63) | `Appliquer-Lot F3` vert ; `npm test` vert ; dans le navigateur, statut de la liste conforme après chaque transition : création (Brouillon), soumission (Soumise, numéro), compléments (À compléter), reprise (Brouillon), validation (Validée, « Télécharger »), refus (Refusée) |
 | L1 | Cycle de vie, serveur (DEB-Q73 à DEB-Q78) : `Transitions` du Domaine, table SQLite et migration du schéma 1 au schéma 2, dépôt, service, champ `cycle` de `GET api/fiches/{id}` | `Appliquer-Lot L1` vert (tests, couverture 100 / 100) et commité ; base du poste migrée au schéma 2 au premier lancement (`Localhost`) ; parcours création → soumission → compléments → reprise → nouvelle soumission → validation : six transitions dans `GET api/fiches/{id}`, dans l'ordre, acteurs conformes ; un refus ajoute « Refus » |
-| L2 | Cycle de vie, front : panneau « Cycle de vie » de la page Dialogue (vue pure, coquille sans `innerHTML`) | `npm test` vert ; dans le navigateur, le panneau montre le parcours de L1 et se met à jour après chaque action |
+| L2 | Cycle de vie, front : panneau « Cycle de vie » de la page Dialogue (vue pure, coquille sans `innerHTML`) ; consultation relue après chaque transition (DEB-Q79 à DEB-Q82) | `npm test` vert ; dans le navigateur, le panneau montre le parcours de L1 et se met à jour après chaque action |
 | A1 | Adaptateur IA réel et prompt système (DEB-Q2 : accès à Albert API vérifié à l'ouverture du lot, sinon API Mistral) | scénario e-commerce joué avec l'IA réelle, sans invention ; une demande d'assistance (« pc ne démarre plus », « copieur en panne ») signalée hors périmètre, sans proposition (DEB-Q64) |
 | R1 | Fiche de recette : nominal et retour pour complément | critère de fin du démonstrateur (§1) : **point de terminaison de la V1** |
 
@@ -264,5 +264,9 @@ sont lancés à la main (`npm test`) et leur sortie jointe au compte rendu.
 | DEB-Q76 | (21/11/2026, accord) Migration au démarrage, en transaction : schéma 0 → création (WAL), 1 → ajout de la table, 2 → rien, autre → arrêt (`SchemaFiches.Planifier`, pur) ; aucune reconstitution : le cycle de vie d'une fiche existante commence à la migration |
 | DEB-Q77 | (21/11/2026, accord) Exposition : champ `cycle` en fin de `GET api/fiches/{id}` (`etape, avant, apres, acteur, le`), référence `consultation-reference.json` figée à l'octet par xUnit et lue par Vitest ; panneau « Cycle de vie » de la page Dialogue |
 | DEB-Q78 | (21/11/2026, accord) Deux lots : L1 serveur, L2 front ; L2 bâti après la vérification de L1 |
+| DEB-Q79 | (21/11/2026, « recommandations ok ») Lecture stricte du champ `cycle` par `lireConsultation` (`TransitionVue` : `etape` parmi les six étapes, `avant` statut ou `null`, `apres`, `acteur`, `le`) ; champ absent ou valeur inconnue → `ContratInvalide`, comme le reste du contrat |
+| DEB-Q80 | (21/11/2026, « recommandations ok ») Mise à jour du panneau : après une soumission, une décision ou une reprise RÉUSSIE (les routes qui changent le statut, §5), la consultation est relue (`GET api/fiches/{id}`) dans la même attente ; fiche et cycle pris de la relecture, conversation de la page gardée ; relecture en échec → fiche renvoyée par l'action, ancien cycle, erreur affichée (`apresTransition`, pur). Aucun appel de plus pour la frappe, les tours, les saisies, les propositions ; aucune transition déduite par la page (DEB-Q50) ; le contrat serveur est inchangé (DEB-Q78) |
+| DEB-Q81 | (21/11/2026, « recommandations ok ») Panneau « Cycle de vie » sous le circuit, colonne de la fiche : une ligne par transition, ordre du serveur : étape en français (Création, Soumission, Validation, Demande de compléments, Refus, Reprise), statuts avant → après en badges (« — » à la création), acteur, date et heure jj/mm/aaaa hh:mm à Paris ; cycle vide (fiche antérieure à la migration, DEB-Q76) → « Aucune transition enregistrée (fiche antérieure au suivi du cycle de vie). » |
+| DEB-Q82 | (21/11/2026, « recommandations ok ») Découpage : `dateCourte` et `FUSEAU` déplacés de `features/liste/vue.ts` (qui les réexporte) vers `core/dates.ts`, avec `dateHeure` ; `lignesCycle` et `libelleEtape` purs dans `features/dialogue/vue.ts` ; événements `relue` et `nonRelue` du réducteur ; coquille `PageDialogue.ts` en `textContent`, éprouvée au navigateur ; tables de vérité Vitest, mutations MF22 à MF30 ; aucune dépendance ajoutée |
 
 Questions ouvertes : aucune.

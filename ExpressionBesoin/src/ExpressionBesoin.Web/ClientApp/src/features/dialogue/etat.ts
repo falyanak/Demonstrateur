@@ -1,4 +1,5 @@
-import type { ConsultationVue, ErreurVue, FicheVue, TourVue, TypeDecision } from "../../core/contrats.ts";
+import type { Issue } from "../../core/api.ts";
+import type { ConsultationVue, ErreurVue, FicheVue, TourVue, TransitionVue, TypeDecision } from "../../core/contrats.ts";
 
 // État de la page Dialogue (DEB-Q49) : réducteur PUR, état × événement → état. Aucune règle métier (DEB-Q50) : la fiche
 // vient toujours du serveur ; la page ne garde que ce que l'agent est en train de saisir et l'attente d'une réponse.
@@ -13,6 +14,8 @@ export interface LigneDialogue {
 
 export interface EtatDialogue {
   readonly fiche: FicheVue | null;
+  /** Cycle de vie tel que relu au serveur (L2, DEB-Q80) : jamais calculé par la page. */
+  readonly cycle: readonly TransitionVue[];
   readonly conversation: readonly LigneDialogue[];
   /** Saisie manuelle en cours, par code de rubrique (DEB-Q51) ; gardée tant qu'elle n'est pas enregistrée. */
   readonly brouillons: Readonly<Record<string, string>>;
@@ -29,6 +32,10 @@ export type Evenement =
   | { readonly type: "consultation"; readonly consultation: ConsultationVue }
   | { readonly type: "tour"; readonly envoye: string; readonly tour: TourVue }
   | { readonly type: "fiche"; readonly fiche: FicheVue; readonly enregistree?: string }
+  /** Transition réussie, consultation relue : fiche et cycle remplacés, conversation de la page gardée (DEB-Q80). */
+  | { readonly type: "relue"; readonly consultation: ConsultationVue }
+  /** Transition réussie, relecture en échec : fiche de l'action, ancien cycle, erreur affichée (DEB-Q80). */
+  | { readonly type: "nonRelue"; readonly fiche: FicheVue; readonly erreur: ErreurVue }
   | { readonly type: "refus"; readonly erreur: ErreurVue }
   | { readonly type: "message"; readonly texte: string }
   | { readonly type: "brouillon"; readonly code: string; readonly texte: string }
@@ -38,6 +45,7 @@ export type Evenement =
 
 export const ETAT_INITIAL: EtatDialogue = {
   fiche: null,
+  cycle: [],
   conversation: [],
   brouillons: {},
   message: "",
@@ -51,6 +59,14 @@ export const ETAT_INITIAL: EtatDialogue = {
 /** Départ d'un appel : `null` si un appel est déjà en cours (la page n'en lance pas un second). Pure. */
 export function commencer(etat: EtatDialogue): EtatDialogue | null {
   return etat.attente ? null : { ...etat, attente: true, erreur: null };
+}
+
+/**
+ * Après une transition réussie (soumission, décision, reprise), la consultation est relue (DEB-Q80) : relue → fiche et
+ * cycle du serveur ; échec → fiche renvoyée par l'action, ancien cycle, erreur affichée. Pure.
+ */
+export function apresTransition(fiche: FicheVue, relecture: Issue<ConsultationVue>): Evenement {
+  return relecture.ok ? { type: "relue", consultation: relecture.valeur } : { type: "nonRelue", fiche, erreur: relecture.erreur };
 }
 
 /** Brouillons sans ceux devenus égaux à la valeur retenue (rien à enregistrer) ni ceux d'une rubrique inconnue. Pure. */
@@ -82,7 +98,7 @@ export function reduire(etat: EtatDialogue, evenement: Evenement): EtatDialogue 
   switch (evenement.type) {
     case "consultation": {
       const conversation = evenement.consultation.historique.map((echange) => ({ auteur: echange.auteur, texte: echange.texte, horsPerimetre: false, ecartees: 0 }));
-      return { ...recevoir(etat, evenement.consultation.fiche), conversation };
+      return { ...recevoir(etat, evenement.consultation.fiche), cycle: evenement.consultation.cycle, conversation };
     }
     case "tour": {
       const { tour } = evenement;
@@ -95,6 +111,10 @@ export function reduire(etat: EtatDialogue, evenement: Evenement): EtatDialogue 
     }
     case "fiche":
       return recevoir(etat, evenement.fiche, evenement.enregistree);
+    case "relue":
+      return { ...recevoir(etat, evenement.consultation.fiche), cycle: evenement.consultation.cycle };
+    case "nonRelue":
+      return { ...recevoir(etat, evenement.fiche), erreur: evenement.erreur };
     case "refus":
       return { ...etat, attente: false, erreur: evenement.erreur };
     case "message":

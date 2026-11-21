@@ -493,3 +493,22 @@
   (`Appliquer-Lot` lève sur un cliquet non conforme). Objectif de L1 atteint.
 - L1b : documents seuls (prompt de reprise, historique). Vérifié chez l'assistant : octets (CRLF sans BOM comme les
   originaux), taille du prompt < 30 720 octets. Rien à compiler.
+
+## 21/11/2026 — L2 livré (cycle de vie, front)
+
+- Ouverture (20261121-180238) : 8 pièces conformes à `PIECES.txt` (tailles et SHA-256), archive de 160 entrées au
+  commit `641bf30` (L1b commité), conforme à `MASQUAGE.txt` ; 4 commits à publier et 4 non sauvegardés signalés ;
+  `Compter-Tests` : 568, 0 échec.
+- Constat : `lireConsultation` ignorait le champ `cycle` livré par L1 ; soumission, décision et reprise ne renvoient
+  qu'une fiche, sans cycle. Questions DEB-Q79 à DEB-Q82 posées avec recommandation, « recommandations ok ».
+- L2 : `core/contrats.ts` (`Etape`, `TransitionVue`, `cycle` exigé) ; `core/dates.ts` (`dateCourte` et `FUSEAU`
+  déplacés de `features/liste/vue.ts`, qui les réexporte ; `dateHeure`) ; `features/dialogue/etat.ts` (`cycle` dans
+  l'état, événements `relue` et `nonRelue`, `apresTransition` pur) ; `features/dialogue/vue.ts` (`lignesCycle`,
+  `libelleEtape`, `CYCLE_VIDE`) ; `PageDialogue.ts` (`transitionner` : relecture après les trois transitions ; panneau
+  sous le circuit, `textContent`). Tests : `dates.test.ts` (nouveau, tests de `dateCourte` déplacés de
+  `listeVue.test.ts`), `contrats`, `dialogueEtat`, `dialogueVue`, `listeVue`. Contrat serveur et fichiers .NET inchangés.
+- Vérifié chez l'assistant (réplique de ClientApp, `npm ci` aux versions exactes, Node 22 au lieu de 26) : `tsc -b`,
+  `vite build`, Vitest 249/249 (200 avant), couverture du front 100 % (181/181 lignes, 145/145 branches) ; attendus de
+  date et heure recalculés en Python (zoneinfo, passages à l'heure d'été et d'hiver compris) ; mutations MF22 à MF30
+  sur une copie jetable : 9 détectées sur 9 (1 à 2 échecs chacune) ; aucun `innerHTML` ; CRLF sans BOM comme les
+  originaux. Non vérifié : la coquille au navigateur (parcours de L1 à jouer au poste), Node 26.

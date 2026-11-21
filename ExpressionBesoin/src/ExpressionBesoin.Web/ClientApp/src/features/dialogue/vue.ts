@@ -1,4 +1,5 @@
-import type { FicheVue, RubriqueVue, TypeDecision } from "../../core/contrats.ts";
+import type { Etape, FicheVue, RubriqueVue, TransitionVue, TypeDecision } from "../../core/contrats.ts";
+import { dateHeure } from "../../core/dates.ts";
 import { badgeStatut, type Badge } from "../../core/statuts.ts";
 import type { EtatDialogue } from "./etat.ts";
 
@@ -128,4 +129,43 @@ export function peutEnregistrer(etat: EtatDialogue, code: string): boolean {
 export function noteEcartees(ecartees: number): string | null {
   if (ecartees <= 0) return null;
   return ecartees === 1 ? "1 proposition de l'IA écartée (forme non reconnue)." : `${ecartees} propositions de l'IA écartées (forme non reconnue).`;
+}
+
+/** Une ligne du panneau « Cycle de vie » (L2, DEB-Q81). */
+export interface LigneCycle {
+  readonly etape: string;
+  /** Statut avant la transition ; `null` à la création (affiché « — »). */
+  readonly avant: Badge | null;
+  readonly apres: Badge;
+  readonly acteur: string;
+  /** Date et heure, jj/mm/aaaa hh:mm dans le fuseau. */
+  readonly le: string;
+}
+
+const ETAPES: Readonly<Record<Etape, string>> = {
+  Creation: "Création",
+  Soumission: "Soumission",
+  Validation: "Validation",
+  DemandeComplements: "Demande de compléments",
+  Refus: "Refus",
+  Reprise: "Reprise",
+};
+
+/** Cycle vide : fiche créée avant la migration au schéma 2, sans reconstitution (DEB-Q76). */
+export const CYCLE_VIDE = "Aucune transition enregistrée (fiche antérieure au suivi du cycle de vie).";
+
+/** Libellé d'une étape (plan §3). Pure. */
+export function libelleEtape(etape: Etape): string {
+  return ETAPES[etape];
+}
+
+/** Lignes du panneau, dans l'ordre du serveur (rang) ; aucune transition déduite par la page (DEB-Q50, DEB-Q80). Pure. */
+export function lignesCycle(cycle: readonly TransitionVue[], fuseau: string): LigneCycle[] {
+  return cycle.map((transition) => ({
+    etape: libelleEtape(transition.etape),
+    avant: transition.avant === null ? null : badgeStatut(transition.avant),
+    apres: badgeStatut(transition.apres),
+    acteur: transition.acteur,
+    le: dateHeure(transition.le, fuseau),
+  }));
 }

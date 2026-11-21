@@ -127,6 +127,23 @@ describe("lireConsultation et lireTour sur les références partagées avec xUni
     ]);
   });
 
+  it("consultation : cycle de vie dans l'ordre du serveur, création sans statut avant (L1, DEB-Q79)", () => {
+    expect(lireConsultation(JSON.parse(referenceConsultation)).cycle).toEqual([
+      { etape: "Creation", avant: null, apres: "Brouillon", acteur: "Camille Martin", le: "2026-11-20T09:00:00+00:00" },
+      { etape: "Soumission", avant: "Brouillon", apres: "Soumise", acteur: "Camille Martin", le: "2026-11-20T10:00:00+00:00" },
+      { etape: "DemandeComplements", avant: "Soumise", apres: "ACompleter", acteur: "Dominique Bernard", le: "2026-11-20T11:30:00+00:00" },
+    ]);
+  });
+
+  it.each(["Creation", "Soumission", "Validation", "DemandeComplements", "Refus", "Reprise"])("étape %s acceptée", (etape) => {
+    const brut = { ...JSON.parse(referenceConsultation), cycle: [{ etape, avant: "Soumise", apres: "Validee", acteur: "a", le: "l" }] };
+    expect(lireConsultation(brut).cycle[0]?.etape).toBe(etape);
+  });
+
+  it("cycle vide (fiche antérieure à la migration, DEB-Q76) : accepté", () => {
+    expect(lireConsultation({ ...JSON.parse(referenceConsultation), cycle: [] }).cycle).toEqual([]);
+  });
+
   it("tour : message, hors périmètre, écarts et fiche", () => {
     const tour = lireTour(JSON.parse(referenceTour));
     expect(tour.message).toBe("Quelle application est concernée ? Précisez « le service » s'il y a lieu.");
@@ -153,6 +170,15 @@ describe("lireConsultation et lireTour sur les références partagées avec xUni
     [() => lireConsultation({ ...JSON.parse(referenceConsultation), historique: {} }), "consultation.historique devait être un tableau"],
     [() => lireConsultation({ ...JSON.parse(referenceConsultation), historique: [{ auteur: "Chef", texte: "t", le: "l" }] }), "consultation.historique[0].auteur devait être l'une de Agent, IA"],
     [() => lireConsultation({ ...JSON.parse(referenceConsultation), historique: [{ auteur: "IA", texte: 1, le: "l" }] }), "consultation.historique[0].texte devait être un texte"],
+    [() => lireConsultation({ fiche: JSON.parse(reference), historique: [] }), "consultation.cycle devait être un tableau"],
+    [() => lireConsultation({ ...JSON.parse(referenceConsultation), cycle: {} }), "consultation.cycle devait être un tableau"],
+    [() => lireConsultation({ ...JSON.parse(referenceConsultation), cycle: [null] }), "consultation.cycle[0] devait être un objet"],
+    [() => lireConsultation({ ...JSON.parse(referenceConsultation), cycle: [{ ...{ etape: "Soumission", avant: "Brouillon", apres: "Soumise", acteur: "a", le: "l" }, etape: "Archivage" }] }), "consultation.cycle[0].etape devait être l'une de Creation, Soumission, Validation, DemandeComplements, Refus, Reprise"],
+    [() => lireConsultation({ ...JSON.parse(referenceConsultation), cycle: [{ ...{ etape: "Soumission", avant: "Brouillon", apres: "Soumise", acteur: "a", le: "l" }, avant: undefined }] }), "consultation.cycle[0].avant devait être un texte"],
+    [() => lireConsultation({ ...JSON.parse(referenceConsultation), cycle: [{ ...{ etape: "Soumission", avant: "Brouillon", apres: "Soumise", acteur: "a", le: "l" }, avant: "Archivee" }] }), "consultation.cycle[0].avant devait être l'une de"],
+    [() => lireConsultation({ ...JSON.parse(referenceConsultation), cycle: [{ ...{ etape: "Soumission", avant: "Brouillon", apres: "Soumise", acteur: "a", le: "l" }, apres: null }] }), "consultation.cycle[0].apres devait être un texte"],
+    [() => lireConsultation({ ...JSON.parse(referenceConsultation), cycle: [{ etape: "Soumission", avant: "Brouillon", apres: "Soumise", acteur: "a", le: "l" }, { ...{ etape: "Soumission", avant: "Brouillon", apres: "Soumise", acteur: "a", le: "l" }, acteur: 3 }] }), "consultation.cycle[1].acteur devait être un texte"],
+    [() => lireConsultation({ ...JSON.parse(referenceConsultation), cycle: [{ ...{ etape: "Soumission", avant: "Brouillon", apres: "Soumise", acteur: "a", le: "l" }, le: null }] }), "consultation.cycle[0].le devait être un texte"],
     [() => lireTour(null), "tour devait être un objet"],
     [() => lireTour({ ...JSON.parse(referenceTour), message: null }), "tour.message devait être un texte"],
     [() => lireTour({ ...JSON.parse(referenceTour), horsPerimetre: "non" }), "tour.horsPerimetre devait être un booléen"],

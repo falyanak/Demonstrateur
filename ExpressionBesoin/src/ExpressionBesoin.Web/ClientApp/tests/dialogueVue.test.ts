@@ -1,13 +1,18 @@
 import { describe, expect, it } from "vitest";
 import reference from "./contrats/fiche-reference.json?raw";
-import { lireFiche, type FicheVue, type RubriqueVue, type Statut } from "../src/core/contrats.ts";
+import referenceConsultation from "./contrats/consultation-reference.json?raw";
+import { lireConsultation, lireFiche, type Etape, type FicheVue, type RubriqueVue, type Statut } from "../src/core/contrats.ts";
+import { FUSEAU } from "../src/core/dates.ts";
 import { ETAT_INITIAL, type EtatDialogue } from "../src/features/dialogue/etat.ts";
 import {
   actions,
   badgeRubrique,
   badgeStatut,
   blocs,
+  CYCLE_VIDE,
   DECISIONS,
+  libelleEtape,
+  lignesCycle,
   noteEcartees,
   peutEnregistrer,
   progression,
@@ -170,5 +175,58 @@ describe("noteEcartees", () => {
     [3, "3 propositions de l'IA écartées (forme non reconnue)."],
   ])("%i", (n, attendu) => {
     expect(noteEcartees(n)).toBe(attendu);
+  });
+});
+
+describe("cycle de vie (L2, DEB-Q81)", () => {
+  it.each([
+    ["Creation", "Création"],
+    ["Soumission", "Soumission"],
+    ["Validation", "Validation"],
+    ["DemandeComplements", "Demande de compléments"],
+    ["Refus", "Refus"],
+    ["Reprise", "Reprise"],
+  ] as const)("étape %s → « %s »", (etape: Etape, libelle) => {
+    expect(libelleEtape(etape)).toBe(libelle);
+  });
+
+  it("référence partagée avec xUnit : ordre du serveur, « — » à la création (null), badges des statuts, heure de Paris", () => {
+    expect(lignesCycle(lireConsultation(JSON.parse(referenceConsultation)).cycle, FUSEAU)).toEqual([
+      { etape: "Création", avant: null, apres: { texte: "Brouillon", couleur: "secondary" }, acteur: "Camille Martin", le: "20/11/2026 10:00" },
+      { etape: "Soumission", avant: { texte: "Brouillon", couleur: "secondary" }, apres: { texte: "Soumise", couleur: "info" }, acteur: "Camille Martin", le: "20/11/2026 11:00" },
+      { etape: "Demande de compléments", avant: { texte: "Soumise", couleur: "info" }, apres: { texte: "À compléter", couleur: "warning" }, acteur: "Dominique Bernard", le: "20/11/2026 12:30" },
+    ]);
+  });
+
+  it("parcours complet de L1 puis refus : six transitions et un refus, ordre gardé tel que reçu", () => {
+    const t = (etape: Etape, avant: Statut | null, apres: Statut) => ({ etape, avant, apres, acteur: "a", le: "2026-11-21T08:00:00+00:00" });
+    const cycle = [
+      t("Creation", null, "Brouillon"),
+      t("Soumission", "Brouillon", "Soumise"),
+      t("DemandeComplements", "Soumise", "ACompleter"),
+      t("Reprise", "ACompleter", "Brouillon"),
+      t("Soumission", "Brouillon", "Soumise"),
+      t("Validation", "Soumise", "Validee"),
+      t("Refus", "Soumise", "Refusee"),
+    ];
+    expect(lignesCycle(cycle, FUSEAU).map((l) => [l.etape, l.avant?.texte ?? null, l.apres.texte, l.le])).toEqual([
+      ["Création", null, "Brouillon", "21/11/2026 09:00"],
+      ["Soumission", "Brouillon", "Soumise", "21/11/2026 09:00"],
+      ["Demande de compléments", "Soumise", "À compléter", "21/11/2026 09:00"],
+      ["Reprise", "À compléter", "Brouillon", "21/11/2026 09:00"],
+      ["Soumission", "Brouillon", "Soumise", "21/11/2026 09:00"],
+      ["Validation", "Soumise", "Validée", "21/11/2026 09:00"],
+      ["Refus", "Soumise", "Refusée", "21/11/2026 09:00"],
+    ]);
+  });
+
+  it("le fuseau est un paramètre", () => {
+    const [ligne] = lignesCycle([{ etape: "Creation", avant: null, apres: "Brouillon", acteur: "a", le: "2026-11-20T23:30:00+00:00" }], "America/Cayenne");
+    expect(ligne?.le).toBe("20/11/2026 20:30");
+  });
+
+  it("cycle vide : aucune ligne, message de la fiche antérieure à la migration (DEB-Q76)", () => {
+    expect(lignesCycle([], FUSEAU)).toEqual([]);
+    expect(CYCLE_VIDE).toBe("Aucune transition enregistrée (fiche antérieure au suivi du cycle de vie).");
   });
 });

@@ -1,12 +1,14 @@
 import type { ContextePage, Page } from "../../core/aiguillage.ts";
 import { erreurException, type Issue } from "../../core/api.ts";
-import type { TypeDecision } from "../../core/contrats.ts";
-import { commencer, ETAT_INITIAL, reduire, type EtatDialogue, type Evenement } from "./etat.ts";
-import { actions, badgeStatut, blocs, DECISIONS, noteEcartees, peutEnregistrer, progression, titreFiche, type Badge } from "./vue.ts";
+import type { ConsultationVue, FicheVue, TypeDecision } from "../../core/contrats.ts";
+import { FUSEAU } from "../../core/dates.ts";
+import { apresTransition, commencer, ETAT_INITIAL, reduire, type EtatDialogue, type Evenement } from "./etat.ts";
+import { actions, badgeStatut, blocs, CYCLE_VIDE, DECISIONS, lignesCycle, noteEcartees, peutEnregistrer, progression, titreFiche, type Badge } from "./vue.ts";
 
 // Page Dialogue (F2, DEB-Q48 à DEB-Q53) : COQUILLE sans décision. L'état vient du réducteur (etat.ts), l'affichage du
 // modèle (vue.ts) ; ici, seulement le DOM (textContent, jamais innerHTML) et les appels de l'API.
 // Une saisie (frappe) ne reconstruit pas la page : elle met l'état à jour et rafraîchit les commandes, le focus reste.
+// Panneau « Cycle de vie » (L2) : lignes de vue.ts ; consultation relue après chaque transition (DEB-Q80).
 
 type Attributs = Readonly<Record<string, string>>;
 
@@ -42,19 +44,36 @@ export const page: Page = {
       else rafraichir();
     };
 
-    async function executer<T>(appel: () => Promise<Issue<T>>, succes: (valeur: T) => Evenement): Promise<void> {
+    async function lancer(produire: () => Promise<Evenement>): Promise<void> {
       const depart = commencer(etat);
       if (depart === null) return;
       etat = depart;
       rendre();
       let evenement: Evenement;
       try {
-        const issue = await appel();
-        evenement = issue.ok ? succes(issue.valeur) : { type: "refus", erreur: issue.erreur };
+        evenement = await produire();
       } catch (exception) {
         evenement = { type: "refus", erreur: erreurException(exception) };
       }
       appliquer(evenement, true);
+    }
+
+    function executer<T>(appel: () => Promise<Issue<T>>, succes: (valeur: T) => Evenement): Promise<void> {
+      return lancer(async () => {
+        const issue = await appel();
+        return issue.ok ? succes(issue.valeur) : { type: "refus", erreur: issue.erreur };
+      });
+    }
+
+    // Soumission, décision, reprise : les routes qui changent le statut (plan §5). La consultation est relue dans la même
+    // attente (DEB-Q80) ; une panne de la relecture n'efface pas l'action réussie (apresTransition).
+    function transitionner(appel: () => Promise<Issue<FicheVue>>): Promise<void> {
+      return lancer(async () => {
+        const action = await appel();
+        if (!action.ok) return { type: "refus", erreur: action.erreur };
+        const relecture = await client.consulter(id).catch((exception: unknown): Issue<ConsultationVue> => ({ ok: false, statut: 0, erreur: erreurException(exception) }));
+        return apresTransition(action.valeur, relecture);
+      });
     }
 
     function rafraichir(): void {
@@ -150,8 +169,32 @@ export const page: Page = {
           section.append(champ);
         }
       }
-      section.append(rendreCircuit());
+      section.append(rendreCircuit(), rendreCycle());
       return section;
+    }
+
+    function rendreCycle(): HTMLElement {
+      const panneau = el("section", "border-top mt-3 pt-3", undefined, { "aria-labelledby": "titre-cycle" }, [el("h3", "h6", "Cycle de vie", { id: "titre-cycle" })]);
+      const lignes = lignesCycle(etat.cycle, FUSEAU);
+      if (lignes.length === 0) {
+        panneau.append(el("p", "small text-body-secondary mb-0", CYCLE_VIDE));
+        return panneau;
+      }
+      const liste = el("ol", "list-group list-group-numbered small");
+      for (const ligne of lignes) {
+        liste.append(
+          el("li", "list-group-item d-flex flex-wrap align-items-center gap-2", undefined, {}, [
+            el("span", "fw-semibold", ligne.etape),
+            ligne.avant === null ? el("span", "text-body-secondary", "—") : pastille(ligne.avant),
+            el("span", "", "→", { "aria-label": "devient" }),
+            pastille(ligne.apres),
+            el("span", "", ligne.acteur),
+            el("span", "text-body-secondary ms-auto text-nowrap", ligne.le),
+          ]),
+        );
+      }
+      panneau.append(liste);
+      return panneau;
     }
 
     function rendreCircuit(): HTMLElement {
@@ -165,7 +208,7 @@ export const page: Page = {
         pied.append(
           el("div", "form-check", undefined, {}, [case_, el("label", "form-check-label", "Je confirme que le contenu de la fiche reflète fidèlement mon besoin.", { for: "confirmation" })]),
           el("div", "", undefined, {}, [
-            commande(bouton("Soumettre", "btn-primary", () => void executer(() => client.soumettre(id, etat.confirme), (f) => ({ type: "fiche", fiche: f }))), (e) => actions(e).soumettre),
+            commande(bouton("Soumettre", "btn-primary", () => void transitionner(() => client.soumettre(id, etat.confirme))), (e) => actions(e).soumettre),
           ]),
         );
       }
@@ -181,14 +224,14 @@ export const page: Page = {
           el("div", "d-flex gap-2 align-items-start", undefined, {}, [
             choix,
             commentaire,
-            commande(bouton("Décider", "btn-sm btn-primary", () => void executer(() => client.decider(id, etat.decision, etat.commentaire), (f) => ({ type: "fiche", fiche: f }))), (e) => actions(e).decider),
+            commande(bouton("Décider", "btn-sm btn-primary", () => void transitionner(() => client.decider(id, etat.decision, etat.commentaire))), (e) => actions(e).decider),
           ]),
         );
       }
       const derniere = fiche.decisions[fiche.decisions.length - 1];
       if (derniere !== undefined && derniere.commentaire !== null) pied.append(el("div", "small", `Commentaire de ${derniere.auteur} : ${derniere.commentaire}`));
       if (fiche.statut === "ACompleter") {
-        pied.append(el("div", "", undefined, {}, [commande(bouton("Reprendre la fiche", "btn-warning", () => void executer(() => client.reprendre(id), (f) => ({ type: "fiche", fiche: f }))), (e) => actions(e).reprendre)]));
+        pied.append(el("div", "", undefined, {}, [commande(bouton("Reprendre la fiche", "btn-warning", () => void transitionner(() => client.reprendre(id))), (e) => actions(e).reprendre)]));
       }
       if (actions(etat).telecharger) {
         pied.append(el("div", "", undefined, {}, [el("a", "btn btn-success", "Télécharger la fiche (.docx)", { href: client.urlDocument(id), download: "" })]));

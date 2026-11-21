@@ -3,7 +3,7 @@ import reference from "./contrats/fiche-reference.json?raw";
 import referenceConsultation from "./contrats/consultation-reference.json?raw";
 import referenceTour from "./contrats/tour-reference.json?raw";
 import { lireConsultation, lireFiche, lireTour, type FicheVue, type Statut } from "../src/core/contrats.ts";
-import { commencer, ETAT_INITIAL, nettoyerBrouillons, reduire, type EtatDialogue } from "../src/features/dialogue/etat.ts";
+import { apresTransition, commencer, ETAT_INITIAL, nettoyerBrouillons, reduire, type EtatDialogue } from "../src/features/dialogue/etat.ts";
 
 // Fiche de référence : statut ACompleter ; application = « SICCRF » (AccepteeIA), intitule = « Contrôle des
 // plates-formes e-commerce » (Manuelle), situationActuelle vide avec une proposition, les autres vides.
@@ -44,6 +44,7 @@ describe("reduire", () => {
       { auteur: "IA", texte: "Quelle application est concernée ?", horsPerimetre: false, ecartees: 0 },
     ]);
     expect(etat.attente).toBe(false);
+    expect(etat.cycle).toBe(consultation.cycle);
   });
 
   it("tour : message de l'agent puis réponse de l'IA ajoutés, saisie vidée, fiche remplacée", () => {
@@ -90,5 +91,44 @@ describe("reduire", () => {
   ])("saisie %# : seul le champ visé change", (evenement, change) => {
     const avant: EtatDialogue = { ...ETAT_INITIAL, fiche: fiche(), brouillons: { application: "A" } };
     expect(reduire(avant, evenement)).toEqual({ ...avant, ...change });
+  });
+});
+
+describe("cycle de vie (L2, DEB-Q80)", () => {
+  const consultation = lireConsultation(JSON.parse(referenceConsultation));
+  const ligne = { auteur: "IA" as const, texte: "Bonjour", horsPerimetre: true, ecartees: 1 };
+  const ancienCycle = [consultation.cycle[0]!];
+
+  it("état initial : cycle vide", () => {
+    expect(ETAT_INITIAL.cycle).toEqual([]);
+  });
+
+  it("relue : fiche et cycle du serveur, conversation de la page gardée (indicateurs compris), confirmation remise à zéro", () => {
+    const avant: EtatDialogue = { ...ETAT_INITIAL, fiche: fiche("Soumise"), cycle: ancienCycle, conversation: [ligne], confirme: true, commentaire: "c", attente: true, erreur };
+    const etat = reduire(avant, { type: "relue", consultation });
+    expect(etat).toEqual({ ...avant, fiche: consultation.fiche, cycle: consultation.cycle, confirme: false, commentaire: "", attente: false, erreur: null });
+  });
+
+  it("nonRelue : fiche de l'action, ancien cycle gardé, erreur affichée, attente finie", () => {
+    const avant: EtatDialogue = { ...ETAT_INITIAL, fiche: fiche("Brouillon"), cycle: ancienCycle, conversation: [ligne], confirme: true, attente: true };
+    const etat = reduire(avant, { type: "nonRelue", fiche: fiche("Soumise"), erreur });
+    expect(etat).toEqual({ ...avant, fiche: fiche("Soumise"), confirme: false, attente: false, erreur });
+  });
+
+  it.each([
+    ["fiche", { type: "fiche", fiche: fiche() } as const],
+    ["refus", { type: "refus", erreur } as const],
+    ["tour", { type: "tour", envoye: "m", tour: lireTour(JSON.parse(referenceTour)) } as const],
+  ])("%s : le cycle n'est pas touché (aucune transition déduite par la page)", (_nom, evenement) => {
+    const avant: EtatDialogue = { ...ETAT_INITIAL, fiche: fiche(), cycle: ancienCycle, attente: true };
+    expect(reduire(avant, evenement).cycle).toBe(ancienCycle);
+  });
+
+  it("apresTransition : relecture réussie → relue", () => {
+    expect(apresTransition(fiche("Soumise"), { ok: true, valeur: consultation })).toEqual({ type: "relue", consultation });
+  });
+
+  it("apresTransition : relecture en échec → nonRelue avec la fiche de l'action et l'erreur", () => {
+    expect(apresTransition(fiche("Soumise"), { ok: false, statut: 503, erreur })).toEqual({ type: "nonRelue", fiche: fiche("Soumise"), erreur });
   });
 });

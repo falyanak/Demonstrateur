@@ -40,8 +40,14 @@ export type AuteurEchange = "Agent" | "IA";
 
 export interface EchangeVue { readonly auteur: AuteurEchange; readonly texte: string; readonly le: string }
 
-/** `GET api/fiches/{id}` : fiche et historique du dialogue (DEB-Q21). */
-export interface ConsultationVue { readonly fiche: FicheVue; readonly historique: readonly EchangeVue[] }
+/** Étape du cycle de vie, calculée par le Domaine (`Transitions.EtapeDe`, DEB-Q74), jamais par le front. */
+export type Etape = "Creation" | "Soumission" | "Validation" | "DemandeComplements" | "Refus" | "Reprise";
+
+/** Une transition du cycle de vie (DEB-Q77) : `avant` nul à la création. */
+export interface TransitionVue { readonly etape: Etape; readonly avant: Statut | null; readonly apres: Statut; readonly acteur: string; readonly le: string }
+
+/** `GET api/fiches/{id}` : fiche, historique du dialogue (DEB-Q21) et cycle de vie dans l'ordre du serveur (DEB-Q77, DEB-Q79). */
+export interface ConsultationVue { readonly fiche: FicheVue; readonly historique: readonly EchangeVue[]; readonly cycle: readonly TransitionVue[] }
 
 export interface EcartVue { readonly position: number; readonly code: string; readonly motif: string }
 
@@ -69,6 +75,7 @@ const STATUTS: readonly string[] = ["Brouillon", "Soumise", "Validee", "AComplet
 const ORIGINES: readonly string[] = ["Vide", "AccepteeIA", "Manuelle"];
 const DECISIONS: readonly string[] = ["Valider", "DemanderComplements", "Refuser"];
 const AUTEURS: readonly string[] = ["Agent", "IA"];
+const ETAPES: readonly string[] = ["Creation", "Soumission", "Validation", "DemandeComplements", "Refus", "Reprise"];
 
 export class ContratInvalide extends Error {
   constructor(chemin: string, attendu: string) {
@@ -181,10 +188,25 @@ function lireEcart(v: unknown, c: string): EcartVue {
   return { position: entier(o, "position", c), code: texte(o, "code", c), motif: texte(o, "motif", c) };
 }
 
-/** Consultation d'une fiche (GET api/fiches/{id}). Pure. */
+function lireTransition(v: unknown, c: string): TransitionVue {
+  const o = objet(v, c);
+  return {
+    etape: parmi<Etape>(o, "etape", c, ETAPES),
+    avant: o["avant"] === null ? null : parmi<Statut>(o, "avant", c, STATUTS),
+    apres: parmi<Statut>(o, "apres", c, STATUTS),
+    acteur: texte(o, "acteur", c),
+    le: texte(o, "le", c),
+  };
+}
+
+/** Consultation d'une fiche (GET api/fiches/{id}) ; `cycle` exigé (L1, DEB-Q79). Pure. */
 export function lireConsultation(valeur: unknown): ConsultationVue {
   const o = objet(valeur, "consultation");
-  return { fiche: lireFiche(o["fiche"], "consultation.fiche"), historique: tableau(o, "historique", "consultation", lireEchange) };
+  return {
+    fiche: lireFiche(o["fiche"], "consultation.fiche"),
+    historique: tableau(o, "historique", "consultation", lireEchange),
+    cycle: tableau(o, "cycle", "consultation", lireTransition),
+  };
 }
 
 /** Réponse d'un tour de dialogue (POST api/fiches/{id}/messages). Pure. */

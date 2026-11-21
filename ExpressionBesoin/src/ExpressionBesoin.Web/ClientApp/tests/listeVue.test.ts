@@ -2,33 +2,15 @@ import { describe, expect, it } from "vitest";
 import referenceListe from "./contrats/liste-reference.json?raw";
 import { lireResumes, type ResumeVue, type Statut } from "../src/core/contrats.ts";
 import { AUCUNE_FICHE, dateCourte, FUSEAU, lignes } from "../src/features/liste/vue.ts";
+import * as dates from "../src/core/dates.ts";
 
 // Attendus des dates recalculés par une réplique Python (zoneinfo, Europe/Paris), jamais recopiés de la sortie du code.
+// dateCourte et FUSEAU sont testés dans dates.test.ts (core/dates.ts, L2) ; ici, seulement leur réexport.
 
-describe("dateCourte", () => {
-  it.each([
-    ["2026-11-20T09:00:00+00:00", "20/11/2026"],
-    ["2026-11-20T23:30:00+00:00", "21/11/2026"],
-    ["2026-12-31T22:59:59+00:00", "31/12/2026"],
-    ["2026-12-31T23:00:00+00:00", "01/01/2027"],
-    ["2026-03-29T00:30:00+00:00", "29/03/2026"],
-    ["2026-07-14T21:59:00+00:00", "14/07/2026"],
-    ["2026-07-14T22:00:00+00:00", "15/07/2026"],
-    ["2026-11-20T23:30:00-05:00", "21/11/2026"],
-  ])("%s → %s à Paris", (instant, attendu) => {
-    expect(dateCourte(instant, FUSEAU)).toBe(attendu);
-  });
-
-  it("le fuseau est un paramètre, pas une lecture du poste", () => {
-    expect(dateCourte("2026-11-20T23:30:00+00:00", "America/Cayenne")).toBe("20/11/2026");
-  });
-
-  it.each([["pas une date"], [""]])("texte %j non daté : rendu tel quel", (texte) => {
-    expect(dateCourte(texte, FUSEAU)).toBe(texte);
-  });
-
-  it("fuseau des dates affichées : celui du numéro et du .docx", () => {
-    expect(FUSEAU).toBe("Europe/Paris");
+describe("réexport de core/dates.ts", () => {
+  it("dateCourte et FUSEAU sont ceux de core/dates.ts (un sujet, un endroit)", () => {
+    expect(dateCourte).toBe(dates.dateCourte);
+    expect(FUSEAU).toBe(dates.FUSEAU);
   });
 });
 

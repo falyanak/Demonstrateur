@@ -1,6 +1,6 @@
 # Prompt de reprise — Demonstrateur
 
-> Mis à jour le 21/11/2026 par le lot L1b. Règles génériques : harnais central, `regles\regles-de-travail.md` (v5) ;
+> Mis à jour le 21/11/2026 par le lot L2. Règles génériques : harnais central, `regles\regles-de-travail.md` (v5) ;
 > modèle de projet : `regles\harnais-modele-generique.md` (v2) ; front : `regles\gabarit-frontend-vite-aspnet.md` ;
 > outillage : `C:\Dev\Harnais\docs\specification-harnais-central.md` (fait foi).
 > Historique détaillé : `docs/historique-Demonstrateur.md` (non envoyé par défaut). Documents hors dépôt dont dépend ce
@@ -8,26 +8,27 @@
 > `Expression_de_besoin_demonstrateur_IA_SICCRF.docx` (document de cadrage, novembre 2026). Le modèle `FEB.docx` est
 > versionné depuis I2, nettoyé de ses métadonnées (DEB-Q9, DEB-Q33).
 
-## ▶ ÉTAT AU 21/11/2026 (chantier L ouvert ; L1 vérifié et clos, L2 à faire) — À LIRE D'ABORD
+## ▶ ÉTAT AU 21/11/2026 (chantier L : L1 clos, L2 LIVRÉ, à vérifier au poste) — À LIRE D'ABORD
 
-**Où on en est** : chantiers P, B, I, F clos ; hygiène HY1 à HY3 close. **Chantier L (cycle de vie d'une demande)**
-ouvert avant A1 par décision du développeur (DEB-Q65) : table SQLite `Transitions` plutôt qu'un journal Serilog
-(DEB-Q73 à DEB-Q78). **L1 vérifié au poste** (commit `b275507`) : 568 tests .NET, 0 échec (`Compter-Tests`) ; parcours
-joué par l'API (`Jouer-ParcoursL1.ps1`, hors dépôt) : six transitions dans l'ordre, acteurs conformes, refus →
-« Refus ». L1b : comptes mesurés reportés.
-**Prochaine action** : ouvrir la session (ci-dessous) ; l'assistant livre **L2** (panneau « Cycle de vie » de la page
-Dialogue : vue pure, coquille sans `innerHTML`). **Critère de fin de L2** : `Appliquer-Lot L2` vert et commité ;
-`npm test` vert ; dans le navigateur, le panneau montre le parcours de L1 et se met à jour après chaque action.
+**Où on en est** : chantiers P, B, I, F clos ; hygiène HY1 à HY3 close. **Chantier L (cycle de vie d'une demande)**,
+ouvert avant A1 (DEB-Q65) : L1 (serveur, table `Transitions`) vérifié et clos (`b275507`, 568 tests .NET).
+**L2 livré** (panneau « Cycle de vie » de la page Dialogue, DEB-Q79 à DEB-Q82) : front seul, aucun fichier .NET touché ;
+chez l'assistant : `tsc -b`, `vite build`, Vitest **249** (ESTIMÉ au poste : 200 + 49), couverture du front 100 %,
+mutations MF22 à MF30 détectées.
+**Prochaine action** : appliquer L2 par la ligne enchaînée (§0, `L2`), lancer `npm test` (attendu : 249 tests, 8
+fichiers), puis jouer dans le navigateur le parcours de L1 (création → soumission → compléments → reprise → nouvelle
+soumission → validation ; puis un refus). **Critère de fin de L2** : `Appliquer-Lot L2` vert et commité ; `npm test`
+vert ; le panneau montre le parcours et se met à jour après chaque action. Ensuite L2b (comptes mesurés).
 **Ensuite** : A1 (accès à Albert API à confirmer à son ouverture), puis R1, **point de terminaison de la V1**
-(DEB-D4). **Avant R1** : publier et sauvegarder le dernier commit (3 commits à publier et 3 non sauvegardés à
-l'ouverture du 21/11/2026, 17:54).
+(DEB-D4). **Avant R1** : publier et sauvegarder le dernier commit (4 commits à publier et 4 non sauvegardés à
+l'ouverture du 21/11/2026, 18:02).
 **Ouverture de la session suivante** (site arrêté : il verrouille les DLL de `bin\Debug`) :
 
     Set-Location C:\Dev\Demonstrateur; . C:\Dev\Harnais\outillage\Charger-Harnais.ps1; Ouvrir-Session -BrancheAttendue main
     # attendu : « SESSION PRÉPARÉE : 8 pièce(s) dans C:\Dev\Sessions\Demonstrateur\<horodatage> » ; joindre toutes les
     # pièces et donner leur compte.
 
-**Décisions récentes** : DEB-Q65 à DEB-Q78 (21/11/2026). **Anomalies ouvertes** : aucune. **Questions ouvertes** :
+**Décisions récentes** : DEB-Q79 à DEB-Q82 (21/11/2026). **Anomalies ouvertes** : aucune. **Questions ouvertes** :
 aucune. **Hygiène** : aucune en cours.
 
 ## §0. Protocole (propre au projet)
@@ -44,7 +45,7 @@ aucune. **Hygiène** : aucune en cours.
 | Front | Node.js 26.13.1 LTS et son npm (DEB-D7) ; `node_modules` versionné (DEB-D6), Windows x64 ; `npm ci` seulement s'il manque ; versions exactes (`.npmrc`) |
 | Données | fictives, jamais réelles ; jeux d'essai hors dépôt ; base SQLite hors dépôt, clé `Fiches:Base` fixée par environnement (DEB-Q54, DEB-Q55) : poste `C:\Dev\Demonstrateur-data\fiches.db` (`appsettings.Localhost.json`) ; serveurs `appsettings.Staging.json`, `appsettings.Production.json` (`D:\Donnees\Demonstrateur-data[-staging]`, à confirmer) ; variable `Fiches__Base` prioritaire ; rien dans `appsettings.json` |
 | Dépôt distant | `https://github.com/falyanak/Demonstrateur.git`, **public**, branche `main` ; publication par le développeur seul (`Publier-Branche -Confirmer`, Git Credential Manager) |
-| Identifiants | `DEB-D…`, `DEB-A…`, `DEB-Q…`, `DEB-HY…` ; pris : DEB-D1 à DEB-D7, DEB-Q1 à DEB-Q78, DEB-A1 (close par F2), DEB-A2 (close par HY3), DEB-HY1 (close par HY1), DEB-HY2 (close par HY2) ; mutations M1 à M10, MF1 à MF21 (front) |
+| Identifiants | `DEB-D…`, `DEB-A…`, `DEB-Q…`, `DEB-HY…` ; pris : DEB-D1 à DEB-D7, DEB-Q1 à DEB-Q82, DEB-A1 (close par F2), DEB-A2 (close par HY3), DEB-HY1 (close par HY1), DEB-HY2 (close par HY2) ; mutations M1 à M10, MF1 à MF30 (front) |
 
 Ligne enchaînée du projet (zip portant `DEPOT.txt` = « Demonstrateur ») :
 
@@ -69,7 +70,7 @@ page de liste des fiches et de leur statut. Plan, périmètre et critère de fin
 | I — infrastructure | I1 (SQLite), I2 (.docx) | clos le 21/11/2026 : I1 (`f42de12`), I1b ; I2 relivré en I2a (`e28a964`), I2b |
 | F — front | F1 (socle, API), F2 (Dialogue), F3 (Liste) | F1 clos le 21/11/2026 : F1 (`bfaaf97`), F1b (`fe31e69`), F1c (`3e45551`) ; F2 clos le 21/11/2026 : F2 (`ba3aafd`), F2c (`50ccdb4`) ; F3 clos le 21/11/2026 : F3 (`ce06fe6`), F3b ; `TestsFront` attendu d'OT2 |
 | Hygiène | HY1, HY1b (DEB-HY1 : NuGet, outils dotnet, SDK) ; HY2 (DEB-HY2 : dossier de données par environnement) ; HY3 (DEB-A2 : SDK depuis la racine) | HY1 clos le 21/11/2026 : HY1 (`d307a91`), HY1b ; HY2 clos le 21/11/2026 : HY2 (`9b21bdb`) ; HY3 clos le 21/11/2026 : HY3 (`fcdb37a`) |
-| L — cycle de vie | L1 (serveur), L2 (front) | ouvert le 21/11/2026 (DEB-Q65) ; L1 clos le 21/11/2026 : L1 (`b275507`), L1b ; L2 à faire |
+| L — cycle de vie | L1 (serveur), L2 (front) | ouvert le 21/11/2026 (DEB-Q65) ; L1 clos le 21/11/2026 : L1 (`b275507`), L1b ; L2 livré le 21/11/2026, à vérifier |
 | A — IA réelle | A1 | à faire ; Albert API si accès, sinon Mistral (DEB-Q2) ; critère élargi par DEB-Q64 |
 | R — recette | R1 | à faire |
 
@@ -85,7 +86,7 @@ Comptes de P0 à I1 : historique. Depuis I2a :
 | **Total** | **432** | **525** ; Vitest **58** | **525** (xUnit 4) | **531** ; Vitest **165** | **535** | **538** (Debug, `Compter-Tests`, 0 échec, SDK 10.0.403) | **539** (Debug, `Compter-Tests`, 0 échec) ; Vitest **200** au poste | **568** (Debug, `Compter-Tests`, 0 échec) ; Vitest 200 (inchangé) |
 | Couverture | 1181/1181 lignes, 356/356 branches | cliquet 100 / 100 ; front 74/74, 57/57 | cliquet 100 / 100 | cliquet 100 / 100 ; front 153/153, 123/123 | cliquet 100 / 100 | cliquet 100 / 100 (`Appliquer-Lot HY3` vert) | cliquet 100 / 100 (`Appliquer-Lot F3` vert) ; front 167/167 lignes, 131/131 branches (chez l'assistant) | cliquet 100 / 100 (`Appliquer-Lot L1` vert, commit par la ligne enchaînée) |
 
-L1 : comptes mesurés égaux à l'estimation (Domain +22, Infrastructure +7). Comptes .NET mesurés de HY1 à HY2 : compilés par le SDK 11.0.100 (DEB-A2), cible `net10.0` inchangée ; depuis HY3 : SDK 10.0.403.
+L1 : comptes mesurés égaux à l'estimation (Domain +22, Infrastructure +7). L2 : .NET inchangé (568) ; Vitest 249, front 181/181 lignes, 145/145 branches (chez l'assistant, à mesurer au poste). Comptes .NET mesurés de HY1 à HY2 : compilés par le SDK 11.0.100 (DEB-A2), cible `net10.0` inchangée ; depuis HY3 : SDK 10.0.403.
 
 ## §2. Points ouverts
 
@@ -123,6 +124,7 @@ L1 : comptes mesurés égaux à l'estimation (Domain +22, Infrastructure +7). Co
 | DEB-D7 | Principe des versions : dernière STABLE de chaque outil et bibliothèque, dernière LTS des environnements d'exécution, épinglées exactement ; prime sur la marge de 14 jours du modèle générique ; Node.js 26.13.1, TypeScript 7.0.2, Vite 8.3.8, Vitest 5.1.1 ; .NET 10 ; NuGet par DEB-HY1 : plan §8 (demande du développeur, 21/11/2026). |
 | DEB-Q45 à DEB-Q47 | Versions (HY1) : `net10.0` gardé malgré .NET 11 (non LTS), paquets du framework en 10.0.15 ; xUnit 4.0.3 (MTP v2), runner 4.0.1, Test.Sdk 18.12.0, tous les projets ensemble, révise « xUnit v3 » ; SDK bloqué sur 10.0.403 pour la CI/CD (DEB-Q47, choix du développeur) : plan §8 (21/11/2026). |
 | DEB-Q58 | DEB-A2 corrigée tout de suite, avant F3 : `global.json` déplacé à la racine du dépôt (racine de lot ajoutée d'abord, par F2c), garde du SDK au build ; DEB-Q47 inchangée (choix du développeur, 21/11/2026). |
+| DEB-Q79 à DEB-Q82 | Panneau « Cycle de vie » (L2) : `cycle` lu strictement par `lireConsultation` ; consultation relue après une soumission, une décision ou une reprise réussie (fiche et cycle relus, conversation gardée ; échec → fiche de l'action, ancien cycle, erreur), aucune transition déduite par la page, contrat serveur inchangé ; panneau sous le circuit : étape en français, statuts en badges, acteur, date et heure à Paris, message pour un cycle vide ; `core/dates.ts` (`dateCourte`, `dateHeure`, `FUSEAU`) : plan §8 (« recommandations ok », 21/11/2026). |
 | DEB-Q65 à DEB-Q78 | Cycle de vie (chantier L, ouvert avant A1, DEB-Q65) : aucun texte libre ; table `Transitions` (métier, même transaction que la fiche) plutôt que Serilog (évolution V2), DEB-Q67 à DEB-Q72 sans objet ; ligne `Avant`/`Apres`/`Acteur`/`Le`, étape calculée, contrainte CHECK sur les six transitions ; `Transitions.Entre` pur, `Cycle` inchangé ; migration 1 → 2 au démarrage sans reconstitution ; champ `cycle` de `GET api/fiches/{id}`, panneau en L2 : plan §8 (« recommandations ok » puis « accord », 21/11/2026). |
 | DEB-Q59 à DEB-Q63 | Page Liste (F3) : à l'accueil, sans route nouvelle ; action « Ouvrir » (et non « Reprendre », réservé à la transition) et « Télécharger » si validée ; `lireResumes`, `lister`, vue pure, coquille `PageListe.ts`, badge du statut dans `core/statuts.ts`, référence `liste-reference.json` partagée ; date de création jj/mm/aaaa à Paris ; toutes les fiches, ordre du serveur, rechargée à l'affichage : plan §8 (« recommandations ok », 21/11/2026). |
 | DEB-Q54 à DEB-Q57 | Données (HY2) : poste `C:\Dev\Demonstrateur-data\fiches.db` (révise DEB-Q31) ; `Fiches:Base` dans `appsettings.{Localhost,Staging,Production}.json`, rien dans `appsettings.json`, variable `Fiches__Base` prioritaire ; serveur : hors dossier publié, volume local, droit Modification du pool ; publication IIS hors V1 ; convention versée au harnais : plan §8 (« recommandations ok », DEB-Q55 précisée par le développeur, 21/11/2026). |
@@ -169,9 +171,9 @@ ExpressionBesoin/
                                         IncludeViteDist, ViteClean)
   src/ExpressionBesoin.Web/ClientApp/   package.json, package-lock.json, .npmrc, tsconfig*.json, vite.config.ts,
                                         vitest.config.ts ; src/main.ts (coquille) ; src/core/ Url, contrats, api,
-                                        agentCourant, aiguillage, chemins, statuts (purs) ; src/features/liste/ vue (pur),
-                                        PageListe (coquille) (F3) ; src/features/dialogue/ etat, vue (purs), PageDialogue (coquille) (F2) ;
-                                        src/styles/main.scss ; tests/ (Vitest : Url, agentCourant, api, contrats,
+                                        agentCourant, aiguillage, chemins, dates (L2), statuts (purs) ; src/features/liste/ vue (pur),
+                                        PageListe (coquille) (F3) ; src/features/dialogue/ etat, vue (purs), PageDialogue (coquille) (F2 ; cycle de vie L2) ;
+                                        src/styles/main.scss ; tests/ (Vitest : Url, agentCourant, api, contrats, dates,
                                         dialogueEtat, dialogueVue, listeVue) et tests/contrats/{fiche,consultation,tour,liste}-reference.json ;
                                         node_modules/ (DEB-D6)
   tests/Directory.Build.props
@@ -202,7 +204,7 @@ ExpressionBesoin/
 | Codes de refus du Domaine | `fiche.nonModifiable`, `proposition.absente`, `cycle.transitionInterdite`, `soumission.{confirmationAbsente,incomplete,propositionsEnAttente}`, `decision.commentaireObligatoire`, `numerotation.{annee,illisible,anneeAnterieure,epuisee}` | tests de B1 |
 | Stockage des fiches | JSON v1 (DEB-Q28) ; schéma SQLite `user_version = 2` (DEB-Q29, DEB-Q76 : migration depuis 1), tables `Fiches`, `Echanges`, `Transitions` (CHECK : six transitions du cycle) | `CodecFicheTests` (JSON de référence à l'octet), `DepotFichesSqliteTests`, `SchemaFichesTests` (I1) |
 | API des fiches | plan §5 (route `reprendre` comprise) ; refus `fiche.introuvable`, `agent.inconnu`, `rubrique.inconnue`, `message.vide`, `document.nonValidee`, `decision.inconnue` ; 404 / 409 / 422, panne 503 `panne.technique` (DEB-Q42) ; en-tête `X-Agent` | tests de B2 ; `PointsFichesTests`, `ParcoursFicheTests`, `StatutHttpTests` (F1) |
-| Cycle de vie | `Transitions.Entre` (statut inchangé → aucune), `EtapeDe` (six paires, sinon lève) ; consultation : `cycle` = `[{ etape, avant, apres, acteur, le }]` en dernier champ (DEB-Q77) | `TransitionsTests`, `SchemaFichesTests` (contrainte = Domaine sur 30 paires), `ParcoursFicheTests` (L1) |
+| Cycle de vie | `Transitions.Entre` (statut inchangé → aucune), `EtapeDe` (six paires, sinon lève) ; consultation : `cycle` = `[{ etape, avant, apres, acteur, le }]` en dernier champ (DEB-Q77), lu strictement par le front (DEB-Q79) | `TransitionsTests`, `SchemaFichesTests` (contrainte = Domaine sur 30 paires), `ParcoursFicheTests` (L1) ; `contrats.test.ts` (L2) |
 | JSON de l'API | projections de `Web/Api/Vues.cs`, camelCase, énumérations par leur nom, encodeur relâché (`ContratJson`) ; fiche : `id, numero, statut, enTete, rubriques, obligatoires, remplies, complete, modifiable, prochaineRubrique, confirmeeLe, decisions` | `FicheVueTests` (octets de `ClientApp/tests/contrats/{fiche,consultation,tour,liste}-reference.json`, réplique Python) et `contrats.test.ts` (Vitest) |
 | Pages | `GET /` (accueil : « Nouvelle fiche » et liste, `data-page="liste"`, F3) ; `GET /Home/Dialogue/{id}` → `<div id="app" data-page="dialogue" data-fiche="{id}">`, 404 sans Guid non vide (DEB-Q48) | `PointsFichesTests` (F2) |
 | IA scénarisée | réponse au contrat du plan §2 (`ScenarioDialogue`, DEB-Q41) | `ScenarioDialogueTests` (F1) |
@@ -217,10 +219,11 @@ synthèse CODIR / COPIL, export PDF, version optimiste des fiches (DEB-Q26), jou
 
 ## §7. Prochaine session
 
-Acquis : plan v1.17 ; socle P0, Domaine B1, Application B2, Infrastructure I1 et I2, front F1 à F3, hygiène HY1 à HY3,
-cycle de vie serveur L1 validés sur le poste (568 tests .NET, couverture 100 %, Vitest 200 ; schéma SQLite 2).
+Acquis : plan v1.18 ; socle P0, Domaine B1, Application B2, Infrastructure I1 et I2, front F1 à F3, hygiène HY1 à HY3,
+cycle de vie serveur L1 validés sur le poste (568 tests .NET, couverture 100 %, Vitest 200 ; schéma SQLite 2) ; L2
+livré, non vérifié au poste.
 Audit honnête : chez l'assistant, ni SDK .NET ni NuGet (C# analysé par tree-sitter, pas compilé ; Vitest sur une
-réplique, Node 22 au lieu de 26) : la compilation et `Appliquer-Lot` au poste tranchent. Pour L1, la sortie
-d'`Appliquer-Lot L1` n'a pas été reçue : le verdict « couverture conforme » se déduit du commit, fait par la ligne
-enchaînée (la commande lève sur un cliquet non conforme). Plan ordonné : L2 (panneau), A1, R1 (point de terminaison
-de la V1, DEB-D4). Pièces à envoyer : toutes celles d'`Ouvrir-Session` (8), avec leur compte, site arrêté.
+réplique, Node 22 au lieu de 26) : la compilation et `Appliquer-Lot` au poste tranchent. L2 ne touche aucun fichier
+.NET ; la coquille `PageDialogue.ts` n'est pas testée par Vitest (DEB-Q49) : le parcours du navigateur l'éprouve. Plan
+ordonné : vérification de L2 (L2b), A1, R1 (point de terminaison de la V1, DEB-D4). Pièces à envoyer : toutes celles
+d'`Ouvrir-Session` (8), avec leur compte, site arrêté ; et la sortie d'`Appliquer-Lot L2` et de `npm test`.
