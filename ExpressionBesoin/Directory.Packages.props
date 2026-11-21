@@ -1,21 +1,22 @@
 <Project>
-  <!-- Une version par paquet (gestion centralisée). Versions publiées depuis plus de 14 jours au 20/11/2026. -->
+  <!-- Une version par paquet (gestion centralisée). Principe des versions (DEB-D7) : dernière version stable, épinglée
+       exactement ; versions relevées sur nuget.org le 21/11/2026 (lot HY1, DEB-HY1). -->
   <PropertyGroup>
     <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
   </PropertyGroup>
   <ItemGroup>
-    <!-- xUnit v3 retenu, pas la v4 (4.0.0 du 15/08/2026) : migration de tous les projets ensemble, après essai (règles,
-         annexe « xUnit »). 3.2.2 : version résolue sur le poste le 08/11/2026 (démonstration du harnais, lot OT1c). -->
-    <PackageVersion Include="xunit.v3" Version="3.2.2" />
-    <!-- 3.1.5 : dernière de la série 3, celle qui accompagne xunit.v3 3.x (la série 4 accompagne xUnit 4). -->
-    <PackageVersion Include="xunit.runner.visualstudio" Version="3.1.5" />
-    <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="18.10.1" />
-    <!-- Même version majeure que le framework partagé ASP.NET Core 10. -->
-    <PackageVersion Include="Microsoft.AspNetCore.Mvc.Testing" Version="10.0.12" />
+    <!-- xUnit 4 (DEB-Q46, révise « xUnit v3 ») : tous les projets de tests migrés ensemble ; Microsoft Testing Platform
+         v2 par défaut. 4.0.3 du 09/11/2026. -->
+    <PackageVersion Include="xunit.v3" Version="4.0.3" />
+    <!-- Série 4 de l'adaptateur Visual Studio, celle qui accompagne xUnit 4 ; 4.0.1 du 09/10/2026. -->
+    <PackageVersion Include="xunit.runner.visualstudio" Version="4.0.1" />
+    <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="18.12.0" />
+    <!-- Série 10.0 du framework partagé ASP.NET Core 10 (DEB-Q45 : .NET 10 LTS ; la 11.0.0 ne cible que net11.0). -->
+    <PackageVersion Include="Microsoft.AspNetCore.Mvc.Testing" Version="10.0.15" />
   </ItemGroup>
   <ItemGroup>
-    <!-- Infrastructure (lot I1, DEB-Q12) : SQLite sans Entity Framework ; série 10.0 du framework, 10.0.11 relevée sur
-         nuget.org le 20/11/2026 (SQLitePCLRaw 2.1.x, appel natif sqlite3_db_config de ConnexionsSqlite). -->
-    <PackageVersion Include="Microsoft.Data.Sqlite" Version="10.0.11" />
+    <!-- Infrastructure (lot I1, DEB-Q12) : SQLite sans Entity Framework ; série 10.0 du framework (DEB-Q45), 10.0.15 du
+         10/11/2026 ; dépend toujours de SQLitePCLRaw 2.1.x (2.1.13), dont ConnexionsSqlite appelle sqlite3_db_config. -->
+    <PackageVersion Include="Microsoft.Data.Sqlite" Version="10.0.15" />
   </ItemGroup>
 </Project>

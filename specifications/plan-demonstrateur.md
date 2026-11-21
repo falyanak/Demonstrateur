@@ -1,9 +1,10 @@
 # Plan du démonstrateur « Expression de besoin » (version simplifiée)
 
-> Version 1.9 du 21/11/2026 (lot F1 ; 1.8 au lot I2b, 1.7 au lot I2, 1.6 au lot I1, 1.5 au lot B2, 1.4 au lot B1b, 1.3 au lot B1, 1.2 au lot P0c, 1.1 au
+> Version 1.10 du 21/11/2026 (lot HY1 ; 1.9 au lot F1, 1.8 au lot I2b, 1.7 au lot I2, 1.6 au lot I1, 1.5 au lot B2, 1.4 au lot B1b, 1.3 au lot B1, 1.2 au lot P0c, 1.1 au
 > lot P0, 1.0 au lot P0a). Arbitrages DEB-Q1 à DEB-Q8, DEB-Q11 à DEB-Q32 : « recommandations ok » (20/11/2026) ; DEB-Q9 :
 > « ok » (20/11/2026) ; DEB-Q33 à DEB-Q37 : « recommandations ok » (21/11/2026) ;
-> DEB-Q38 à DEB-Q44 : « recommandations ok » (21/11/2026). Décisions : §8. Document d'origine **hors
+> DEB-Q38 à DEB-Q44 : « recommandations ok » (21/11/2026) ; DEB-Q45, DEB-Q46 : « recommandations ok »
+> (21/11/2026) ; DEB-Q47 : tranchée par le développeur (21/11/2026). Décisions : §8. Document d'origine **hors
 > dépôt** (DEB-D2) : cahier des charges « Document de cadrage » (novembre 2026), tenu par le développeur ; le modèle de
 > fiche (FEB) est versionné, nettoyé de ses métadonnées (DEB-Q9, DEB-Q33).
 
@@ -155,6 +156,7 @@ Liste : N°, intitulé, demandeur, date, statut (badge), actions *Reprendre* et 
 | I1 | SQLite, référentiel fictif agent → service → chef | tests d'intégration sur le schéma de production |
 | I2 | Génération .docx sur le gabarit FEB (DEB-Q9) | octets stables ; fichier ouvert dans Word |
 | F1 | Socle du front (gabarit Vite, DEB-D7), composition dans `Program`, routes du §5, IA scénarisée (DEB-Q38 à DEB-Q44) | `Appliquer-Lot` vert (tests, couverture) ; `npm test` vert ; `node_modules` commité ; parcours de l'API joué sur 5080 |
+| HY1 | Hygiène DEB-HY1 : paquets NuGet, outils dotnet et SDK alignés sur DEB-D7 (DEB-Q45 à DEB-Q47) | `Appliquer-Lot` vert et commité (525 tests, couverture 100 / 100) ; `Compter-Tests` compte 525 à l'ouverture suivante |
 | F2 | Page Dialogue | parcours complet avec l'IA scénarisée, dans le navigateur |
 | F3 | Page Liste | statuts conformes après chaque transition |
 | A1 | Adaptateur IA réel et prompt système (DEB-Q2) | scénario e-commerce joué avec l'IA réelle, sans invention |
@@ -218,6 +220,9 @@ sont lancés à la main (`npm test`) et leur sortie jointe au compte rendu.
 | DEB-Q42 | (21/11/2026) Refus → HTTP : 404, 409, 422, panne 503 (§5) ; agent courant par l'en-tête `X-Agent`. |
 | DEB-Q43 | (21/11/2026) Contrat JSON : projections pures du Web, camelCase, énumérations par leur nom ; même fichier de référence testé à l'octet par xUnit et lu par Vitest. |
 | DEB-Q44 | (21/11/2026) `<vite-scripts />` sans exclusion de couverture : `ViteTags` pur (table de vérité), coquille testée par ses E/S réelles. |
+| DEB-Q45 | (21/11/2026, « recommandations ok ») .NET 11 (paru le 10/11/2026, non LTS) écarté : `net10.0` gardé (DEB-D7) ; paquets liés au framework (`Microsoft.AspNetCore.Mvc.Testing`, `Microsoft.Data.Sqlite`) sur la dernière 10.0.x (10.0.15) ; Mvc.Testing 11 ne cible que net11.0, Sqlite 10.0.15 reste sur SQLitePCLRaw 2.1. |
+| DEB-Q46 | (21/11/2026, « recommandations ok ») xUnit 4 (`xunit.v3` 4.0.3, Microsoft Testing Platform v2 par défaut), `xunit.runner.visualstudio` 4.0.1, `Microsoft.NET.Test.Sdk` 18.12.0, tous les projets ensemble ; révise « xUnit v3 » ; l'essai est `Appliquer-Lot HY1`, un échec retient le commit. Outils : dotnet-coverage 18.12.0, ReportGenerator 5.6.0. |
+| DEB-Q47 | (21/11/2026, tranchée par le développeur, contre la recommandation « 10.0.404 minimum, `latestFeature` ») SDK **bloqué** sur 10.0.403 (`global.json`, `rollForward: disable`) pour la conformité de la chaîne CI/CD ; .NET 11 installé sur le poste, non utilisé. Écart au modèle générique (§4.1 : 10.0.100, `latestFeature`) acté ici. |
 
 Questions ouvertes :
 

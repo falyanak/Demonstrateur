@@ -282,3 +282,21 @@
   `Invoke-RestMethod` rend un tableau JSON comme UN objet, que `@(…)` emballe (annexe des règles, piège de
   `ConvertFrom-Json`). Recompté par la commande jointe à F1c. Leçon versée au §2 du prompt pour le harnais.
 - Critère de fin de F1 atteint : objectif atteint, on arrête F1. F1c : documents seulement.
+
+## 21/11/2026 — HY1 : versions NuGet, outils dotnet et SDK (DEB-HY1)
+
+- Ouverture : pièces contrôlées (8, tailles et SHA-256 conformes à `PIECES.txt` ; archive 141 entrées, commit
+  `3e4555112f69`, aucun masquage) ; F1c commité ; 525 tests mesurés (`Compter-Tests`), 0 échec. Journal : 1 commit à
+  publier, 1 commit non sauvegardé (publication et sauvegarde demandées au développeur).
+- Versions relevées sur nuget.org le 21/11/2026 : `xunit.v3` 4.0.3 (09/11), `xunit.runner.visualstudio` 4.0.1 (09/10),
+  `Microsoft.NET.Test.Sdk` 18.12.0 (11/11), `Microsoft.AspNetCore.Mvc.Testing` et `Microsoft.Data.Sqlite` 11.0.0 et
+  10.0.15 (10/11), dotnet-coverage 18.12.0 (06/10), ReportGenerator 5.6.0 (10/11) ; .NET 10.0.15 (correctif de sécurité
+  du 10/11, SDK 10.0.404 et 10.0.115). Sqlite 10.0.15 dépend de SQLitePCLRaw 2.1.13 (appel direct de
+  `sqlite3_db_config` inchangé). Surface xUnit des tests : `[Fact]`, `[Theory]`, `TestContext.Current` seulement.
+- DEB-Q45, DEB-Q46 : « recommandations ok » ; DEB-Q47 tranchée par le développeur contre la recommandation (SDK
+  10.0.404 minimum) : `global.json` bloqué sur 10.0.403, `rollForward: disable`, pour la conformité CI/CD ; .NET 11
+  installé sur le poste. Plan v1.10.
+- HY1 : `Directory.Packages.props`, `.config/dotnet-tools.json`, `global.json`, plan, prompt, historique. Vérifié par
+  l'assistant : JSON et XML bien formés, fins de ligne CRLF conservées, aucun BOM ajouté. Non vérifié : restauration,
+  compilation, tests .NET, couverture, format de sortie de xUnit 4 lu par le harnais (SDK .NET et nuget.org refusés au
+  shell de l'assistant) : le poste tranche.
