@@ -212,3 +212,15 @@
   sous ICU, « \u0001 » est ignorable et se trouve dans tout texte. Défaut du test, pas du code. Lot I2a : I2 complet,
   ce test en comparaison ordinale et sans exigence sur « > » (XML n'impose que « & » et « < »). Leçon générique à verser
   aux règles par un lot du harnais : assertion sur une sous-chaîne → `StringComparison.Ordinal`.
+
+## 21/11/2026 — I2a validé, I2b : clôture du chantier I
+
+- `Appliquer-Lot I2a` (après remise de l'arbre à HEAD, fichiers d'I2 seuls) : 21 fichiers, compilation Release,
+  432 tests MESURÉS (Domain 207, Application 66, Infrastructure 109, Web 30, Architecture 20), 0 échec ; commit
+  `e28a964`. L'hypothèse d'I2 (comparaison selon la culture) n'est pas démentie : le seul test retouché passe.
+- Mutations sur clone jetable : M9 → `Failed: 1` (Domain, attendu 1) ; M10 → `Failed: 5` (Infrastructure, estimé 5).
+- `Lancer-Couverture -UpdateBaseline` : lignes 1181/1181, branches 356/356 = 100 %, base inchangée (déjà à 100 %),
+  « COUVERTURE CONFORME ».
+- Exemplaire EB-2026-0007 (commande de l'entrée I2) : ouvert dans Word sans réparation, conforme au modèle FEB (en-tête,
+  logo, case ☒, « Validée » dans la ligne du chef), déclaration du développeur du 21/11/2026.
+- DEB-Q33 à DEB-Q37 : « recommandations ok » (21/11/2026) ; plan v1.8. Chantier I clos. I2b : documents seuls.
