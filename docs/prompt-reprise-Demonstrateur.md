@@ -1,6 +1,6 @@
 # Prompt de reprise — Demonstrateur
 
-> Mis à jour le 21/11/2026 par le lot L1. Règles génériques : harnais central, `regles\regles-de-travail.md` (v5) ;
+> Mis à jour le 21/11/2026 par le lot L1b. Règles génériques : harnais central, `regles\regles-de-travail.md` (v5) ;
 > modèle de projet : `regles\harnais-modele-generique.md` (v2) ; front : `regles\gabarit-frontend-vite-aspnet.md` ;
 > outillage : `C:\Dev\Harnais\docs\specification-harnais-central.md` (fait foi).
 > Historique détaillé : `docs/historique-Demonstrateur.md` (non envoyé par défaut). Documents hors dépôt dont dépend ce
@@ -8,23 +8,19 @@
 > `Expression_de_besoin_demonstrateur_IA_SICCRF.docx` (document de cadrage, novembre 2026). Le modèle `FEB.docx` est
 > versionné depuis I2, nettoyé de ses métadonnées (DEB-Q9, DEB-Q33).
 
-## ▶ ÉTAT AU 21/11/2026 (chantier L ouvert ; L1 livré, à appliquer) — À LIRE D'ABORD
+## ▶ ÉTAT AU 21/11/2026 (chantier L ouvert ; L1 vérifié et clos, L2 à faire) — À LIRE D'ABORD
 
-**Où on en est** : chantiers P, B, I, F clos ; hygiène HY1 à HY3 close ; F3 vérifié au poste (539 tests .NET, Vitest
-200, commit `ce06fe6`). **Chantier L (cycle de vie d'une demande)** ouvert avant A1 par décision du développeur
-(DEB-Q65) : table SQLite `Transitions` plutôt qu'un journal Serilog (DEB-Q73 à DEB-Q78). **L1 livré** (serveur :
-Domaine, table, migration du schéma 1 au schéma 2, dépôt, service, champ `cycle` de l'API), **non vérifié au poste**.
-**Prochaine action** : appliquer L1 (site arrêté), puis lancer le site au profil `Localhost` (la base du poste passe
-au schéma 2) et jouer le parcours création → soumission → compléments → reprise → nouvelle soumission → validation ;
-envoyer la sortie d'`Appliquer-Lot L1` et la réponse de `GET api/fiches/{id}` (champ `cycle`) :
-
-    Set-Location C:\Dev\Demonstrateur; . C:\Dev\Harnais\outillage\Charger-Harnais.ps1; Appliquer-Lot L1; if ($?) { git add -A; git commit -m "L1 : cycle de vie des fiches (table Transitions, schéma 2, champ cycle de l'API)" }
-
-**Critère de fin de L1** : `Appliquer-Lot L1` vert (tests, couverture 100 / 100) et commité ; base du poste migrée ;
-six transitions dans l'ordre, acteurs conformes ; un refus ajoute « Refus ». **Ensuite** : L1b (comptes mesurés),
-L2 (panneau « Cycle de vie » de la page Dialogue), puis A1 (accès à Albert API à confirmer à son ouverture), puis R1,
-**point de terminaison de la V1** (DEB-D4). **Avant R1** : publier et sauvegarder le dernier commit (2 commits à
-publier et 2 non sauvegardés à l'ouverture du 21/11/2026, 17:32).
+**Où on en est** : chantiers P, B, I, F clos ; hygiène HY1 à HY3 close. **Chantier L (cycle de vie d'une demande)**
+ouvert avant A1 par décision du développeur (DEB-Q65) : table SQLite `Transitions` plutôt qu'un journal Serilog
+(DEB-Q73 à DEB-Q78). **L1 vérifié au poste** (commit `b275507`) : 568 tests .NET, 0 échec (`Compter-Tests`) ; parcours
+joué par l'API (`Jouer-ParcoursL1.ps1`, hors dépôt) : six transitions dans l'ordre, acteurs conformes, refus →
+« Refus ». L1b : comptes mesurés reportés.
+**Prochaine action** : ouvrir la session (ci-dessous) ; l'assistant livre **L2** (panneau « Cycle de vie » de la page
+Dialogue : vue pure, coquille sans `innerHTML`). **Critère de fin de L2** : `Appliquer-Lot L2` vert et commité ;
+`npm test` vert ; dans le navigateur, le panneau montre le parcours de L1 et se met à jour après chaque action.
+**Ensuite** : A1 (accès à Albert API à confirmer à son ouverture), puis R1, **point de terminaison de la V1**
+(DEB-D4). **Avant R1** : publier et sauvegarder le dernier commit (3 commits à publier et 3 non sauvegardés à
+l'ouverture du 21/11/2026, 17:54).
 **Ouverture de la session suivante** (site arrêté : il verrouille les DLL de `bin\Debug`) :
 
     Set-Location C:\Dev\Demonstrateur; . C:\Dev\Harnais\outillage\Charger-Harnais.ps1; Ouvrir-Session -BrancheAttendue main
@@ -73,24 +69,23 @@ page de liste des fiches et de leur statut. Plan, périmètre et critère de fin
 | I — infrastructure | I1 (SQLite), I2 (.docx) | clos le 21/11/2026 : I1 (`f42de12`), I1b ; I2 relivré en I2a (`e28a964`), I2b |
 | F — front | F1 (socle, API), F2 (Dialogue), F3 (Liste) | F1 clos le 21/11/2026 : F1 (`bfaaf97`), F1b (`fe31e69`), F1c (`3e45551`) ; F2 clos le 21/11/2026 : F2 (`ba3aafd`), F2c (`50ccdb4`) ; F3 clos le 21/11/2026 : F3 (`ce06fe6`), F3b ; `TestsFront` attendu d'OT2 |
 | Hygiène | HY1, HY1b (DEB-HY1 : NuGet, outils dotnet, SDK) ; HY2 (DEB-HY2 : dossier de données par environnement) ; HY3 (DEB-A2 : SDK depuis la racine) | HY1 clos le 21/11/2026 : HY1 (`d307a91`), HY1b ; HY2 clos le 21/11/2026 : HY2 (`9b21bdb`) ; HY3 clos le 21/11/2026 : HY3 (`fcdb37a`) |
-| L — cycle de vie | L1 (serveur), L2 (front) | ouvert le 21/11/2026 (DEB-Q65) ; L1 livré, à appliquer ; L2 à faire |
+| L — cycle de vie | L1 (serveur), L2 (front) | ouvert le 21/11/2026 (DEB-Q65) ; L1 clos le 21/11/2026 : L1 (`b275507`), L1b ; L2 à faire |
 | A — IA réelle | A1 | à faire ; Albert API si accès, sinon Mistral (DEB-Q2) ; critère élargi par DEB-Q64 |
 | R — recette | R1 | à faire |
 
 Comptes de P0 à I1 : historique. Depuis I2a :
 
-| Projet de tests | I2a, poste | F1, poste | HY1, poste | F2, poste | HY2, poste | HY3, poste | F3, poste (21/11/2026) |
-| --- | --- | --- | --- | --- | --- | --- | --- |
-| ExpressionBesoin.Domain.Tests | 207 | 207 | 207 | 207 | 207 | 207 | 207 |
-| ExpressionBesoin.Application.Tests | 66 | 66 | 66 | 66 | 66 | 66 | 66 |
-| ExpressionBesoin.Infrastructure.Tests | 109 | 135 | 135 | 135 | 135 | 135 | 135 |
-| ExpressionBesoin.Web.Tests | 30 | 97 | 97 | 103 | 107 | 107 | 108 |
-| ExpressionBesoin.Architecture.Tests | 20 | 20 | 20 | 20 | 20 | 23 | 23 |
-| **Total** | **432** | **525** ; Vitest **58** | **525** (xUnit 4) | **531** ; Vitest **165** | **535** | **538** (Debug, `Compter-Tests`, 0 échec, SDK 10.0.403) | **539** (Debug, `Compter-Tests`, 0 échec) ; Vitest **200** au poste |
-| Couverture | 1181/1181 lignes, 356/356 branches | cliquet 100 / 100 ; front 74/74, 57/57 | cliquet 100 / 100 | cliquet 100 / 100 ; front 153/153, 123/123 | cliquet 100 / 100 | cliquet 100 / 100 (`Appliquer-Lot HY3` vert) | cliquet 100 / 100 (`Appliquer-Lot F3` vert) ; front 167/167 lignes, 131/131 branches (chez l'assistant) |
+| Projet de tests | I2a, poste | F1, poste | HY1, poste | F2, poste | HY2, poste | HY3, poste | F3, poste (21/11/2026) | L1, poste (21/11/2026) |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| ExpressionBesoin.Domain.Tests | 207 | 207 | 207 | 207 | 207 | 207 | 207 | 229 |
+| ExpressionBesoin.Application.Tests | 66 | 66 | 66 | 66 | 66 | 66 | 66 | 66 |
+| ExpressionBesoin.Infrastructure.Tests | 109 | 135 | 135 | 135 | 135 | 135 | 135 | 142 |
+| ExpressionBesoin.Web.Tests | 30 | 97 | 97 | 103 | 107 | 107 | 108 | 108 |
+| ExpressionBesoin.Architecture.Tests | 20 | 20 | 20 | 20 | 20 | 23 | 23 | 23 |
+| **Total** | **432** | **525** ; Vitest **58** | **525** (xUnit 4) | **531** ; Vitest **165** | **535** | **538** (Debug, `Compter-Tests`, 0 échec, SDK 10.0.403) | **539** (Debug, `Compter-Tests`, 0 échec) ; Vitest **200** au poste | **568** (Debug, `Compter-Tests`, 0 échec) ; Vitest 200 (inchangé) |
+| Couverture | 1181/1181 lignes, 356/356 branches | cliquet 100 / 100 ; front 74/74, 57/57 | cliquet 100 / 100 | cliquet 100 / 100 ; front 153/153, 123/123 | cliquet 100 / 100 | cliquet 100 / 100 (`Appliquer-Lot HY3` vert) | cliquet 100 / 100 (`Appliquer-Lot F3` vert) ; front 167/167 lignes, 131/131 branches (chez l'assistant) | cliquet 100 / 100 (`Appliquer-Lot L1` vert, commit par la ligne enchaînée) |
 
-L1, ESTIMÉ (à mesurer par `Compter-Tests`) : Domain 229 (+22), Application 66, Infrastructure 142 (+7), Web 108,
-Architecture 23, total **568** ; Vitest 200 inchangé (réplique). Comptes .NET mesurés de HY1 à HY2 : compilés par le SDK 11.0.100 (DEB-A2), cible `net10.0` inchangée ; depuis HY3 : SDK 10.0.403.
+L1 : comptes mesurés égaux à l'estimation (Domain +22, Infrastructure +7). Comptes .NET mesurés de HY1 à HY2 : compilés par le SDK 11.0.100 (DEB-A2), cible `net10.0` inchangée ; depuis HY3 : SDK 10.0.403.
 
 ## §2. Points ouverts
 
@@ -222,10 +217,10 @@ synthèse CODIR / COPIL, export PDF, version optimiste des fiches (DEB-Q26), jou
 
 ## §7. Prochaine session
 
-Acquis : plan v1.17 ; socle P0, Domaine B1, Application B2, Infrastructure I1 et I2, front F1 à F3, hygiène HY1 à HY3
-validés sur le poste (539 tests .NET, couverture 100 %, Vitest 200). L1 livré, non vérifié. Audit honnête : chez
-l'assistant, ni SDK .NET ni NuGet (C# analysé par tree-sitter, pas compilé ; SQL rejoué dans sqlite3 ; Vitest 200/200
-sur une réplique, Node 22 au lieu de 26) : la compilation et `Appliquer-Lot L1` au poste tranchent. Plan ordonné :
-L1 (application, parcours, base migrée), L1b (comptes mesurés), L2 (panneau), A1, R1 (point de terminaison de la V1,
-DEB-D4). Pièces à envoyer : toutes celles d'`Ouvrir-Session` (8), avec leur compte, site arrêté ; la sortie
-d'`Appliquer-Lot L1` et la réponse de `GET api/fiches/{id}` après le parcours.
+Acquis : plan v1.17 ; socle P0, Domaine B1, Application B2, Infrastructure I1 et I2, front F1 à F3, hygiène HY1 à HY3,
+cycle de vie serveur L1 validés sur le poste (568 tests .NET, couverture 100 %, Vitest 200 ; schéma SQLite 2).
+Audit honnête : chez l'assistant, ni SDK .NET ni NuGet (C# analysé par tree-sitter, pas compilé ; Vitest sur une
+réplique, Node 22 au lieu de 26) : la compilation et `Appliquer-Lot` au poste tranchent. Pour L1, la sortie
+d'`Appliquer-Lot L1` n'a pas été reçue : le verdict « couverture conforme » se déduit du commit, fait par la ligne
+enchaînée (la commande lève sur un cliquet non conforme). Plan ordonné : L2 (panneau), A1, R1 (point de terminaison
+de la V1, DEB-D4). Pièces à envoyer : toutes celles d'`Ouvrir-Session` (8), avec leur compte, site arrêté.

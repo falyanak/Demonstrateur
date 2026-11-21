@@ -476,3 +476,20 @@
   réplique (`npm ci`, Node 22 au lieu de 26) avec la référence étendue ; syntaxe C# par tree-sitter (0 erreur sur les
   fichiers du lot, contrôle éprouvé sur un cas fautif) ; équilibre des accolades ; CRLF sans BOM comme les originaux.
   Non vérifié : compilation C#, tests .NET (comptes ESTIMÉS : 568), couverture, mutations C# (aucun SDK).
+
+## 21/11/2026 — L1 vérifié et clos ; L1b : comptes mesurés
+
+- Ouverture (20261121-175422) : 8 pièces conformes à `PIECES.txt` (tailles et SHA-256), archive de 160 entrées au
+  commit `b275507` (L1 commité), conforme à `MASQUAGE.txt` ; 3 commits à publier et 3 non sauvegardés signalés.
+  `Compter-Tests` (Debug) : Domain 229, Application 66, Infrastructure 142, Web 108, Architecture 23, total 568,
+  0 échec, égal à l'estimation de L1.
+- Preuve du parcours : script hors dépôt `Jouer-ParcoursL1.ps1` (livré dans la session, par l'API, site au profil
+  `Localhost`, `api/sante` version `0.1.0+b275507…`) : parcours A (création, soumission, compléments, reprise,
+  nouvelle soumission, validation) : six transitions dans l'ordre, demandeur « Camille Martin » pour création,
+  soumissions et reprise, valideur « Dominique Bernard » pour les décisions, chaque `avant` égal à l'`apres` précédent ;
+  parcours B : création, soumission, « Refus ». Base du poste (schéma 1 depuis I1) servie après démarrage : migration
+  au schéma 2 faite (un échec arrête le démarrage, DEB-Q76).
+- Non reçu : la sortie d'`Appliquer-Lot L1` ; la couverture conforme se déduit du commit par la ligne enchaînée
+  (`Appliquer-Lot` lève sur un cliquet non conforme). Objectif de L1 atteint.
+- L1b : documents seuls (prompt de reprise, historique). Vérifié chez l'assistant : octets (CRLF sans BOM comme les
+  originaux), taille du prompt < 30 720 octets. Rien à compiler.
