@@ -512,3 +512,15 @@
   date et heure recalculés en Python (zoneinfo, passages à l'heure d'été et d'hiver compris) ; mutations MF22 à MF30
   sur une copie jetable : 9 détectées sur 9 (1 à 2 échecs chacune) ; aucun `innerHTML` ; CRLF sans BOM comme les
   originaux. Non vérifié : la coquille au navigateur (parcours de L1 à jouer au poste), Node 26.
+
+## 21/11/2026 — L2 vérifié et clos ; chantier L clos ; L2b : comptes mesurés
+
+- `Appliquer-Lot L2` : 14 fichiers écrits et relus à l'octet près, compilation Release, 568 tests .NET, 0 échec ;
+  commit `ec192e6` par la ligne enchaînée (cliquet de couverture conforme). `npm test` : 8 fichiers, 249 tests, 0 échec,
+  égal à l'estimation.
+- Navigateur (capture du développeur) : panneau « Cycle de vie » d'une fiche : Création (— → Brouillon), Soumission,
+  Demande de compléments, Reprise, Soumission, Refus ; demandeur « Louis Petit », valideur « Dominique Bernard » ;
+  heures de Paris de 19:39 à 19:45. Étape « Validation » non vue (parcours terminé par un refus) : couverte par Vitest,
+  à voir en R1. Objectif de L2 atteint ; chantier L clos.
+- L2b : documents seuls (prompt de reprise, historique). Vérifié chez l'assistant : octets (CRLF sans BOM comme les
+  originaux), taille du prompt < 30 720 octets. Rien à compiler.
