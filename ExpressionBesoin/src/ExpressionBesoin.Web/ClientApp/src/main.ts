@@ -7,7 +7,7 @@ import { Url } from "./core/Url.ts";
 // Point d'entrée UNIQUE : coquille sans décision (sélecteur d'agent, aiguillage). Tout le reste est testé ailleurs.
 
 const pages: Readonly<Record<string, ChargeurPage>> = {
-  accueil: () => import("./features/accueil/PageAccueil.ts").then((module) => module.page),
+  liste: () => import("./features/liste/PageListe.ts").then((module) => module.page),
   dialogue: () => import("./features/dialogue/PageDialogue.ts").then((module) => module.page),
 };
 
@@ -43,6 +43,7 @@ const contexte: ContextePage = {
     return selecteur instanceof HTMLSelectElement && selecteur.value !== "" ? selecteur.value : null;
   },
   aller: (chemin) => globalThis.location.assign(Url.resolve(chemin)),
+  adresse: (chemin) => Url.resolve(chemin),
 };
 
 async function monterPage(): Promise<void> {

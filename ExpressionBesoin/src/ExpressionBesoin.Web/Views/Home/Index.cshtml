@@ -1,11 +1,14 @@
 @{
-    ViewData["Title"] = "Accueil";
+    ViewData["Title"] = "Fiches";
 }
-<div id="app" data-page="accueil">
-    <h1 class="h3">Démonstrateur « Expression de besoin »</h1>
-    <p>Choisissez un agent fictif dans l'en-tête, puis créez une fiche : l'assistant vous aide à la rédiger. La liste des
-        fiches arrive au lot F3.</p>
-    @* Branché par features/accueil/PageAccueil.ts (DEB-Q48). *@
+@* Page Liste, à l'accueil (F3, DEB-Q59) : montée par features/liste/PageListe.ts, qui lit les fiches par l'API. *@
+<div id="app" data-page="liste">
+    <h1 class="h3">Fiches d'expression de besoin</h1>
+    <p>Choisissez un agent fictif dans l'en-tête, puis créez une fiche : l'assistant vous aide à la rédiger. Toutes les
+        fiches figurent ci-dessous avec leur statut ; « Ouvrir » mène à leur page Dialogue.</p>
     <button id="nouvelle-fiche" type="button" class="btn btn-primary">Nouvelle fiche</button>
-    <p id="accueil-erreur" class="text-danger mt-2" role="alert"></p>
+    <p id="liste-erreur" class="text-danger mt-2" role="alert"></p>
+    <div id="liste" aria-live="polite">
+        <noscript>La liste des fiches nécessite JavaScript.</noscript>
+    </div>
 </div>

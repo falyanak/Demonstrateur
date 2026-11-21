@@ -1,14 +1,12 @@
-import type { FicheVue, RubriqueVue, Statut, TypeDecision } from "../../core/contrats.ts";
+import type { FicheVue, RubriqueVue, TypeDecision } from "../../core/contrats.ts";
+import { badgeStatut, type Badge } from "../../core/statuts.ts";
 import type { EtatDialogue } from "./etat.ts";
 
 // Modèle d'affichage de la page Dialogue (DEB-Q49) : fonctions PURES, sans DOM. Les actions ne dépendent que des champs
 // calculés par le Domaine (statut, modifiable, complete) et de la case de confirmation (DEB-Q50, DEB-Q53).
 
-export interface Badge {
-  readonly texte: string;
-  /** Suffixe de couleur Bootstrap (`text-bg-…`). */
-  readonly couleur: "secondary" | "warning" | "info" | "primary" | "success" | "danger";
-}
+// Badge et badgeStatut vivent dans core/statuts.ts (commun avec la page Liste, F3) ; réexportés pour la page Dialogue.
+export { badgeStatut, type Badge };
 
 export interface RubriqueAffichee {
   readonly code: string;
@@ -45,14 +43,6 @@ const TITRES_BLOCS: Readonly<Record<string, string>> = {
   Complements: "6. Compléments",
 };
 
-const STATUTS: Readonly<Record<Statut, Badge>> = {
-  Brouillon: { texte: "Brouillon", couleur: "secondary" },
-  Soumise: { texte: "Soumise", couleur: "info" },
-  Validee: { texte: "Validée", couleur: "success" },
-  ACompleter: { texte: "À compléter", couleur: "warning" },
-  Refusee: { texte: "Refusée", couleur: "danger" },
-};
-
 export const DECISIONS: readonly { readonly valeur: TypeDecision; readonly libelle: string }[] = [
   { valeur: "Valider", libelle: "Valider" },
   { valeur: "DemanderComplements", libelle: "Demander des compléments" },
@@ -62,10 +52,6 @@ export const DECISIONS: readonly { readonly valeur: TypeDecision; readonly libel
 /** Titre d'un bloc du modèle FEB ; un bloc inconnu garde son nom. Pure. */
 export function titreBloc(bloc: string): string {
   return Object.hasOwn(TITRES_BLOCS, bloc) ? (TITRES_BLOCS[bloc] as string) : bloc;
-}
-
-export function badgeStatut(statut: Statut): Badge {
-  return STATUTS[statut];
 }
 
 /** Origine affichée (plan §6) : « Proposée » = vide avec une proposition en attente (DEB-Q13). Pure. */

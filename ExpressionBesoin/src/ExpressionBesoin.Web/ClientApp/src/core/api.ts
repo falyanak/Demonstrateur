@@ -4,11 +4,13 @@ import {
   lireConsultation,
   lireErreur,
   lireFiche,
+  lireResumes,
   lireTour,
   type AgentVue,
   type ConsultationVue,
   type ErreurVue,
   type FicheVue,
+  type ResumeVue,
   type TourVue,
   type TypeDecision,
 } from "./contrats.ts";
@@ -54,6 +56,8 @@ export async function interpreter<T>(reponse: Response, lire: (v: unknown) => T)
 
 export interface ClientApi {
   agents(): Promise<Issue<AgentVue[]>>;
+  /** Résumés de toutes les fiches, de la plus récente à la plus ancienne (F3). */
+  lister(): Promise<Issue<ResumeVue[]>>;
   creerFiche(agent: string): Promise<Issue<FicheVue>>;
   consulter(id: string): Promise<Issue<ConsultationVue>>;
   envoyerMessage(id: string, message: string): Promise<Issue<TourVue>>;
@@ -81,6 +85,7 @@ export function creerClient(recuperer: Recuperer, resoudre: (chemin: string) => 
   const lire = (v: unknown) => lireFiche(v);
   return {
     agents: () => appeler("api/agents", { headers: json }, lireAgents),
+    lister: () => appeler("api/fiches", { headers: json }, lireResumes),
     creerFiche: (agent) => appeler("api/fiches", { method: "POST", headers: { ...json, [EN_TETE_AGENT]: agent } }, lire),
     consulter: (id) => appeler(fiche(id), { headers: json }, lireConsultation),
     envoyerMessage: (id, message) => appeler(`${fiche(id)}/messages`, envoyer({ message }), lireTour),

@@ -2,7 +2,8 @@ import { describe, expect, it } from "vitest";
 import reference from "./contrats/fiche-reference.json?raw";
 import referenceConsultation from "./contrats/consultation-reference.json?raw";
 import referenceTour from "./contrats/tour-reference.json?raw";
-import { ContratInvalide, lireAgents, lireConsultation, lireErreur, lireFiche, lireTour } from "../src/core/contrats.ts";
+import referenceListe from "./contrats/liste-reference.json?raw";
+import { ContratInvalide, lireAgents, lireConsultation, lireErreur, lireFiche, lireResumes, lireTour } from "../src/core/contrats.ts";
 
 // Mêmes octets que FicheVueTests (xUnit) : le contrat est vérifié des deux côtés (règles §7).
 const brut = (): Record<string, unknown> => JSON.parse(reference) as Record<string, unknown>;
@@ -159,6 +160,61 @@ describe("lireConsultation et lireTour sur les références partagées avec xUni
     [() => lireTour({ ...JSON.parse(referenceTour), ecartees: [{ position: 1, code: "c" }] }), "tour.ecartees[0].motif devait être un texte"],
     [() => lireTour({ ...JSON.parse(referenceTour), fiche: { id: 1 } }), "tour.fiche.enTete devait être un objet"],
   ])("refus %#", (lire, message) => {
+    expect(lire).toThrow(ContratInvalide);
+    expect(lire).toThrow(message);
+  });
+});
+
+describe("lireResumes sur la référence de la liste partagée avec xUnit (F3)", () => {
+  const brutListe = (): Record<string, unknown>[] => JSON.parse(referenceListe) as Record<string, unknown>[];
+
+  it("deux lignes dans l'ordre du serveur, nuls et caractères spéciaux intacts", () => {
+    expect(lireResumes(JSON.parse(referenceListe))).toEqual([
+      {
+        id: "6f1c2b3a-0000-4000-8000-0000000000c1",
+        numero: "EB-2026-0007",
+        intitule: "Contrôle des plates-formes e-commerce",
+        demandeur: "Camille Martin",
+        statut: "ACompleter",
+        creeeLe: "2026-11-20T09:00:00+00:00",
+        confirmeeLe: "2026-11-20T10:00:00+00:00",
+      },
+      {
+        id: "6f1c2b3a-0000-4000-8000-0000000000c2",
+        numero: null,
+        intitule: null,
+        demandeur: "Claude Petit-Lefèvre",
+        statut: "Brouillon",
+        creeeLe: "2026-11-20T23:30:00+00:00",
+        confirmeeLe: null,
+      },
+    ]);
+  });
+
+  it("le fichier est compact, sans BOM ni fin de ligne", () => {
+    expect(referenceListe.charCodeAt(0)).toBe(0x5b);
+    expect(referenceListe.endsWith("]")).toBe(true);
+    expect(referenceListe).not.toMatch(/\n/);
+  });
+
+  it("liste vide", () => {
+    expect(lireResumes([])).toEqual([]);
+  });
+
+  const cas: Array<[string, () => unknown, string]> = [
+    ["racine non tableau", () => ({}), "resumes devait être un tableau"],
+    ["ligne non objet", () => [null], "resumes[0] devait être un objet"],
+    ["id absent", () => [{ ...brutListe()[0], id: undefined }], "resumes[0].id devait être un texte"],
+    ["numéro non texte", () => [{ ...brutListe()[0], numero: 7 }], "resumes[0].numero devait être un texte"],
+    ["intitulé absent", () => [{ ...brutListe()[0], intitule: undefined }], "resumes[0].intitule devait être un texte"],
+    ["demandeur nul", () => [{ ...brutListe()[0], demandeur: null }], "resumes[0].demandeur devait être un texte"],
+    ["statut inconnu", () => [brutListe()[0], { ...brutListe()[1], statut: "Archivee" }], "resumes[1].statut devait être l'une de"],
+    ["création absente", () => [{ ...brutListe()[0], creeeLe: undefined }], "resumes[0].creeeLe devait être un texte"],
+    ["confirmation non texte", () => [{ ...brutListe()[0], confirmeeLe: false }], "resumes[0].confirmeeLe devait être un texte"],
+  ];
+
+  it.each(cas)("refus : %s", (_nom, corps, message) => {
+    const lire = () => lireResumes(corps());
     expect(lire).toThrow(ContratInvalide);
     expect(lire).toThrow(message);
   });

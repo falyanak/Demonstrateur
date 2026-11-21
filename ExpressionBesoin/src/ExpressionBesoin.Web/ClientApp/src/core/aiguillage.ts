@@ -10,6 +10,8 @@ export interface ContextePage {
   agent(): string | null;
   /** Navigation vers un chemin applicatif (résolu par Url.resolve). */
   aller(chemin: string): void;
+  /** Adresse d'un chemin applicatif (Url.resolve), pour un lien (F3). */
+  adresse(chemin: string): string;
 }
 
 export interface Page {

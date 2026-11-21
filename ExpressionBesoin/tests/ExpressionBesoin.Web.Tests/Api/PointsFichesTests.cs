@@ -136,15 +136,16 @@ public sealed class PointsFichesTests(UsineWeb usine) : IClassFixture<UsineWeb>
     }
 
     [Fact]
-    public async Task Page_d_accueil_balise_vite_remplacee_et_base_des_url_posee()
+    public async Task Page_d_accueil_liste_des_fiches_balise_vite_remplacee_et_base_des_url_posee()
     {
         using var client = usine.CreateClient();
         var html = await client.GetStringAsync("/", Annulation);
         Assert.DoesNotContain("<vite-scripts", html);
         Assert.Contains("<div id=\"maplayout\" data-url-home-link=\"/\"></div>", html);
         Assert.Contains("id=\"agent-courant\"", html);
-        Assert.Contains("data-page=\"accueil\"", html);
+        Assert.Contains("<div id=\"app\" data-page=\"liste\">", html);
         Assert.Contains("id=\"nouvelle-fiche\"", html);
+        Assert.Contains("<div id=\"liste\" aria-live=\"polite\">", html);
     }
 
     [Fact]

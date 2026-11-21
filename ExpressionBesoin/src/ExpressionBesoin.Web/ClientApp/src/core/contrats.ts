@@ -50,6 +50,17 @@ export interface TourVue { readonly message: string; readonly horsPerimetre: boo
 
 export interface AgentVue { readonly identifiant: string; readonly nom: string; readonly bureau: string; readonly valideur: string }
 
+/** Ligne de la liste (`GET api/fiches`, F3) : colonnes dénormalisées, sans les rubriques (plan §4, performance). */
+export interface ResumeVue {
+  readonly id: string;
+  readonly numero: string | null;
+  readonly intitule: string | null;
+  readonly demandeur: string;
+  readonly statut: Statut;
+  readonly creeeLe: string;
+  readonly confirmeeLe: string | null;
+}
+
 export interface ErreurVue { readonly code: string; readonly message: string }
 
 type Objet = Readonly<Record<string, unknown>>;
@@ -194,6 +205,24 @@ export function lireAgents(valeur: unknown): AgentVue[] {
     const c = `agents[${i}]`;
     const o = objet(v, c);
     return { identifiant: texte(o, "identifiant", c), nom: texte(o, "nom", c), bureau: texte(o, "bureau", c), valideur: texte(o, "valideur", c) };
+  });
+}
+
+/** Résumés de la liste (GET api/fiches), dans l'ordre du serveur. Pure. */
+export function lireResumes(valeur: unknown): ResumeVue[] {
+  if (!Array.isArray(valeur)) throw new ContratInvalide("resumes", "un tableau");
+  return valeur.map((v, i) => {
+    const c = `resumes[${i}]`;
+    const o = objet(v, c);
+    return {
+      id: texte(o, "id", c),
+      numero: texteOuNul(o, "numero", c),
+      intitule: texteOuNul(o, "intitule", c),
+      demandeur: texte(o, "demandeur", c),
+      statut: parmi<Statut>(o, "statut", c, STATUTS),
+      creeeLe: texte(o, "creeeLe", c),
+      confirmeeLe: texteOuNul(o, "confirmeeLe", c),
+    };
   });
 }
 

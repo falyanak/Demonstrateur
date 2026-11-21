@@ -1,6 +1,6 @@
 # Prompt de reprise — Demonstrateur
 
-> Mis à jour le 21/11/2026 par le lot HY3. Règles génériques : harnais central, `regles\regles-de-travail.md` (v5) ;
+> Mis à jour le 21/11/2026 par le lot F3. Règles génériques : harnais central, `regles\regles-de-travail.md` (v5) ;
 > modèle de projet : `regles\harnais-modele-generique.md` (v2) ; front : `regles\gabarit-frontend-vite-aspnet.md` ;
 > outillage : `C:\Dev\Harnais\docs\specification-harnais-central.md` (fait foi).
 > Historique détaillé : `docs/historique-Demonstrateur.md` (non envoyé par défaut). Documents hors dépôt dont dépend ce
@@ -8,17 +8,17 @@
 > `Expression_de_besoin_demonstrateur_IA_SICCRF.docx` (document de cadrage, novembre 2026). Le modèle `FEB.docx` est
 > versionné depuis I2, nettoyé de ses métadonnées (DEB-Q9, DEB-Q33).
 
-## ▶ ÉTAT AU 21/11/2026 (F2c commité ; lot HY3 livré : correction de DEB-A2) — À LIRE D'ABORD
+## ▶ ÉTAT AU 21/11/2026 (HY3 clos ; lot F3 livré : page Liste) — À LIRE D'ABORD
 
-**Où on en est** : chantiers P, B, I clos ; F1, F2, HY1, HY2 clos ; F2c commité (`50ccdb4`). **DEB-A2** : lancées depuis
-la racine du dépôt, les commandes du harnais compilaient avec le SDK 11.0.100, car `global.json` (10.0.403, DEB-Q47)
-était dans `ExpressionBesoin/`, hors du chemin où `dotnet` le cherche (dossier courant et parents). **HY3** (DEB-Q58)
-livré, à appliquer : `global.json` à la racine du dépôt (l'ancien supprimé), `.slnx` relié, garde `VerifierSdk` au build
-(erreur `DEB0001` si le SDK n'est pas `SdkAttendu`), `SdkTests` (3 tests d'architecture).
-**Critère de fin de HY3** : `Appliquer-Lot HY3` vert et commité (538 tests estimés) ; `dotnet --version` rend 10.0.403
-à la racine du dépôt ; la garde échoue sur une version forcée (`-p:SdkAttendu=0.0.0`) ; `Compter-Tests` compte 538 à
-l'ouverture suivante, site arrêté.
-**Prochain pas** (plan ordonné) : HY3, puis F3 (page Liste).
+**Où on en est** : chantiers P, B, I clos ; F1, F2 clos ; hygiène HY1, HY2, HY3 close (DEB-A2 corrigée : `dotnet
+--version` rend 10.0.403 à la racine, garde DEB0001 éprouvée, 538 tests au commit `fcdb37a`). **F3** (DEB-Q59 à
+DEB-Q63) livré, à appliquer : liste des fiches à l'accueil, actions « Ouvrir » et « Télécharger », vue pure, coquille
+`PageListe.ts`, référence `liste-reference.json` partagée xUnit / Vitest ; `features/accueil` retiré.
+**Critère de fin de F3** : `Appliquer-Lot F3` vert et commité (539 tests estimés) ; `npm test` vert (200 chez
+l'assistant) ; dans le navigateur (profil `Localhost` + `npm run dev`), statut de la liste conforme après chaque
+transition : création (Brouillon), soumission (Soumise, numéro), compléments (À compléter), reprise (Brouillon),
+validation (Validée, « Télécharger » ouvre le .docx), refus (Refusée).
+**Prochain pas** (plan ordonné) : F3, puis A1 (fournisseur à trancher, DEB-Q2), puis R1.
 **Point de terminaison de la V1** (DEB-D4) : lot R1, critère du plan §1 ; périmètre gelé jusque-là.
 **Ouverture de la session suivante** (site arrêté : il verrouille les DLL de `bin\Debug`) :
 
@@ -26,8 +26,8 @@ l'ouverture suivante, site arrêté.
     # attendu : « SESSION PRÉPARÉE : 8 pièce(s) dans C:\Dev\Sessions\Demonstrateur\<horodatage> » ; joindre toutes les
     # pièces et donner leur compte.
 
-**Décisions récentes** : DEB-Q58 (21/11/2026). **Anomalies ouvertes** : DEB-A2 (correction : HY3, à appliquer).
-**Questions ouvertes** : DEB-Q2 (fournisseur d'IA). **Hygiène** : aucune en cours (DEB-HY2 close par HY2).
+**Décisions récentes** : DEB-Q59 à DEB-Q63 (21/11/2026). **Anomalies ouvertes** : aucune (DEB-A2 close par HY3).
+**Questions ouvertes** : DEB-Q2 (fournisseur d'IA). **Hygiène** : aucune en cours.
 
 ## §0. Protocole (propre au projet)
 
@@ -39,11 +39,11 @@ l'ouverture suivante, site arrêté.
 | Couverture | `ExpressionBesoin/coverage-baseline.json` (100 / 100 depuis `a73cb7e`), `ExpressionBesoin/coverage-dette.txt` (vide) ; projets mesurés : Domain.Tests, Application.Tests, Infrastructure.Tests, Web.Tests ; assemblies attendues : Domain, Application, Infrastructure, Web (Infrastructure depuis I1) |
 | Outils | SDK 10.0.403, bloqué par `global.json` (`rollForward: disable`, DEB-Q47), à la RACINE du dépôt depuis HY3 (DEB-A2) ; garde `VerifierSdk` (`Directory.Build.props`, `SdkAttendu`) ; .NET 11 installé, non utilisé ; `.config/dotnet-tools.json` : dotnet-coverage 18.12.0, ReportGenerator 5.6.0 (HY1) |
 | Paquets | `nuget.config` du projet : nuget.org seul (DEB-Q11) ; versions centralisées dans `Directory.Packages.props` |
-| Tests du front | `ExpressionBesoin/src/ExpressionBesoin.Web/ClientApp/tests` (Vitest 5) ; contrat partagé `tests/contrats/fiche-reference.json` |
+| Tests du front | `ExpressionBesoin/src/ExpressionBesoin.Web/ClientApp/tests` (Vitest 5) ; contrats partagés `tests/contrats/{fiche,consultation,tour,liste}-reference.json` |
 | Front | Node.js 26.13.1 LTS et son npm (DEB-D7) ; `node_modules` versionné (DEB-D6), Windows x64 ; `npm ci` seulement s'il manque ; versions exactes (`.npmrc`) |
 | Données | fictives, jamais réelles ; jeux d'essai hors dépôt ; base SQLite hors dépôt, clé `Fiches:Base` fixée par environnement (DEB-Q54, DEB-Q55) : poste `C:\Dev\Demonstrateur-data\fiches.db` (`appsettings.Localhost.json`) ; serveurs `appsettings.Staging.json`, `appsettings.Production.json` (`D:\Donnees\Demonstrateur-data[-staging]`, à confirmer) ; variable `Fiches__Base` prioritaire ; rien dans `appsettings.json` |
 | Dépôt distant | `https://github.com/falyanak/Demonstrateur.git`, **public**, branche `main` ; publication par le développeur seul (`Publier-Branche -Confirmer`, Git Credential Manager) |
-| Identifiants | `DEB-D…`, `DEB-A…`, `DEB-Q…`, `DEB-HY…` ; pris : DEB-D1 à DEB-D7, DEB-Q1 à DEB-Q58, DEB-A1 (close par F2), DEB-A2 (lot HY3), DEB-HY1 (close par HY1), DEB-HY2 (close par HY2) ; mutations M1 à M10, MF1 à MF15 (front) |
+| Identifiants | `DEB-D…`, `DEB-A…`, `DEB-Q…`, `DEB-HY…` ; pris : DEB-D1 à DEB-D7, DEB-Q1 à DEB-Q63, DEB-A1 (close par F2), DEB-A2 (close par HY3), DEB-HY1 (close par HY1), DEB-HY2 (close par HY2) ; mutations M1 à M10, MF1 à MF21 (front) |
 
 Ligne enchaînée du projet (zip portant `DEPOT.txt` = « Demonstrateur ») :
 
@@ -66,28 +66,29 @@ page de liste des fiches et de leur statut. Plan, périmètre et critère de fin
 | P — socle | P0a, P0, P0b | clos le 20/11/2026 : P0a (`56388a3`), P0 (`78ff21b`, base `a73cb7e`), P0b |
 | B — métier (Domain, Application) | B1, B1b, B2, B2b | clos le 20/11/2026 : B1 (`3ee722c`), B1b (`17f3a8d`), B2 (`9007adf`), B2b |
 | I — infrastructure | I1 (SQLite), I2 (.docx) | clos le 21/11/2026 : I1 (`f42de12`), I1b ; I2 relivré en I2a (`e28a964`), I2b |
-| F — front | F1 (socle, API), F2 (Dialogue), F3 (Liste) | F1 clos le 21/11/2026 : F1 (`bfaaf97`), F1b (`fe31e69`), F1c (`3e45551`) ; F2 clos le 21/11/2026 : F2 (`ba3aafd`), F2c ; F3 à faire ; `TestsFront` attendu d'OT2 |
-| Hygiène | HY1, HY1b (DEB-HY1 : NuGet, outils dotnet, SDK) ; HY2 (DEB-HY2 : dossier de données par environnement) ; HY3 (DEB-A2 : SDK depuis la racine) | HY1 clos le 21/11/2026 : HY1 (`d307a91`), HY1b ; HY2 clos le 21/11/2026 : HY2 (`9b21bdb`) ; HY3 livré, à appliquer |
+| F — front | F1 (socle, API), F2 (Dialogue), F3 (Liste) | F1 clos le 21/11/2026 : F1 (`bfaaf97`), F1b (`fe31e69`), F1c (`3e45551`) ; F2 clos le 21/11/2026 : F2 (`ba3aafd`), F2c (`50ccdb4`) ; F3 livré, à appliquer ; `TestsFront` attendu d'OT2 |
+| Hygiène | HY1, HY1b (DEB-HY1 : NuGet, outils dotnet, SDK) ; HY2 (DEB-HY2 : dossier de données par environnement) ; HY3 (DEB-A2 : SDK depuis la racine) | HY1 clos le 21/11/2026 : HY1 (`d307a91`), HY1b ; HY2 clos le 21/11/2026 : HY2 (`9b21bdb`) ; HY3 clos le 21/11/2026 : HY3 (`fcdb37a`) |
 | A — IA réelle | A1 | à faire ; fournisseur à trancher (DEB-Q2) |
 | R — recette | R1 | à faire |
 
-| Projet de tests | P0, poste (20/11/2026) | B1, poste (20/11/2026) | B2, poste (20/11/2026) | I1, poste (20/11/2026) | I2a, poste (21/11/2026) | F1, poste (21/11/2026) | HY1, poste (21/11/2026) | F2, poste (21/11/2026) | HY2, poste (21/11/2026) | HY3, ESTIMÉ |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| ExpressionBesoin.Domain.Tests | 25 | 189 | 189 | 189 | 207 | 207 | 207 | 207 | 207 | 207 |
-| ExpressionBesoin.Application.Tests | — | — | 65 | 65 | 66 | 66 | 66 | 66 | 66 | 66 |
-| ExpressionBesoin.Infrastructure.Tests | — | — | — | 48 | 109 | 135 | 135 | 135 | 135 | 135 |
-| ExpressionBesoin.Web.Tests | 30 | 30 | 30 | 30 | 30 | 97 | 97 | 103 | 107 | 107 |
-| ExpressionBesoin.Architecture.Tests | 20 | 20 | 20 | 20 | 20 | 20 | 20 | 20 | 20 | 23 |
-| **Total** | **75** (Release et Debug, 0 échec) | **239** (Release et Debug, 0 échec) | **304** (Debug, 0 échec) | **352** (Release et Debug, 0 échec) | **432** (Release et Debug, 0 échec) | **525** (Debug, 0 échec) ; Vitest **58** | **525** (Debug, xUnit 4, 0 échec) | **531** (Debug, `Compter-Tests`, 0 échec) ; Vitest **165** (poste, 21/11/2026) | **535** (Debug, `Compter-Tests`, 0 échec ; +4 Web, `ConfigurationEnvironnementsTests`) | **538** (estimé : +3 Architecture, `SdkTests`) |
-| Couverture | Domain, Web : lignes 64/64, branches 16/16 = 100 % | Domain, Web : lignes 410/410, branches 156/156 = 100 % | Domain, Application, Web : lignes 580/580, branches 202/202 = 100 % | Domain, Application, Infrastructure, Web : lignes 918/918, branches 266/266 = 100 % | Domain, Application, Infrastructure, Web : lignes 1181/1181, branches 356/356 = 100 % | conforme au cliquet 100 / 100 (`Appliquer-Lot F1` vert ; comptes non transmis) ; front 74/74 lignes, 57/57 branches (chez l'assistant) | conforme au cliquet 100 / 100 (`Appliquer-Lot HY1` vert ; comptes non transmis) | conforme au cliquet 100 / 100 (`Appliquer-Lot F2` vert ; comptes non transmis) ; front 153/153 lignes, 123/123 branches (chez l'assistant) | conforme au cliquet 100 / 100 (`Appliquer-Lot HY2` vert ; comptes non transmis) | à mesurer (`Appliquer-Lot HY3`) ; aucun code couvrable ajouté |
+Comptes de P0 à I1 : historique. Depuis I2a :
 
-Comptes .NET mesurés de HY1 à HY2 : compilés par le SDK 11.0.100 (DEB-A2), cible `net10.0` inchangée.
+| Projet de tests | I2a, poste | F1, poste | HY1, poste | F2, poste | HY2, poste | HY3, poste (21/11/2026) | F3, ESTIMÉ |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| ExpressionBesoin.Domain.Tests | 207 | 207 | 207 | 207 | 207 | 207 | 207 |
+| ExpressionBesoin.Application.Tests | 66 | 66 | 66 | 66 | 66 | 66 | 66 |
+| ExpressionBesoin.Infrastructure.Tests | 109 | 135 | 135 | 135 | 135 | 135 | 135 |
+| ExpressionBesoin.Web.Tests | 30 | 97 | 97 | 103 | 107 | 107 | 108 |
+| ExpressionBesoin.Architecture.Tests | 20 | 20 | 20 | 20 | 20 | 23 | 23 |
+| **Total** | **432** | **525** ; Vitest **58** | **525** (xUnit 4) | **531** ; Vitest **165** | **535** | **538** (Debug, `Compter-Tests`, 0 échec, SDK 10.0.403) | **539** (+1 Web : référence de la liste) ; Vitest **200** chez l'assistant |
+| Couverture | 1181/1181 lignes, 356/356 branches | cliquet 100 / 100 ; front 74/74, 57/57 | cliquet 100 / 100 | cliquet 100 / 100 ; front 153/153, 123/123 | cliquet 100 / 100 | cliquet 100 / 100 (`Appliquer-Lot HY3` vert) | à mesurer (`Appliquer-Lot F3`) ; aucun code .NET ajouté ; front 167/167 lignes, 131/131 branches (chez l'assistant) |
+
+Comptes .NET mesurés de HY1 à HY2 : compilés par le SDK 11.0.100 (DEB-A2), cible `net10.0` inchangée ; depuis HY3 : SDK 10.0.403.
 
 ## §2. Points ouverts
 
 1. Fournisseur d'IA (DEB-Q2) : à trancher avant A1 ; l'IA scénarisée suffit jusque-là. Recommandation : Albert API
    (DINUM) si le ministère y a accès, sinon API Mistral. Technologie : DEB-D5.
-2. DEB-A2 (SDK 11.0.100 utilisé depuis la racine du dépôt) : HY3 livré, à appliquer (DEB-Q58).
 6. Chemins des serveurs (DEB-Q55) : `D:\Donnees\Demonstrateur-data\fiches.db` (Production) et
    `D:\Donnees\Demonstrateur-data-staging\fiches.db` (Staging), à confirmer avec l'exploitation avant toute
    publication (évolution V2, DEB-Q56) ; un changement = retouche des deux fichiers et de `ConfigurationEnvironnementsTests`.
@@ -118,6 +119,7 @@ Comptes .NET mesurés de HY1 à HY2 : compilés par le SDK 11.0.100 (DEB-A2), ci
 | DEB-D7 | Principe des versions : dernière STABLE de chaque outil et bibliothèque, dernière LTS des environnements d'exécution, épinglées exactement ; prime sur la marge de 14 jours du modèle générique ; Node.js 26.13.1, TypeScript 7.0.2, Vite 8.3.8, Vitest 5.1.1 ; .NET 10 ; NuGet par DEB-HY1 : plan §8 (demande du développeur, 21/11/2026). |
 | DEB-Q45 à DEB-Q47 | Versions (HY1) : `net10.0` gardé malgré .NET 11 (non LTS), paquets du framework en 10.0.15 ; xUnit 4.0.3 (MTP v2), runner 4.0.1, Test.Sdk 18.12.0, tous les projets ensemble, révise « xUnit v3 » ; SDK bloqué sur 10.0.403 pour la CI/CD (DEB-Q47, choix du développeur) : plan §8 (21/11/2026). |
 | DEB-Q58 | DEB-A2 corrigée tout de suite, avant F3 : `global.json` déplacé à la racine du dépôt (racine de lot ajoutée d'abord, par F2c), garde du SDK au build ; DEB-Q47 inchangée (choix du développeur, 21/11/2026). |
+| DEB-Q59 à DEB-Q63 | Page Liste (F3) : à l'accueil, sans route nouvelle ; action « Ouvrir » (et non « Reprendre », réservé à la transition) et « Télécharger » si validée ; `lireResumes`, `lister`, vue pure, coquille `PageListe.ts`, badge du statut dans `core/statuts.ts`, référence `liste-reference.json` partagée ; date de création jj/mm/aaaa à Paris ; toutes les fiches, ordre du serveur, rechargée à l'affichage : plan §8 (« recommandations ok », 21/11/2026). |
 | DEB-Q54 à DEB-Q57 | Données (HY2) : poste `C:\Dev\Demonstrateur-data\fiches.db` (révise DEB-Q31) ; `Fiches:Base` dans `appsettings.{Localhost,Staging,Production}.json`, rien dans `appsettings.json`, variable `Fiches__Base` prioritaire ; serveur : hors dossier publié, volume local, droit Modification du pool ; publication IIS hors V1 ; convention versée au harnais : plan §8 (« recommandations ok », DEB-Q55 précisée par le développeur, 21/11/2026). |
 | DEB-Q48 à DEB-Q53 | Page Dialogue (F2) : `Home/Dialogue/{id}` (Guid, sinon 404) et « Nouvelle fiche » à l'accueil ; réducteur et vue purs, coquille DOM sans `innerHTML`, seules les coquilles `Page*.ts` hors couverture du front ; aucune règle métier dans le front (statut, `modifiable`, `complete`, case de confirmation) ; « Enregistrer » explicite par rubrique ; références `tour` et `consultation` partagées xUnit / Vitest ; actions selon le statut : plan §8 (« recommandations ok », 21/11/2026). |
 | DEB-Q38 à DEB-Q44 | Front et API (F1) : découpage F1 / F2 Dialogue / F3 Liste ; Bootstrap seul ; lock et `.npmrc` ; IA scénarisée qui reprend les mots de l'agent ; 404 / 409 / 422 / 503, en-tête `X-Agent` ; contrat JSON partagé xUnit / Vitest ; `<vite-scripts />` testé sans exclusion : plan §8 (« recommandations ok », 21/11/2026). |
@@ -162,10 +164,10 @@ ExpressionBesoin/
                                         IncludeViteDist, ViteClean)
   src/ExpressionBesoin.Web/ClientApp/   package.json, package-lock.json, .npmrc, tsconfig*.json, vite.config.ts,
                                         vitest.config.ts ; src/main.ts (coquille) ; src/core/ Url, contrats, api,
-                                        agentCourant, aiguillage, chemins (purs) ; src/features/accueil/PageAccueil
-                                        (coquille) ; src/features/dialogue/ etat, vue (purs), PageDialogue (coquille) (F2) ;
+                                        agentCourant, aiguillage, chemins, statuts (purs) ; src/features/liste/ vue (pur),
+                                        PageListe (coquille) (F3) ; src/features/dialogue/ etat, vue (purs), PageDialogue (coquille) (F2) ;
                                         src/styles/main.scss ; tests/ (Vitest : Url, agentCourant, api, contrats,
-                                        dialogueEtat, dialogueVue) et tests/contrats/{fiche,consultation,tour}-reference.json ;
+                                        dialogueEtat, dialogueVue, listeVue) et tests/contrats/{fiche,consultation,tour,liste}-reference.json ;
                                         node_modules/ (DEB-D6)
   tests/Directory.Build.props
   tests/ExpressionBesoin.Domain.Tests/        ResultatTests.cs, ListeImmuableTests.cs ; Fiches/ Essais.cs (aides),
@@ -195,23 +197,24 @@ ExpressionBesoin/
 | Codes de refus du Domaine | `fiche.nonModifiable`, `proposition.absente`, `cycle.transitionInterdite`, `soumission.{confirmationAbsente,incomplete,propositionsEnAttente}`, `decision.commentaireObligatoire`, `numerotation.{annee,illisible,anneeAnterieure,epuisee}` | tests de B1 |
 | Stockage des fiches | JSON v1 (DEB-Q28) ; schéma SQLite `user_version = 1` (DEB-Q29), tables `Fiches`, `Echanges` | `CodecFicheTests` (JSON de référence à l'octet), `DepotFichesSqliteTests`, `SchemaFichesTests` (I1) |
 | API des fiches | plan §5 (route `reprendre` comprise) ; refus `fiche.introuvable`, `agent.inconnu`, `rubrique.inconnue`, `message.vide`, `document.nonValidee`, `decision.inconnue` ; 404 / 409 / 422, panne 503 `panne.technique` (DEB-Q42) ; en-tête `X-Agent` | tests de B2 ; `PointsFichesTests`, `ParcoursFicheTests`, `StatutHttpTests` (F1) |
-| JSON de l'API | projections de `Web/Api/Vues.cs`, camelCase, énumérations par leur nom, encodeur relâché (`ContratJson`) ; fiche : `id, numero, statut, enTete, rubriques, obligatoires, remplies, complete, modifiable, prochaineRubrique, confirmeeLe, decisions` | `FicheVueTests` (octets de `ClientApp/tests/contrats/{fiche,consultation,tour}-reference.json`, réplique Python) et `contrats.test.ts` (Vitest) |
-| Pages | `GET /` (accueil, « Nouvelle fiche ») ; `GET /Home/Dialogue/{id}` → `<div id="app" data-page="dialogue" data-fiche="{id}">`, 404 sans Guid non vide (DEB-Q48) | `PointsFichesTests` (F2) |
+| JSON de l'API | projections de `Web/Api/Vues.cs`, camelCase, énumérations par leur nom, encodeur relâché (`ContratJson`) ; fiche : `id, numero, statut, enTete, rubriques, obligatoires, remplies, complete, modifiable, prochaineRubrique, confirmeeLe, decisions` | `FicheVueTests` (octets de `ClientApp/tests/contrats/{fiche,consultation,tour,liste}-reference.json`, réplique Python) et `contrats.test.ts` (Vitest) |
+| Pages | `GET /` (accueil : « Nouvelle fiche » et liste, `data-page="liste"`, F3) ; `GET /Home/Dialogue/{id}` → `<div id="app" data-page="dialogue" data-fiche="{id}">`, 404 sans Guid non vide (DEB-Q48) | `PointsFichesTests` (F2) |
 | IA scénarisée | réponse au contrat du plan §2 (`ScenarioDialogue`, DEB-Q41) | `ScenarioDialogueTests` (F1) |
 | Document .docx | modèle FEB embarqué (empreinte figée) ; placement DEB-Q35 ; contenu DEB-Q36 ; octets stables DEB-Q37 | `ContenuDocumentTests`, `GabaritFebTests`, `GenerateurDocumentFebTests` (55 paragraphes attendus, I2) |
 
 ## §6. Reliquat, hygiène, leçons
 
-Anomalie ouverte : **DEB-A2** (21/11/2026) : `global.json` dans `ExpressionBesoin/`, hors du chemin de recherche de
-`dotnet` lancé depuis la racine ; SDK 11.0.100 utilisé ; correction HY3, livrée (DEB-Q58). DEB-A1 close par F2 : historique. **Évolutions V2** (hors V1, DEB-D4 ; ouvertes seulement par décision du développeur) :
+Anomalies : aucune ouverte ; DEB-A1 close par F2, DEB-A2 close par HY3 (`global.json` à la racine, garde DEB0001) : historique. **Évolutions V2** (hors V1, DEB-D4 ; ouvertes seulement par décision du développeur) :
 courriel au chef de service, habilitations, instruction XA / SICCRF, rapprochement de demandes, tableau de bord,
 synthèse CODIR / COPIL, export PDF, version optimiste des fiches (DEB-Q26) ; toute idée née pendant la V1 s'ajoute ici.
 
 ## §7. Prochaine session
 
-Acquis : plan v1.14 ; socle P0, Domaine B1, Application B2, Infrastructure I1 et I2, front F1 et F2, hygiène HY1 et HY2
-validés sur le poste (535 tests .NET sous xUnit 4, couverture 100 %, Vitest 165, parcours de la page Dialogue joué :
-validation, compléments, refus ; .docx ouvert dans Word ; base `C:\Dev\Demonstrateur-data\fiches.db`, `api/sante`
-« ok » en version `0.1.0+9b21bdb`). Audit honnête : chez l'assistant, ni SDK .NET ni NuGet ; HY3 non compilé chez l'assistant :
-`SdkTests` rejoué par une réplique Python sur les fichiers du lot, qui échoue sur des copies mutées. Plan ordonné : HY3 (à appliquer ; DEB-A2), F3, A1, R1 (point de terminaison de la
-V1, DEB-D4). Pièces à envoyer : toutes celles d'`Ouvrir-Session` (8), avec leur compte, site arrêté.
+Acquis : plan v1.15 ; socle P0, Domaine B1, Application B2, Infrastructure I1 et I2, front F1 et F2, hygiène HY1 à HY3
+validés sur le poste (538 tests .NET sous xUnit 4 et SDK 10.0.403, couverture 100 %, Vitest 165, parcours de la page
+Dialogue joué ; .docx ouvert dans Word). Audit honnête : chez l'assistant, ni SDK .NET ni NuGet ; F3 non compilé en C# :
+la référence `liste-reference.json` est écrite par une réplique Python de la sérialisation, le test xUnit qui la fige
+(`FicheVueTests`) tranche au poste ; front vérifié chez l'assistant (`tsc -b`, `vite build`, Vitest 200, couverture
+100 %, mutations MF16 à MF21 détectées) ; coquille `PageListe.ts` non exercée hors navigateur. Plan ordonné : F3 (à
+appliquer, parcours dans le navigateur), A1, R1 (point de terminaison de la V1, DEB-D4). Pièces à envoyer : toutes celles
+d'`Ouvrir-Session` (8), avec leur compte, site arrêté.

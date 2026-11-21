@@ -404,3 +404,31 @@
   mutées, chacune en échec : `SdkAttendu` 10.0.404, `global.json` laissé dans la solution, `rollForward` `latestFeature` ;
   XML et JSON bien formés ; octets (CRLF, BOM du seul fichier qui en portait). Non vérifié : compilation C#, tests .NET,
   évaluation de la garde par MSBuild (le poste tranche : `dotnet --version` à la racine, build forcé en échec).
+
+## 21/11/2026 — HY3 vérifié et clos ; F3 : page Liste (DEB-Q59 à DEB-Q63)
+
+- Ouverture (20261121-164746) : 8 pièces conformes à `PIECES.txt` (tailles et SHA-256) ; archive de 154 entrées au
+  commit `fcdb37a` (HY3 commité), conforme à `MASQUAGE.txt` ; état conforme, 0 commit à publier, sauvegarde du jour.
+  `Compter-Tests` (Debug) : Domain 207, Application 66, Infrastructure 135, Web 107, Architecture 23, total 538,
+  0 échec, égal à l'estimation de HY3.
+- Preuves du poste pour HY3 : `dotnet --version` rend 10.0.403 à la racine du dépôt ;
+  `dotnet build … -p:SdkAttendu=0.0.0` échoue par `DEB0001` (« SDK 10.0.403 utilisé, 0.0.0 attendu »), code 1. DEB-A2
+  close. Objectif de HY3 atteint, on arrête.
+- DEB-Q59 à DEB-Q63 posées puis tranchées (« recommandations ok ») : liste à l'accueil ; action « Ouvrir » (« Reprendre »
+  désignait déjà la transition `ACompleter → Brouillon`) ; découpage pur / coquille ; date à Paris ; toutes les fiches.
+- F3 : `contrats.ts` (`ResumeVue`, `lireResumes`), `api.ts` (`lister`), `aiguillage.ts` (`adresse` du contexte, pour
+  les liens), `core/statuts.ts` (badge du statut, déplacé de `features/dialogue/vue.ts`, qui le réexporte),
+  `features/liste/vue.ts` (pur : `dateCourte`, `lignes`), `PageListe.ts` (coquille : tableau en `textContent`, dernière
+  demande seule affichée, rechargement sur `pageshow` persistant, « Nouvelle fiche » reprise de l'accueil), `main.ts`,
+  `Views/Home/Index.cshtml` (`data-page="liste"`, zone `#liste`) ; `features/accueil/PageAccueil.ts` retiré
+  (`SUPPRESSIONS.txt`). Tests : `listeVue.test.ts`, `contrats.test.ts` et `api.test.ts` complétés ;
+  `liste-reference.json` figé par `FicheVueTests` (nouveau test, Web 108) ; `PointsFichesTests` : page d'accueil en
+  `data-page="liste"`. Les manifestes d'essai de `ViteTagsTests` citent encore `PageAccueil.ts` : données de test,
+  sans lien avec un fichier réel, laissées.
+- Vérifié chez l'assistant (réplique du ClientApp, `npm ci` sur le lock du dépôt) : `tsc -b`, `vite build`, Vitest
+  200 tests verts (165 + 35), couverture du front 100 % (167/167 lignes, 131/131 branches, coquilles exclues) ; une
+  branche inatteignable de `dateCourte` retirée plutôt qu'exclue ; dates attendues recalculées par Python
+  (`zoneinfo`) ; mutations MF16 (Télécharger hors validée), MF17 (fuseau ignoré), MF18 (numéro absent), MF19 (route
+  de la liste), MF20 (statut non vérifié), MF21 (libellé du badge) : chacune fait échouer 1 à 4 tests. Octets : CRLF
+  sans BOM comme les originaux, référence JSON compacte sans fin de ligne. Non vérifié : compilation C# et tests .NET
+  (`FicheVueTests` tranche la réplique Python de la sérialisation), coquille `PageListe.ts` dans un navigateur.

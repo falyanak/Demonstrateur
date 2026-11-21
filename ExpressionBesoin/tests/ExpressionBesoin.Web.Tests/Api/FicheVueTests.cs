@@ -7,7 +7,7 @@ using ExpressionBesoin.Web.Api;
 namespace ExpressionBesoin.Web.Tests.Api;
 
 /// <summary>
-/// Contrat JSON de la fiche (DEB-Q43), de la consultation et du tour (DEB-Q52) : la sérialisation de l'API est comparée
+/// Contrat JSON de la fiche (DEB-Q43), de la consultation et du tour (DEB-Q52), de la liste (F3) : la sérialisation de l'API est comparée
 /// À L'OCTET aux fichiers de référence du ClientApp, produits par une réplique Python et lus aussi par Vitest
 /// (tests/contrats.test.ts) : un écart d'un côté casse les deux.
 /// </summary>
@@ -55,6 +55,23 @@ public sealed class FicheVueTests
             ]),
             Reference());
 
+    /// <summary>
+    /// Liste de référence (F3) : le résumé de la fiche de référence, puis un brouillon sans numéro ni intitulé, créé à
+    /// 23 h 30 UTC (le lendemain à Paris : la date affichée est vérifiée par Vitest).
+    /// </summary>
+    internal static ResumeVue[] ListeReference() =>
+    [
+        ResumeVue.De(ResumeFiche.De(Reference())),
+        ResumeVue.De(new ResumeFiche(
+            new Guid("6f1c2b3a-0000-4000-8000-0000000000c2"),
+            null,
+            null,
+            "Claude Petit-Lefèvre",
+            Statut.Brouillon,
+            new DateTimeOffset(2026, 11, 20, 23, 30, 0, TimeSpan.Zero),
+            null)),
+    ];
+
     /// <summary>Fichier de référence, trouvé en remontant jusqu'à la solution (jamais « le premier trouvé »).</summary>
     internal static string CheminReference(string nom = "fiche-reference.json")
     {
@@ -85,6 +102,12 @@ public sealed class FicheVueTests
         Assert.Equal(
             File.ReadAllBytes(CheminReference("tour-reference.json")),
             JsonSerializer.SerializeToUtf8Bytes(TourVue.De(TourReference()), ContratJson.Options));
+
+    [Fact]
+    public void Liste_de_reference_serialisee_a_l_octet_comme_le_fichier_partage_avec_Vitest() =>
+        Assert.Equal(
+            File.ReadAllBytes(CheminReference("liste-reference.json")),
+            JsonSerializer.SerializeToUtf8Bytes(ListeReference(), ContratJson.Options));
 
     [Fact]
     public void Fiche_complete_et_sans_question_restante()

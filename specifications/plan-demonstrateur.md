@@ -1,12 +1,12 @@
 # Plan du démonstrateur « Expression de besoin » (version simplifiée)
 
-> Version 1.14 du 21/11/2026 (lot F2c ; 1.13 au lot HY2, 1.12 au lot F2, 1.11 au lot HY1b, 1.10 au lot HY1, 1.9 au lot F1, 1.8 au lot I2b, 1.7 au lot I2, 1.6 au lot I1, 1.5 au lot B2, 1.4 au lot B1b, 1.3 au lot B1, 1.2 au lot P0c, 1.1 au
+> Version 1.15 du 21/11/2026 (lot F3 ; 1.14 au lot F2c, 1.13 au lot HY2, 1.12 au lot F2, 1.11 au lot HY1b, 1.10 au lot HY1, 1.9 au lot F1, 1.8 au lot I2b, 1.7 au lot I2, 1.6 au lot I1, 1.5 au lot B2, 1.4 au lot B1b, 1.3 au lot B1, 1.2 au lot P0c, 1.1 au
 > lot P0, 1.0 au lot P0a). Arbitrages DEB-Q1 à DEB-Q8, DEB-Q11 à DEB-Q32 : « recommandations ok » (20/11/2026) ; DEB-Q9 :
 > « ok » (20/11/2026) ; DEB-Q33 à DEB-Q37 : « recommandations ok » (21/11/2026) ;
 > DEB-Q38 à DEB-Q44 : « recommandations ok » (21/11/2026) ; DEB-Q45, DEB-Q46 : « recommandations ok »
 > (21/11/2026) ; DEB-Q47 : tranchée par le développeur (21/11/2026) ; DEB-Q48 à DEB-Q53 : « recommandations ok » (21/11/2026) ;
 > DEB-Q54 à DEB-Q57 : « recommandations ok », DEB-Q55 précisée par le développeur (21/11/2026) ; DEB-Q58 : « maintenant,
-> avant F3 » (21/11/2026). Décisions : §8. Document d'origine **hors
+> avant F3 » (21/11/2026) ; DEB-Q59 à DEB-Q63 : « recommandations ok » (21/11/2026). Décisions : §8. Document d'origine **hors
 > dépôt** (DEB-D2) : cahier des charges « Document de cadrage » (novembre 2026), tenu par le développeur ; le modèle de
 > fiche (FEB) est versionné, nettoyé de ses métadonnées (DEB-Q9, DEB-Q33).
 
@@ -143,8 +143,9 @@ Identité : sélecteur d'agent fictif dans l'en-tête, sans connexion (DEB-Q6) ;
 └─────────────────────────────────────┴───────────────────────────────────────┘
 ```
 
-Liste : N°, intitulé, demandeur, date, statut (badge), actions *Reprendre* et *Télécharger*. Tableau HTML simple
-(quelques dizaines de lignes : AG Grid inutile). Réponse de l'IA affichée entière, avec indicateur d'attente
+Liste, à l'accueil (DEB-Q59) : N°, intitulé, demandeur, date de création, statut (badge), actions *Ouvrir* (page
+Dialogue, tout statut) et *Télécharger* (fiche validée) (DEB-Q60). Tableau HTML simple (quelques dizaines de lignes :
+AG Grid inutile). Réponse de l'IA affichée entière, avec indicateur d'attente
 (DEB-Q7 : pas de flux SSE en v1).
 
 ## 7. Chantiers et lots
@@ -162,7 +163,7 @@ Liste : N°, intitulé, demandeur, date, statut (badge), actions *Reprendre* et 
 | F2 | Page Dialogue (DEB-Q48 à DEB-Q53) | `Appliquer-Lot` vert ; `npm test` vert ; parcours complet avec l'IA scénarisée, dans le navigateur : création, dialogue jusqu'à 10/10, proposition acceptée et rejetée, correction manuelle, soumission, compléments, reprise, validation, .docx ouvert dans Word |
 | HY2 | Hygiène DEB-HY2 : dossier de données fixé par environnement (DEB-Q54 à DEB-Q57) | `Appliquer-Lot HY2` vert et commité ; site lancé au profil `Localhost` : `C:\Dev\Demonstrateur-data\fiches.db` créé, `GET api/sante` « ok » |
 | HY3 | Correction de DEB-A2 (DEB-Q58) : `global.json` à la racine du dépôt, garde du SDK dans `Directory.Build.props`, tests d'architecture ; précédé de F2c (racine de lot) | `Appliquer-Lot HY3` vert et commité ; `dotnet --version` rend 10.0.403 à la racine ; garde éprouvée sur une version forcée ; `Compter-Tests` à l'ouverture suivante |
-| F3 | Page Liste | statuts conformes après chaque transition |
+| F3 | Page Liste à l'accueil (DEB-Q59 à DEB-Q63) | `Appliquer-Lot F3` vert ; `npm test` vert ; dans le navigateur, statut de la liste conforme après chaque transition : création (Brouillon), soumission (Soumise, numéro), compléments (À compléter), reprise (Brouillon), validation (Validée, « Télécharger »), refus (Refusée) |
 | A1 | Adaptateur IA réel et prompt système (DEB-Q2) | scénario e-commerce joué avec l'IA réelle, sans invention |
 | R1 | Fiche de recette : nominal et retour pour complément | critère de fin du démonstrateur (§1) : **point de terminaison de la V1** |
 
@@ -238,6 +239,11 @@ sont lancés à la main (`npm test`) et leur sortie jointe au compte rendu.
 | DEB-Q56 | (21/11/2026, « recommandations ok ») La publication sur IIS reste hors V1 (DEB-Q8, DEB-D4) : les fichiers Staging et Production sont prêts, la mise en œuvre de la livraison est une évolution V2 |
 | DEB-Q57 | (21/11/2026, « recommandations ok ») Convention générique « dossier de données `C:\Dev\<Depot>-data` sur le poste, chemin par environnement » : versée au modèle générique du harnais (§3, §10) par un lot du harnais central, pas par ce projet |
 | DEB-Q58 | (21/11/2026, « maintenant, avant F3 », recommandation retenue) Anomalie DEB-A2 : `dotnet` cherche `global.json` depuis le dossier courant ; lancées depuis la racine du dépôt, les commandes du harnais ne voient pas `ExpressionBesoin/global.json` et compilent avec le SDK 11.0.100 (mesuré le 21/11/2026). Correction : `global.json` déplacé à la racine du dépôt (un seul fichier ; Visual Studio le trouve aussi, en remontant depuis la solution) ; `Lot.Racines` étendu d'abord (F2c), le déplacement ensuite (HY3) ; garde au build : erreur si `NETCoreSdkVersion` diffère de la version attendue ; tests d'architecture qui lient les deux. DEB-Q47 inchangée |
+| DEB-Q59 | (21/11/2026, « recommandations ok ») Page Liste (F3) à l'accueil (`GET /`, `data-page="liste"`), sous « Nouvelle fiche » : aucune route nouvelle ; `features/accueil` remplacé par `features/liste` |
+| DEB-Q60 | (21/11/2026, « recommandations ok » ; précise DEB-Q48 sur le nom de l'action) Action de la liste « **Ouvrir** » (lien vers `Home/Dialogue/{id}`, tout statut), et non « Reprendre », qui désigne la transition `ACompleter → Brouillon` (un mot = une chose) ; « Télécharger » pour une fiche `Validee` seulement |
+| DEB-Q61 | (21/11/2026, « recommandations ok ») Découpage comme F2 : `lireResumes` (`contrats.ts`), `client.lister()`, `features/liste/vue.ts` PUR (lignes : numéro ou « — », intitulé ou « (sans intitulé) », badge, actions), coquille `PageListe.ts` sans `innerHTML` ; badge du statut déplacé dans `core/statuts.ts` (commun aux deux pages) ; référence `liste-reference.json` figée à l'octet par xUnit, lue par Vitest ; aucune dépendance ajoutée |
+| DEB-Q62 | (21/11/2026, « recommandations ok ») Date affichée : création, jj/mm/aaaa à l'heure de Paris (comme DEB-Q24, DEB-Q36), fuseau en paramètre de la fonction pure |
+| DEB-Q63 | (21/11/2026, « recommandations ok ») Toutes les fiches, sans filtre par agent, ordre du serveur (plus récente d'abord), sans pagination ; rechargement à l'affichage de la page, retour arrière compris (`pageshow`), sans interrogation périodique |
 
 Questions ouvertes :
 

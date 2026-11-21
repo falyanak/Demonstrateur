@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import reference from "./contrats/fiche-reference.json?raw";
 import referenceConsultation from "./contrats/consultation-reference.json?raw";
 import referenceTour from "./contrats/tour-reference.json?raw";
+import referenceListe from "./contrats/liste-reference.json?raw";
 import { creerClient, EN_TETE_AGENT, erreurException, erreurInattendue, interpreter, type ClientApi, type Recuperer } from "../src/core/api.ts";
 import { cheminDialogue } from "../src/core/chemins.ts";
 import { ContratInvalide, lireAgents } from "../src/core/contrats.ts";
@@ -50,6 +51,18 @@ describe("creerClient", () => {
     const { recuperer, appels } = serveur(200, "[]");
     expect(await creerClient(recuperer, resoudre).agents()).toEqual({ ok: true, valeur: [] });
     expect(appels).toEqual([{ url: "/base/api/agents", init: { headers: { Accept: "application/json" } } }]);
+  });
+
+  it("lister : GET des résumés, lus par le contrat de la liste (F3)", async () => {
+    const { recuperer, appels } = serveur(200, referenceListe);
+    const issue = await creerClient(recuperer, resoudre).lister();
+    expect(issue.ok && issue.valeur.map((r) => [r.numero, r.statut])).toEqual([["EB-2026-0007", "ACompleter"], [null, "Brouillon"]]);
+    expect(appels).toEqual([{ url: "/base/api/fiches", init: { headers: { Accept: "application/json" } } }]);
+  });
+
+  it("lister : une fiche seule n'est pas une liste", async () => {
+    const { recuperer } = serveur(200, reference);
+    await expect(creerClient(recuperer, resoudre).lister()).rejects.toThrow("resumes devait être un tableau");
   });
 
   it("creerFiche : POST avec l'en-tête de l'agent", async () => {
