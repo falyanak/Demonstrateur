@@ -1,12 +1,15 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <!-- Infrastructure : adaptateurs des ports (SQLite par Microsoft.Data.Sqlite sans Entity Framework, DEB-Q12 ;
-       génération .docx ; IA). Paquets permis. -->
+       génération .docx ; IA scénarisée et IA réelle, lot A1). Paquets permis. -->
   <ItemGroup>
     <ProjectReference Include="..\ExpressionBesoin.Domain\ExpressionBesoin.Domain.csproj" />
     <ProjectReference Include="..\ExpressionBesoin.Application\ExpressionBesoin.Application.csproj" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.Data.Sqlite" />
+    <!-- IA réelle (A1, DEB-D5) : agent MAF sur un client compatible OpenAI (Albert API). -->
+    <PackageReference Include="Microsoft.Agents.AI" />
+    <PackageReference Include="Microsoft.Extensions.AI.OpenAI" />
   </ItemGroup>
   <ItemGroup>
     <!-- Modèle FEB nettoyé de ses métadonnées (DEB-Q9, DEB-Q33), lu par GenerateurDocumentFeb.DepuisRessource. -->

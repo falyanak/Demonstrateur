@@ -19,4 +19,14 @@
          10/11/2026 ; dépend toujours de SQLitePCLRaw 2.1.x (2.1.13), dont ConnexionsSqlite appelle sqlite3_db_config. -->
     <PackageVersion Include="Microsoft.Data.Sqlite" Version="10.0.15" />
   </ItemGroup>
+  <ItemGroup>
+    <!-- Adaptateur IA réel (lot A1, DEB-D5, DEB-Q83 à DEB-Q88) : Microsoft Agent Framework (ChatClientAgent) sur l'IChatClient
+         OpenAI de Microsoft.Extensions.AI. Microsoft.Agents.AI 1.28.0 du 06/11/2026, dernière stable ; elle dépend de
+         Microsoft.Extensions.AI 10.11. -->
+    <PackageVersion Include="Microsoft.Agents.AI" Version="1.28.0" />
+    <!-- Version RETENUE EN RETRAIT : 10.11.1 du 20/11/2026, et non 11.0.1 (21/11/2026) : la série 11 change de version
+         majeure les abstractions sur lesquelles Microsoft.Agents.AI 1.28.0 est compilé ; on reste sur sa série 10.11.
+         Apporte OpenAI 2.x (client compatible, transport HttpClient) et System.ClientModel. -->
+    <PackageVersion Include="Microsoft.Extensions.AI.OpenAI" Version="10.11.1" />
+  </ItemGroup>
 </Project>

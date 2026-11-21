@@ -524,3 +524,30 @@
   à voir en R1. Objectif de L2 atteint ; chantier L clos.
 - L2b : documents seuls (prompt de reprise, historique). Vérifié chez l'assistant : octets (CRLF sans BOM comme les
   originaux), taille du prompt < 30 720 octets. Rien à compiler.
+
+## 21/11/2026 — Chantier A ouvert ; accès à Albert API sondé ; A1 livré (IA réelle)
+
+- Ouverture (20261121-195412) : 8 pièces conformes à `PIECES.txt` (tailles et SHA-256), archive de 162 entrées au
+  commit `f44ece5`, conforme à `MASQUAGE.txt` ; 0 commit à publier. `Compter-Tests` en échec à l'ouverture (MSB3027 :
+  DLL de `bin\Debug` verrouillées par le site et Visual Studio, cas prévu au §0 du prompt), puis relancé site arrêté :
+  568, 0 échec.
+- DEB-Q83 : accès à Albert API confirmé par le développeur ; adresse, clé (`ALBERT_API_KEY`), proxy et quotas relevés
+  dans CSAgent (cité par FlowPortal). Sonde hors dépôt `Sonder-Albert.ps1` (lecture seule, livrée hors zip) jouée au
+  poste le 21/11/2026 à 20:06 : `GET /models` en 103 ms ; schéma strict respecté 4 fois sur 4 ; `openweight-medium`
+  0,8 s et 1,6 s sans invention ; `openweight-large` 35,4 s et sept rubriques tirées d'une phrase. DEB-Q84 à DEB-Q88
+  posées avec recommandation, « recommandations ok ».
+- A1 : paquets `Microsoft.Agents.AI` 1.28.0 et `Microsoft.Extensions.AI.OpenAI` 10.11.1 (retenue en retrait de la 11.0.1,
+  série de MAF) ; Infrastructure `IA/` : `PromptFiche` et `LimiteDebit` (purs), `GestionnaireLimiteDebit` (un seul
+  nouvel essai sur 429 par minute), `OptionsIA`, `AssistantIAAlbert` (`ChatClientAgent` sans outils ni session, client
+  OpenAI sur `HttpClient`, proxy du système, 60 s) ; Web : `CompositionIA` (choix par `IA:Fournisseur`, arrêt au
+  démarrage si incomplet), `CompositionFiches` (IA choisie et vérifiée au démarrage), `appsettings.{Localhost,Staging,
+  Production}.json` (section `IA`). Tests : `PromptFicheTests`, `LimiteDebitTests`, `GestionnaireLimiteDebitTests`,
+  `AssistantIAAlbertTests` (bout en bout sur `FauxFournisseurIA`), `CompositionIATests`, `ConfigurationEnvironnementsTests`
+  étendu ; `UsineWeb` fixe l'IA scénarisée et une clé vide (la clé du poste n'entre jamais dans un test). Comptes
+  ESTIMÉS : Infrastructure 142 → 190, Web 108 → 133, total 641.
+- Vérifié chez l'assistant : syntaxe C# (tree-sitter) des 15 fichiers C# ; attendus du prompt et du schéma recalculés par
+  une réplique Python (éprouvée sur un attendu faussé) ; API publiques relues dans les sources de Microsoft.Extensions.AI
+  10.11.1 (clé `strict`, instructions en message système), OpenAI 2.15.0 et System.ClientModel 1.16.0, et dans la
+  documentation de MAF (1.13, dépôt source inaccessible) ; JSON des `appsettings` ; octets (CRLF sans BOM comme les
+  originaux) ; taille du prompt < 30 720 octets. Non vérifié : compilation, restauration NuGet, tests, couverture,
+  mutations du back-end, IA réelle : `Appliquer-Lot A1` et le critère au poste tranchent.

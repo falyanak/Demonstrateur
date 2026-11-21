@@ -1,7 +1,6 @@
 using ExpressionBesoin.Application.Fiches;
 using ExpressionBesoin.Infrastructure.Documents;
 using ExpressionBesoin.Infrastructure.Fiches;
-using ExpressionBesoin.Infrastructure.IA;
 using ExpressionBesoin.Infrastructure.Organisation;
 using ExpressionBesoin.Infrastructure.Sqlite;
 
@@ -34,8 +33,8 @@ public static class CompositionFiches
         services.AddSingleton<IReferentielOrganisation, ReferentielOrganisationFictif>();
         // Un seul exemplaire : le gabarit est lu, décompressé et vérifié une fois (plan §4, performance).
         services.AddSingleton<IGenerateurDocument>(_ => GenerateurDocumentFeb.DepuisRessource());
-        // IA scénarisée jusqu'au lot A1 (DEB-Q41) : démonstration jouable sans réseau.
-        services.AddSingleton<IAssistantIA, AssistantIAScenarise>();
+        // IA réelle (Albert API, lot A1) ou scénarisée (hors réseau, DEB-Q41), selon IA:Fournisseur (DEB-Q86).
+        services.AddSingleton<IAssistantIA>(fournisseur => CompositionIA.Creer(fournisseur.GetRequiredService<IConfiguration>()));
         services.AddSingleton(fournisseur => new ServiceFiches(
             fournisseur.GetRequiredService<IDepotFiches>(),
             fournisseur.GetRequiredService<IAssistantIA>(),
@@ -48,13 +47,17 @@ public static class CompositionFiches
         return services;
     }
 
-    /// <summary>Au démarrage : dossier de la base créé, schéma initialisé, gabarit FEB chargé et vérifié.</summary>
+    /// <summary>
+    /// Au démarrage : dossier de la base créé, schéma initialisé, gabarit FEB chargé et vérifié, adaptateur IA choisi
+    /// (configuration de l'IA vérifiée, sans appel réseau).
+    /// </summary>
     public static void Initialiser(IServiceProvider services)
     {
         var options = services.GetRequiredService<OptionsSqlite>();
         Directory.CreateDirectory(Path.GetDirectoryName(options.Chemin)!);
         services.GetRequiredService<DepotFichesSqlite>().Initialiser();
         services.GetRequiredService<IGenerateurDocument>();
+        services.GetRequiredService<IAssistantIA>();
     }
 
     /// <summary>Chemin configuré, variables d'environnement développées ; absent ou relatif → arrêt explicite.</summary>

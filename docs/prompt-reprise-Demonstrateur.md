@@ -1,6 +1,6 @@
 # Prompt de reprise — Demonstrateur
 
-> Mis à jour le 21/11/2026 par le lot L2b. Règles génériques : harnais central, `regles\regles-de-travail.md` (v5) ;
+> Mis à jour le 21/11/2026 par le lot A1. Règles génériques : harnais central, `regles\regles-de-travail.md` (v5) ;
 > modèle de projet : `regles\harnais-modele-generique.md` (v2) ; front : `regles\gabarit-frontend-vite-aspnet.md` ;
 > outillage : `C:\Dev\Harnais\docs\specification-harnais-central.md` (fait foi).
 > Historique détaillé : `docs/historique-Demonstrateur.md` (non envoyé par défaut). Documents hors dépôt dont dépend ce
@@ -8,25 +8,23 @@
 > `Expression_de_besoin_demonstrateur_IA_SICCRF.docx` (document de cadrage, novembre 2026). Le modèle `FEB.docx` est
 > versionné depuis I2, nettoyé de ses métadonnées (DEB-Q9, DEB-Q33).
 
-## ▶ ÉTAT AU 21/11/2026 (chantier L clos ; A1 à ouvrir) — À LIRE D'ABORD
+## ▶ ÉTAT AU 21/11/2026 (A1 livré, à appliquer) — À LIRE D'ABORD
 
-**Où on en est** : chantiers P, B, I, F, **L** clos ; hygiène HY1 à HY3 close. Chantier L (cycle de vie, DEB-Q65) :
-L1 serveur (`b275507`), L2 panneau « Cycle de vie » de la page Dialogue (`ec192e6`, DEB-Q79 à DEB-Q82) vérifié au
-poste : `Appliquer-Lot L2` vert (568 tests .NET, 0 échec, Release), `npm test` 249/249, panneau vu dans le navigateur
-(création, soumission, compléments, reprise, nouvelle soumission, refus ; acteurs et heures de Paris conformes). L2b :
-comptes mesurés reportés.
-**Prochaine action** : ouvrir la session (ci-dessous) ; l'assistant ouvre **A1** (adaptateur IA réel, DEB-D5) en
-commençant par la question de l'accès à Albert API (DEB-Q2 : sinon API Mistral). Critère d'A1 : plan §7.
-**Ensuite** : R1, **point de terminaison de la V1** (DEB-D4) ; l'étape « Validation » du panneau y sera vue au
-navigateur. **Avant R1** : publier et sauvegarder le dernier commit (4 commits à publier à l'ouverture du 21/11/2026,
-18:02, plus L2 et L2b).
+**Où on en est** : chantiers P, B, I, F, L clos ; hygiène HY1 à HY3 close. Chantier A ouvert : accès à Albert API
+confirmé (DEB-Q83) et mesuré au poste par une sonde (`openweight-medium` retenu, DEB-Q84) ; **A1 livré** (adaptateur
+réel, DEB-Q84 à DEB-Q88), non encore appliqué. Comptes ESTIMÉS : 641 tests .NET (Infrastructure 190, Web 133).
+**Prochaine action** : `ALBERT_API_KEY` en variable utilisateur Windows, Visual Studio et site fermés, puis la ligne
+enchaînée d'A1 (§0) ; ensuite le critère d'A1 au navigateur (plan §7) : scénario e-commerce sans invention, « pc ne
+démarre plus » et « copieur en panne » hors périmètre sans proposition.
+**Ensuite** : A1b (comptes mesurés), puis R1, **point de terminaison de la V1** (DEB-D4) ; l'étape « Validation » du
+panneau y sera vue au navigateur. **Avant R1** : publier et sauvegarder le dernier commit.
 **Ouverture de la session suivante** (site arrêté : il verrouille les DLL de `bin\Debug`) :
 
     Set-Location C:\Dev\Demonstrateur; . C:\Dev\Harnais\outillage\Charger-Harnais.ps1; Ouvrir-Session -BrancheAttendue main
     # attendu : « SESSION PRÉPARÉE : 8 pièce(s) dans C:\Dev\Sessions\Demonstrateur\<horodatage> » ; joindre toutes les
     # pièces et donner leur compte.
 
-**Décisions récentes** : DEB-Q79 à DEB-Q82 (21/11/2026). **Anomalies ouvertes** : aucune. **Questions ouvertes** :
+**Décisions récentes** : DEB-Q83 à DEB-Q88 (21/11/2026). **Anomalies ouvertes** : aucune. **Questions ouvertes** :
 aucune. **Hygiène** : aucune en cours.
 
 ## §0. Protocole (propre au projet)
@@ -43,14 +41,15 @@ aucune. **Hygiène** : aucune en cours.
 | Front | Node.js 26.13.1 LTS et son npm (DEB-D7) ; `node_modules` versionné (DEB-D6), Windows x64 ; `npm ci` seulement s'il manque ; versions exactes (`.npmrc`) |
 | Données | fictives, jamais réelles ; jeux d'essai hors dépôt ; base SQLite hors dépôt, clé `Fiches:Base` fixée par environnement (DEB-Q54, DEB-Q55) : poste `C:\Dev\Demonstrateur-data\fiches.db` (`appsettings.Localhost.json`) ; serveurs `appsettings.Staging.json`, `appsettings.Production.json` (`D:\Donnees\Demonstrateur-data[-staging]`, à confirmer) ; variable `Fiches__Base` prioritaire ; rien dans `appsettings.json` |
 | Dépôt distant | `https://github.com/falyanak/Demonstrateur.git`, **public**, branche `main` ; publication par le développeur seul (`Publier-Branche -Confirmer`, Git Credential Manager) |
-| Identifiants | `DEB-D…`, `DEB-A…`, `DEB-Q…`, `DEB-HY…` ; pris : DEB-D1 à DEB-D7, DEB-Q1 à DEB-Q82, DEB-A1 (close par F2), DEB-A2 (close par HY3), DEB-HY1 (close par HY1), DEB-HY2 (close par HY2) ; mutations M1 à M10, MF1 à MF30 (front) |
+| Identifiants | `DEB-D…`, `DEB-A…`, `DEB-Q…`, `DEB-HY…` ; pris : DEB-D1 à DEB-D7, DEB-Q1 à DEB-Q88, DEB-A1 (close par F2), DEB-A2 (close par HY3), DEB-HY1 (close par HY1), DEB-HY2 (close par HY2) ; mutations M1 à M10, MF1 à MF30 (front) |
 
 Ligne enchaînée du projet (zip portant `DEPOT.txt` = « Demonstrateur ») :
 
     Set-Location C:\Dev\Demonstrateur; . C:\Dev\Harnais\outillage\Charger-Harnais.ps1; Appliquer-Lot NOM; if ($?) { git add -A; git commit -m "NOM : …" }
 
 Lancer le site : `npm run dev` dans `ClientApp` (Vite, 5173) ET profil `Localhost` de `launchSettings.json`
-(`http://localhost:5080`) ; ouvrir 5080 ; contrôle : `GET api/sante`. L'arrêter avant `Ouvrir-Session`, `Appliquer-Lot`
+(`http://localhost:5080`) ; ouvrir 5080 ; contrôle : `GET api/sante`. IA réelle (A1) : variable utilisateur
+`ALBERT_API_KEY` (jamais dans un fichier) ; hors réseau : variable `IA__Fournisseur` = `Scenarise` (DEB-Q86). L'arrêter avant `Ouvrir-Session`, `Appliquer-Lot`
 ou `Compter-Tests` : il verrouille les DLL de `bin\Debug` (MSB3027, 21/11/2026). Tests du front :
 
     Set-Location C:\Dev\Demonstrateur\ExpressionBesoin\src\ExpressionBesoin.Web\ClientApp; npm test
@@ -69,7 +68,7 @@ page de liste des fiches et de leur statut. Plan, périmètre et critère de fin
 | F — front | F1 (socle, API), F2 (Dialogue), F3 (Liste) | F1 clos le 21/11/2026 : F1 (`bfaaf97`), F1b (`fe31e69`), F1c (`3e45551`) ; F2 clos le 21/11/2026 : F2 (`ba3aafd`), F2c (`50ccdb4`) ; F3 clos le 21/11/2026 : F3 (`ce06fe6`), F3b ; `TestsFront` attendu d'OT2 |
 | Hygiène | HY1, HY1b (DEB-HY1 : NuGet, outils dotnet, SDK) ; HY2 (DEB-HY2 : dossier de données par environnement) ; HY3 (DEB-A2 : SDK depuis la racine) | HY1 clos le 21/11/2026 : HY1 (`d307a91`), HY1b ; HY2 clos le 21/11/2026 : HY2 (`9b21bdb`) ; HY3 clos le 21/11/2026 : HY3 (`fcdb37a`) |
 | L — cycle de vie | L1 (serveur), L2 (front) | ouvert le 21/11/2026 (DEB-Q65) ; clos le 21/11/2026 : L1 (`b275507`), L1b ; L2 (`ec192e6`), L2b |
-| A — IA réelle | A1 | à faire ; Albert API si accès, sinon Mistral (DEB-Q2) ; critère élargi par DEB-Q64 |
+| A — IA réelle | A1 | ouvert le 21/11/2026 : Albert API (DEB-Q83), `openweight-medium` (DEB-Q84) ; A1 livré, à appliquer ; critère : plan §7 (DEB-Q64) |
 | R — recette | R1 | à faire |
 
 Comptes de P0 à I1 : historique. Depuis I2a :
@@ -88,8 +87,8 @@ L1 : comptes mesurés égaux à l'estimation (Domain +22, Infrastructure +7). L2
 
 ## §2. Points ouverts
 
-1. Accès à Albert API (DEB-Q2) : à confirmer par le développeur à l'ouverture d'A1 ; sinon API Mistral. Clé hors
-   dépôt, par variable d'environnement (règles §13).
+1. A1 : appliquer, puis jouer le critère au navigateur (IA réelle) ; un écart au critère = lot correctif A1x, qui ne
+   touche que le prompt (`PromptFiche`) ou le modèle (`IA:Modele`).
 2. Publication et sauvegarde du dernier commit : exigées par le critère de fin de la V1 (R1).
 6. Chemins des serveurs (DEB-Q55) : `D:\Donnees\Demonstrateur-data\fiches.db` (Production) et
    `D:\Donnees\Demonstrateur-data-staging\fiches.db` (Staging), à confirmer avec l'exploitation avant toute
@@ -109,6 +108,7 @@ L1 : comptes mesurés égaux à l'estimation (Domain +22, Infrastructure +7). L2
 | N° | Décision |
 | --- | --- |
 | DEB-Q1 à DEB-Q8 | Arbitrages du 20/11/2026, « recommandations ok » : plan §8. |
+| DEB-Q83 à DEB-Q88 | IA réelle (A1) : accès à Albert API confirmé et sondé au poste ; `openweight-medium` retenu sur mesure (gpt-oss-120b : 35 s, invention) ; `json_schema` strict ; `IA:Fournisseur`/`Point`/`Modele` par environnement, clé `ALBERT_API_KEY`, arrêt au démarrage si incomplet ; proxy, 60 s, un seul nouvel essai sur limite par minute, sinon 503 ; prompt pur, adaptateur testé sur faux fournisseur : plan §8 (« recommandations ok », 21/11/2026). |
 | DEB-Q2, DEB-Q64 | Fournisseur de l'IA réelle : Albert API si le ministère y a accès, sinon API Mistral, accès vérifié à l'ouverture d'A1 ; repli hors réseau : IA scénarisée. Demandes d'assistance validées au parcours de F3 (« pc ne démarre plus ») : limite connue de l'IA scénarisée, non corrigée ; détection jugée dans le critère d'A1 : plan §7, §8 (« recommandations ok », 21/11/2026). |
 | DEB-D1 | Dépôt `Demonstrateur` (nom du distant GitHub), racine `C:\Dev\Demonstrateur`, solution `ExpressionBesoin/`, préfixe `DEB` ; révise DEB-Q1 pour la racine (20/11/2026). |
 | DEB-D2 | Dépôt public : aucun document interne versionné (cahier des charges, modèle FEB) tant que DEB-Q9 n'est pas tranchée ; le plan en tient lieu (20/11/2026). |
@@ -158,9 +158,10 @@ ExpressionBesoin/
                                         (coquille) ; Sqlite/ ConnexionsSqlite, OptionsSqlite ; Organisation/
                                         ReferentielOrganisationFictif (I1) ; Documents/ PlanFeb, GabaritFeb, MetadonneesFeb
                                         (purs), GenerateurDocumentFeb (adaptateur), FEB.docx (ressource embarquée) (I2)
-  src/ExpressionBesoin.Infrastructure/IA/  ScenarioDialogue (pur), AssistantIAScenarise (adaptateur) (F1)
+  src/ExpressionBesoin.Infrastructure/IA/  ScenarioDialogue (pur), AssistantIAScenarise (adaptateur) (F1) ; PromptFiche,
+                                        LimiteDebit (purs), GestionnaireLimiteDebit, OptionsIA, AssistantIAAlbert (A1)
   src/ExpressionBesoin.Web/             Program.cs ; Sante/DiagnosticSante.cs (pur), Sante/PointsSante.cs ;
-                                        Hebergement/EnvironnementExtensions.cs, CompositionFiches.cs (F1) ;
+                                        Hebergement/EnvironnementExtensions.cs, CompositionFiches.cs (F1), CompositionIA.cs (A1) ;
                                         Api/ ContratJson, Vues (projections pures), StatutHttp (pur), PointsFiches (F1) ;
                                         Vite/ ViteTags (pur), LecteurManifeste, ViteScriptsTagHelper (F1) ;
                                         Controllers/HomeController.cs (Index, Dialogue, Error) ; Views/ (Home/Dialogue, F2) ; Properties/launchSettings.json ;
@@ -188,7 +189,8 @@ ExpressionBesoin/
                                               UsinePanne), CompositionFichesTests.cs, ConfigurationEnvironnementsTests.cs (HY2) ; Api/ EssaisApi, FicheVue, StatutHttp,
                                               PointsFiches, ParcoursFiche (Tests) ; Vite/ ViteTags, LecteurManifeste,
                                               ViteScriptsTagHelper (Tests) (F1)
-  tests/ExpressionBesoin.Infrastructure.Tests/IA/  ScenarioDialogueTests.cs (F1)
+  tests/ExpressionBesoin.Infrastructure.Tests/IA/  ScenarioDialogueTests.cs (F1) ; FauxFournisseurIA (aide), PromptFiche,
+                                              LimiteDebit, GestionnaireLimiteDebit, AssistantIAAlbert (Tests) (A1)
   tests/ExpressionBesoin.Architecture.Tests/  AnalyseCsproj.cs (pur), ReglesSolution.cs, SdkTests.cs (HY3),
                                               AnalyseCsprojTests.cs, SolutionTests.cs
 ```
@@ -206,6 +208,7 @@ ExpressionBesoin/
 | JSON de l'API | projections de `Web/Api/Vues.cs`, camelCase, énumérations par leur nom, encodeur relâché (`ContratJson`) ; fiche : `id, numero, statut, enTete, rubriques, obligatoires, remplies, complete, modifiable, prochaineRubrique, confirmeeLe, decisions` | `FicheVueTests` (octets de `ClientApp/tests/contrats/{fiche,consultation,tour,liste}-reference.json`, réplique Python) et `contrats.test.ts` (Vitest) |
 | Pages | `GET /` (accueil : « Nouvelle fiche » et liste, `data-page="liste"`, F3) ; `GET /Home/Dialogue/{id}` → `<div id="app" data-page="dialogue" data-fiche="{id}">`, 404 sans Guid non vide (DEB-Q48) | `PointsFichesTests` (F2) |
 | IA scénarisée | réponse au contrat du plan §2 (`ScenarioDialogue`, DEB-Q41) | `ScenarioDialogueTests` (F1) |
+| IA réelle | `POST {IA:Point}/chat/completions`, modèle `IA:Modele`, consignes système fixes, `response_format` `json_schema` strict `reponse_fiche` (DEB-Q85) ; 429 : DEB-Q87 | `PromptFicheTests`, `AssistantIAAlbertTests` (A1) |
 | Document .docx | modèle FEB embarqué (empreinte figée) ; placement DEB-Q35 ; contenu DEB-Q36 ; octets stables DEB-Q37 | `ContenuDocumentTests`, `GabaritFebTests`, `GenerateurDocumentFebTests` (55 paragraphes attendus, I2) |
 
 ## §6. Reliquat, hygiène, leçons
@@ -217,10 +220,12 @@ synthèse CODIR / COPIL, export PDF, version optimiste des fiches (DEB-Q26), jou
 
 ## §7. Prochaine session
 
-Acquis : plan v1.18 ; socle P0, Domaine B1, Application B2, Infrastructure I1 et I2, front F1 à F3, hygiène HY1 à HY3,
-cycle de vie L1 et L2 validés sur le poste (568 tests .NET, couverture 100 %, Vitest 249 ; schéma SQLite 2).
-Audit honnête : chez l'assistant, ni SDK .NET ni NuGet (C# analysé par tree-sitter, pas compilé ; Vitest sur une
-réplique, Node 22 au lieu de 26) : la compilation et `Appliquer-Lot` au poste tranchent. Étape « Validation » du
-panneau non vue au navigateur en L2 (parcours terminé par un refus) : couverte par Vitest, à voir en R1. Plan ordonné :
-A1 (accès à Albert API d'abord), R1 (point de terminaison de la V1, DEB-D4). Pièces à envoyer : toutes celles
-d'`Ouvrir-Session` (8), avec leur compte, site arrêté ; pour A1, la réponse sur l'accès à Albert API.
+Acquis : plan v1.19 ; socle P0, Domaine B1, Application B2, Infrastructure I1 et I2, front F1 à F3, hygiène HY1 à HY3,
+cycle de vie L1 et L2 validés sur le poste (568 tests .NET, couverture 100 %, Vitest 249 ; schéma SQLite 2) ; accès à
+Albert API sondé au poste (DEB-Q83, DEB-Q84). A1 livré (paquets `Microsoft.Agents.AI` 1.28.0 et
+`Microsoft.Extensions.AI.OpenAI` 10.11.1, restaurés au poste depuis nuget.org).
+Audit honnête : chez l'assistant, ni SDK .NET ni NuGet (C# analysé par tree-sitter, pas compilé ; API de MAF lues dans
+sa documentation 1.13, de Microsoft.Extensions.AI 10.11.1, OpenAI 2.15.0 et System.ClientModel 1.16.0 dans leurs
+sources) : `Appliquer-Lot A1` tranche. Étape « Validation » du panneau non vue au navigateur en L2 : à voir en R1.
+Plan ordonné : A1 (appliquer, critère au navigateur), A1b, R1 (DEB-D4). Pièces à envoyer : toutes celles
+d'`Ouvrir-Session` (8), avec leur compte, site arrêté ; la sortie d'`Appliquer-Lot A1` et le compte rendu du critère.

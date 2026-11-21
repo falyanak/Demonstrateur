@@ -1,6 +1,6 @@
 # Plan du démonstrateur « Expression de besoin » (version simplifiée)
 
-> Version 1.18 du 21/11/2026 (lot L2 ; 1.17 au lot L1, 1.16 au lot F3b, 1.15 au lot F3, 1.14 au lot F2c, 1.13 au lot HY2, 1.12 au lot F2, 1.11 au lot HY1b, 1.10 au lot HY1, 1.9 au lot F1, 1.8 au lot I2b, 1.7 au lot I2, 1.6 au lot I1, 1.5 au lot B2, 1.4 au lot B1b, 1.3 au lot B1, 1.2 au lot P0c, 1.1 au
+> Version 1.19 du 21/11/2026 (lot A1 ; 1.18 au lot L2, 1.17 au lot L1, 1.16 au lot F3b, 1.15 au lot F3, 1.14 au lot F2c, 1.13 au lot HY2, 1.12 au lot F2, 1.11 au lot HY1b, 1.10 au lot HY1, 1.9 au lot F1, 1.8 au lot I2b, 1.7 au lot I2, 1.6 au lot I1, 1.5 au lot B2, 1.4 au lot B1b, 1.3 au lot B1, 1.2 au lot P0c, 1.1 au
 > lot P0, 1.0 au lot P0a). Arbitrages DEB-Q1 à DEB-Q8, DEB-Q11 à DEB-Q32 : « recommandations ok » (20/11/2026) ; DEB-Q9 :
 > « ok » (20/11/2026) ; DEB-Q33 à DEB-Q37 : « recommandations ok » (21/11/2026) ;
 > DEB-Q38 à DEB-Q44 : « recommandations ok » (21/11/2026) ; DEB-Q45, DEB-Q46 : « recommandations ok »
@@ -8,7 +8,8 @@
 > DEB-Q54 à DEB-Q57 : « recommandations ok », DEB-Q55 précisée par le développeur (21/11/2026) ; DEB-Q58 : « maintenant,
 > avant F3 » (21/11/2026) ; DEB-Q59 à DEB-Q63 : « recommandations ok » (21/11/2026) ; DEB-Q2, DEB-Q64 : « recommandations ok » (21/11/2026) ;
 > DEB-Q65, DEB-Q66 : « recommandations ok », DEB-Q67 à DEB-Q72 rendues sans objet par DEB-Q73 ; DEB-Q73 à DEB-Q78 :
-> « accord » du développeur (21/11/2026) ; DEB-Q79 à DEB-Q82 : « recommandations ok » (21/11/2026). Décisions : §8. Document d'origine **hors
+> « accord » du développeur (21/11/2026) ; DEB-Q79 à DEB-Q82 : « recommandations ok » (21/11/2026) ; DEB-Q83 : accès confirmé par le développeur, DEB-Q84 à DEB-Q88 :
+> « recommandations ok » après la sonde (21/11/2026). Décisions : §8. Document d'origine **hors
 > dépôt** (DEB-D2) : cahier des charges « Document de cadrage » (novembre 2026), tenu par le développeur ; le modèle de
 > fiche (FEB) est versionné, nettoyé de ses métadonnées (DEB-Q9, DEB-Q33).
 
@@ -98,7 +99,8 @@ ExpressionBesoin/src/
                                    et générateur d'identifiants injectés
   ExpressionBesoin.Infrastructure  SQLite (fiche en JSON + colonnes de liste ; table Transitions, schéma 2, L1) ; .docx sur le gabarit FEB embarqué
                                    (zip + XML, sans SDK OpenXML, DEB-Q34 ; placement par libellé, DEB-Q35) ;
-                                   AssistantIA réel ; AssistantIA scénarisé (démonstration et tests hors réseau)
+                                   AssistantIAAlbert (A1 : agent MAF sur Albert API, PromptFiche et LimiteDebit purs) ;
+                                   AssistantIAScenarise (démonstration et tests hors réseau), choisi par IA:Fournisseur
   ExpressionBesoin.Web             API minimale, deux vues Razor ; ClientApp Vite + TypeScript (features/dialogue,
                                    features/liste)
 ```
@@ -268,5 +270,12 @@ sont lancés à la main (`npm test`) et leur sortie jointe au compte rendu.
 | DEB-Q80 | (21/11/2026, « recommandations ok ») Mise à jour du panneau : après une soumission, une décision ou une reprise RÉUSSIE (les routes qui changent le statut, §5), la consultation est relue (`GET api/fiches/{id}`) dans la même attente ; fiche et cycle pris de la relecture, conversation de la page gardée ; relecture en échec → fiche renvoyée par l'action, ancien cycle, erreur affichée (`apresTransition`, pur). Aucun appel de plus pour la frappe, les tours, les saisies, les propositions ; aucune transition déduite par la page (DEB-Q50) ; le contrat serveur est inchangé (DEB-Q78) |
 | DEB-Q81 | (21/11/2026, « recommandations ok ») Panneau « Cycle de vie » sous le circuit, colonne de la fiche : une ligne par transition, ordre du serveur : étape en français (Création, Soumission, Validation, Demande de compléments, Refus, Reprise), statuts avant → après en badges (« — » à la création), acteur, date et heure jj/mm/aaaa hh:mm à Paris ; cycle vide (fiche antérieure à la migration, DEB-Q76) → « Aucune transition enregistrée (fiche antérieure au suivi du cycle de vie). » |
 | DEB-Q82 | (21/11/2026, « recommandations ok ») Découpage : `dateCourte` et `FUSEAU` déplacés de `features/liste/vue.ts` (qui les réexporte) vers `core/dates.ts`, avec `dateHeure` ; `lignesCycle` et `libelleEtape` purs dans `features/dialogue/vue.ts` ; événements `relue` et `nonRelue` du réducteur ; coquille `PageDialogue.ts` en `textContent`, éprouvée au navigateur ; tables de vérité Vitest, mutations MF22 à MF30 ; aucune dépendance ajoutée |
+
+| DEB-Q83 | (21/11/2026, réponse du développeur) Le ministère a accès à Albert API (DINUM) ; accès vérifié depuis le poste par une sonde hors dépôt (`Sonder-Albert.ps1`, lecture seule) : `GET /models` en 103 ms, sortie contrainte par schéma `json_schema` strict respectée par les deux modèles candidats (4 réponses conformes sur 4). Adresse, clé et proxy relevés dans CSAgent (`artydev/CSAgent`, cité par `artydev/FlowPortal`) : `https://albert.api.etalab.gouv.fr/v1`, `Authorization: Bearer`, variable `ALBERT_API_KEY`, identifiants Windows remis au seul proxy |
+| DEB-Q84 | (21/11/2026, « recommandations ok », tranchée sur mesure) Modèle `openweight-medium` (Mistral Small 3.2 24B) : 0,8 s et 1,6 s, aucune invention, hors périmètre juste avec un message adapté ; `openweight-large` (gpt-oss-120b) écarté : 35,4 s, sept rubriques remplies d'une seule phrase (invention, contraire au critère d'A1), message contraire à l'indicateur hors périmètre. Alias configuré (`IA:Modele`), stable d'une version du modèle à l'autre |
+| DEB-Q85 | (21/11/2026, « recommandations ok ») Réponse contrainte par le schéma du contrat (plan §2), `json_schema` strict, codes de rubrique énumérés (`PromptFiche.Schema`) ; toujours relue par `ReponseIA.Lire`, contrat inchangé |
+| DEB-Q86 | (21/11/2026, « recommandations ok ») `IA:Fournisseur` (`Albert` ou `Scenarise`), `IA:Point`, `IA:Modele` dans `appsettings.{Localhost,Staging,Production}.json` (Albert, `openweight-medium`), rien dans `appsettings.json` ; clé dans la variable `ALBERT_API_KEY` (variable utilisateur Windows), jamais dans un fichier ; aucune bascule implicite : valeur absente, inconnue ou incomplète → arrêt au démarrage, message sans la clé (`CompositionIA`). Démonstration hors réseau : `IA:Fournisseur = Scenarise` (ou variable `IA__Fournisseur`) |
+| DEB-Q87 | (21/11/2026, « recommandations ok ») Réseau : connexions par le proxy du système, identifiants Windows remis au seul proxy ; délai de 60 s par appel ; nouvels essais du client OpenAI désactivés ; sur un 429, un seul nouvel essai pour une limite par minute, après `Retry-After` (2 s à défaut, 10 s au plus : `LimiteDebit`, pur ; `GestionnaireLimiteDebit`, coquille) ; limite par jour et tout autre échec → exception, 503 `panne.technique` (DEB-Q22) |
+| DEB-Q88 | (21/11/2026, « recommandations ok ») Tests sans réseau : prompt pur (`PromptFiche` : consignes fixes en tête pour le cache, puis historique et dernier message portant l'état de la fiche, la rubrique questionnée et la suivante, même ordre que l'IA scénarisée), table de vérité ; adaptateur éprouvé de bout en bout (agent MAF, client OpenAI, maillon du 429) sur un faux fournisseur HTTP ; l'IA réelle n'est jugée qu'au critère d'A1, sur le poste ; couverture 100 / 100 |
 
 Questions ouvertes : aucune.
