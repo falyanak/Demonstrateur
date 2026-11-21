@@ -1,6 +1,6 @@
 # Plan du démonstrateur « Expression de besoin » (version simplifiée)
 
-> Version 1.21 du 21/11/2026 (lot A3 ; 1.20 au lot A2, 1.19 au lot A1, 1.18 au lot L2, 1.17 au lot L1, 1.16 au lot F3b, 1.15 au lot F3, 1.14 au lot F2c, 1.13 au lot HY2, 1.12 au lot F2, 1.11 au lot HY1b, 1.10 au lot HY1, 1.9 au lot F1, 1.8 au lot I2b, 1.7 au lot I2, 1.6 au lot I1, 1.5 au lot B2, 1.4 au lot B1b, 1.3 au lot B1, 1.2 au lot P0c, 1.1 au
+> Version 1.22 du 21/11/2026 (lot A4 ; 1.21 au lot A3, 1.20 au lot A2, 1.19 au lot A1, 1.18 au lot L2, 1.17 au lot L1, 1.16 au lot F3b, 1.15 au lot F3, 1.14 au lot F2c, 1.13 au lot HY2, 1.12 au lot F2, 1.11 au lot HY1b, 1.10 au lot HY1, 1.9 au lot F1, 1.8 au lot I2b, 1.7 au lot I2, 1.6 au lot I1, 1.5 au lot B2, 1.4 au lot B1b, 1.3 au lot B1, 1.2 au lot P0c, 1.1 au
 > lot P0, 1.0 au lot P0a). Arbitrages DEB-Q1 à DEB-Q8, DEB-Q11 à DEB-Q32 : « recommandations ok » (20/11/2026) ; DEB-Q9 :
 > « ok » (20/11/2026) ; DEB-Q33 à DEB-Q37 : « recommandations ok » (21/11/2026) ;
 > DEB-Q38 à DEB-Q44 : « recommandations ok » (21/11/2026) ; DEB-Q45, DEB-Q46 : « recommandations ok »
@@ -9,7 +9,7 @@
 > avant F3 » (21/11/2026) ; DEB-Q59 à DEB-Q63 : « recommandations ok » (21/11/2026) ; DEB-Q2, DEB-Q64 : « recommandations ok » (21/11/2026) ;
 > DEB-Q65, DEB-Q66 : « recommandations ok », DEB-Q67 à DEB-Q72 rendues sans objet par DEB-Q73 ; DEB-Q73 à DEB-Q78 :
 > « accord » du développeur (21/11/2026) ; DEB-Q79 à DEB-Q82 : « recommandations ok » (21/11/2026) ; DEB-Q83 : accès confirmé par le développeur, DEB-Q84 à DEB-Q88 :
-> « recommandations ok » après la sonde (21/11/2026) ; DEB-Q89, DEB-Q90 : « recommandations ok » (21/11/2026). Décisions : §8. Document d'origine **hors
+> « recommandations ok » après la sonde (21/11/2026) ; DEB-Q89, DEB-Q90 : « recommandations ok » (21/11/2026) ; DEB-Q91 à DEB-Q94 : « recommandations ok » (21/11/2026). Décisions : §8. Document d'origine **hors
 > dépôt** (DEB-D2) : cahier des charges « Document de cadrage » (novembre 2026), tenu par le développeur ; le modèle de
 > fiche (FEB) est versionné, nettoyé de ses métadonnées (DEB-Q9, DEB-Q33).
 
@@ -177,6 +177,7 @@ AG Grid inutile). Réponse de l'IA affichée entière, avec indicateur d'attente
 | A1 | Adaptateur IA réel et prompt système (DEB-Q2 : accès à Albert API vérifié à l'ouverture du lot, sinon API Mistral) | scénario e-commerce joué avec l'IA réelle, sans invention ; une demande d'assistance (« pc ne démarre plus », « copieur en panne ») signalée hors périmètre, sans proposition (DEB-Q64) ; **révisé par DEB-Q89** : voir A2 |
 | A2 | Périmètre du service informatique (DEB-Q89) : consignes de l'IA réelle (service, tâche ou prestation repérés ; hors périmètre = demande non informatique), IA scénarisée sans liste de mots, libellé du front | `Appliquer-Lot A2` vert et commité ; au navigateur, avec l'IA réelle : scénario e-commerce sans invention ; « pc ne démarre plus », « copieur en panne » et « prêt d'un ordinateur portable » deviennent des fiches, prestation nommée dans la première réponse, sans invention ; « réserver une salle de réunion » signalé hors périmètre, sans proposition ni question. Ce critère tient lieu de celui d'A1 |
 | A3 | Correctif de l'anomalie DEB-A3 (question reposée en boucle) : le dernier message à l'IA porte la liste ordonnée des rubriques encore à questionner, sans « dernière question » déduite ; règles 3, 4, 6, 10 des consignes (réponse brève reprise telle quelle, jamais de question reposée) | `Appliquer-Lot A3` vert et commité ; critère d'A2 rejoué au navigateur, sans question reposée |
+| A4 | Correctif de l'anomalie DEB-A4 (panne non reprise, question incohérente, exemple inventé) : rôle et question type de chaque rubrique dans les consignes (`PromptFiche.Guide`, DEB-Q92) ; règles 5 (toute rubrique renseignée par la demande ; panne → situation actuelle), 6 (question type ; jamais une information déjà donnée), 11 (reformulation sans fait inventé) | `Appliquer-Lot A4` vert et commité ; critère d'A2 rejoué au navigateur : aucune question reposée ni incohérente, aucun fait inventé, symptôme d'une panne repris au premier tour |
 | R1 | Fiche de recette : nominal et retour pour complément | critère de fin du démonstrateur (§1) : **point de terminaison de la V1** |
 
 L'IA scénarisée précède l'IA réelle : la démonstration reste jouable sans réseau le jour du séminaire. Dépendance :
@@ -283,5 +284,10 @@ sont lancés à la main (`npm test`) et leur sortie jointe au compte rendu.
 
 | DEB-Q89 | (21/11/2026, « recommandations ok » ; précisée par le développeur : « l'IA doit détecter dans la demande un service, une tâche, une prestation qui peuvent être rendus par un service informatique ») Objet élargi à toute demande adressée au service informatique : assistance utilisateur, exploitation des serveurs, réseau, applications, développement applicatif. Révise DEB-Q41 (l'IA scénarisée ne classe plus rien hors périmètre, liste de mots retirée), DEB-Q64 et le critère d'A1 (une panne ou une demande de matériel devient une fiche) ; DEB-Q23 inchangée (mécanisme). IA réelle : au premier message, la prestation repérée est nommée dans le message, sans devenir une valeur de rubrique ; la rubrique « Application ou service concerné » reçoit aussi l'élément en cause (poste de travail, matériel, serveur, réseau) ; hors périmètre = demande qu'aucun service informatique ne peut rendre. Contrat, Domaine, base, .docx inchangés ; libellé du front « Demande hors du périmètre du service informatique. » ; lot A2. l'écart signalé le 21/11/2026 sous le nom provisoire DEB-A3 (réponse hors périmètre qui pose une question) est sans objet ; ce numéro reste libre |
 | DEB-Q90 | (21/11/2026, « recommandations ok ») Catégorie de la demande (assistance, exploitation, réseau, applications, développement) comme champ distinct, et rubriques obligatoires selon la catégorie : évolutions V2 ; en V1, les dix rubriques obligatoires valent pour toute demande |
+
+| DEB-Q91 | (21/11/2026, « recommandations ok ») Anomalie DEB-A4 corrigée maintenant (lot A4) : elle bloque le critère d'A2, donc R1 |
+| DEB-Q92 | (21/11/2026, « recommandations ok ») Rôle et question type de chaque rubrique : consignes pour l'IA, dans `PromptFiche.Guide` (Infrastructure), pas dans le `Catalogue` du Domaine ; partie fixe du prompt (cache du fournisseur) |
+| DEB-Q93 | (21/11/2026, « recommandations ok ») En V1, une demande d'assistance passe aussi par les dix rubriques obligatoires, avec des questions types qui ont un sens pour une panne ; parcours raccourci selon la catégorie : évolution V2 (DEB-Q90) |
+| DEB-Q94 | (21/11/2026, « recommandations ok ») Modèle `openweight-medium` gardé : une variable à la fois, le prompt d'abord ; si l'écart persiste, essai d'un autre modèle d'Albert sur la même conversation, par une nouvelle décision |
 
 Questions ouvertes : aucune.

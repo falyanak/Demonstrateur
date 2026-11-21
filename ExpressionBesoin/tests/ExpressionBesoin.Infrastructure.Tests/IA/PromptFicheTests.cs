@@ -6,7 +6,7 @@ using ExpressionBesoin.Infrastructure.IA;
 namespace ExpressionBesoin.Infrastructure.Tests.IA;
 
 /// <summary>
-/// Prompt de l'IA réelle (DEB-Q88) : attendus écrits à la main, recalculés par une réplique indépendante (Python) avant
+/// Prompt de l'IA réelle (DEB-Q88 ; questionnement DEB-A3, DEB-A4) : attendus écrits à la main, recalculés par une réplique indépendante (Python) avant
 /// livraison ; jamais recopiés de la sortie.
 /// </summary>
 public sealed class PromptFicheTests
@@ -175,7 +175,7 @@ public sealed class PromptFicheTests
             "Une panne, un incident, une demande de matériel, d'accès ou d'habilitation relèvent du service informatique : horsPerimetre = false.",
             consignes);
         Assert.Contains("Quand il ne reste que resume, ne pose pas de question : propose le résumé", consignes);
-        Assert.Contains("sans en faire une valeur de rubrique, puis pose la question de la règle 6.", consignes);
+        Assert.Contains("sans en faire une valeur de rubrique, puis applique les règles 5 et 6.", consignes);
         Assert.Contains("propose-la telle quelle et ajoute la précision manquante, sous forme de question, dans pointsAClarifier.", consignes);
         Assert.Contains("Ne repose jamais une question à laquelle l'agent a déjà répondu, même en la reformulant.", consignes);
         Assert.Contains("Quand la liste « Rubriques à questionner » est vide (aucune), invite l'agent", consignes);
@@ -183,27 +183,82 @@ public sealed class PromptFicheTests
             "Réponse : un objet JSON seulement, { \"message\": texte pour l'agent, \"propositions\": [ { \"rubrique\": code, \"valeur\": texte, \"justification\": texte } ], \"horsPerimetre\": booléen }.",
             consignes);
         Assert.EndsWith(
-            "Rubriques de la fiche (code : libellé), dans l'ordre du modèle :\n"
-            + "- application : Application ou service concerné (obligatoire)\n"
-            + "- intitule : Intitulé court (obligatoire)\n"
-            + "- resume : Résumé (obligatoire)\n"
-            + "- situationActuelle : Situation actuelle (obligatoire)\n"
-            + "- difficultes : Difficultés rencontrées (obligatoire)\n"
-            + "- exempleRepresentatif : Exemple représentatif\n"
-            + "- resultatRecherche : Résultat recherché (obligatoire)\n"
-            + "- criteresReussite : Critères de réussite (obligatoire)\n"
-            + "- solutionEnvisagee : Solution envisagée\n"
-            + "- utilisateursConcernes : Utilisateurs ou services concernés (obligatoire)\n"
-            + "- processusMetier : Processus métier (obligatoire)\n"
-            + "- liens : Liens avec d'autres outils ou demandes\n"
-            + "- beneficesAttendus : Bénéfices attendus (obligatoire)\n"
-            + "- echeance : Échéance et justification\n"
-            + "- contraintes : Contraintes identifiées\n"
-            + "- documentsReferences : Documents ou références\n"
-            + "- pointsAClarifier : Points restant à clarifier\n"
+            "Rubriques de la fiche (code : libellé — rôle et question type), dans l'ordre du modèle :\n"
+            + "- application : Application ou service concerné (obligatoire) — l'application, le service ou l'élément en cause (nom d'application, poste de travail, matériel, serveur, réseau). Question type : « Quelle application ou quel équipement est concerné ? »\n"
+            + "- intitule : Intitulé court (obligatoire) — le titre de la demande, huit mots au plus, tiré des mots de l'agent. Question type : « Comment intituleriez-vous votre demande en quelques mots ? »\n"
+            + "- resume : Résumé (obligatoire) — la synthèse des seules valeurs retenues et proposées, en dernier. Pas de question : propose-le (règle 6).\n"
+            + "- situationActuelle : Situation actuelle (obligatoire) — ce qui se passe aujourd'hui ; pour une panne ou un incident, le symptôme constaté. Question type : « Que se passe-t-il aujourd'hui, concrètement ? »\n"
+            + "- difficultes : Difficultés rencontrées (obligatoire) — les conséquences sur le travail de l'agent ou de son service, pas le symptôme. Question type : « Qu'est-ce que cela vous empêche de faire dans votre travail ? »\n"
+            + "- exempleRepresentatif : Exemple représentatif — un cas précis donné par l'agent. Question type : « Pouvez-vous citer un cas précis ? »\n"
+            + "- resultatRecherche : Résultat recherché (obligatoire) — ce que l'agent attend du service informatique ; pour une panne, la remise en état ou un remplacement. Question type : « Qu'attendez-vous du service informatique ? »\n"
+            + "- criteresReussite : Critères de réussite (obligatoire) — ce qui montrera que la demande est satisfaite. Question type : « À quoi verrez-vous que c'est réglé ? »\n"
+            + "- solutionEnvisagee : Solution envisagée — une solution que l'agent a en tête, qui n'est pas le besoin (règle 7). Question type : « Avez-vous une solution en tête ? »\n"
+            + "- utilisateursConcernes : Utilisateurs ou services concernés (obligatoire) — les personnes ou services touchés. Question type : « Qui est concerné : vous seul, votre bureau, d'autres services ? »\n"
+            + "- processusMetier : Processus métier (obligatoire) — l'activité de travail touchée. Question type : « Pour quelle activité de votre travail en avez-vous besoin ? »\n"
+            + "- liens : Liens avec d'autres outils ou demandes — les autres outils ou demandes liés. Question type : « Cette demande est-elle liée à un autre outil ou à une autre demande ? »\n"
+            + "- beneficesAttendus : Bénéfices attendus (obligatoire) — ce que la réponse apportera au travail de l'agent ou du service. Question type : « Qu'est-ce que cela vous permettra de faire une fois réglé ? »\n"
+            + "- echeance : Échéance et justification — la date souhaitée et sa raison. Question type : « Pour quand en avez-vous besoin, et pourquoi ? »\n"
+            + "- contraintes : Contraintes identifiées — les contraintes connues (règles, technique, calendrier). Question type : « Y a-t-il des contraintes à respecter ? »\n"
+            + "- documentsReferences : Documents ou références — les documents ou références cités par l'agent. Question type : « Avez-vous des documents ou des références à signaler ? »\n"
+            + "- pointsAClarifier : Points restant à clarifier — les questions restées ouvertes, rédigées par toi (règles 4 et 8). Pas de question.\n"
             + "Les rubriques obligatoires sont questionnées dans cet ordre, resume en dernier.",
             consignes);
         Assert.DoesNotContain("\r", consignes);
+    }
+
+    /// <summary>
+    /// DEB-A4 (dialogue du 21/11/2026, « mon pc ne s'allume plus ») : la panne n'était proposée pour aucune rubrique au
+    /// premier message, l'IA a posé une question incohérente (« Quel est votre poste de travail ? ») puis demandé les
+    /// difficultés comme une seconde fois le problème, et son exemple portait des faits inventés. Les consignes portent
+    /// désormais le symptôme au premier message, la question type de chaque rubrique, l'interdiction de redemander une
+    /// information donnée et un exemple sans fait inventé.
+    /// </summary>
+    [Fact]
+    public void Consignes_panne_symptome_question_type_et_exemple_sans_fait_invente()
+    {
+        var consignes = PromptFiche.Consignes;
+
+        Assert.Contains("5. Au premier message, propose toute rubrique vide que la demande renseigne clairement", consignes);
+        Assert.Contains("pour une panne ou un incident, le symptôme décrit va dans situationActuelle.\n", consignes);
+        Assert.Contains("Pars de la question type de cette rubrique (liste ci-dessous), adaptée à la demande, en mots simples.", consignes);
+        Assert.Contains(
+            "Ne demande jamais une information déjà donnée : dans une valeur retenue, une proposition en attente, une proposition de cette réponse ou un message de l'agent.",
+            consignes);
+        Assert.Contains(
+            "11. Si l'agent ne comprend pas la question, reformule-la plus simplement à partir de sa question type ; un exemple éventuel ne contient aucun fait que l'agent n'a pas donné (ni date, ni cause, ni chiffre).\n",
+            consignes);
+        Assert.Contains("les conséquences sur le travail de l'agent ou de son service, pas le symptôme.", consignes);
+        Assert.True(
+            consignes.IndexOf("10. Quand la liste", StringComparison.Ordinal) < consignes.IndexOf("11. Si l'agent", StringComparison.Ordinal),
+            "règle 11 après la règle 10");
+    }
+
+    [Fact]
+    public void Guide_chaque_rubrique_a_un_role_et_les_rubriques_questionnees_une_question_type()
+    {
+        foreach (var definition in Catalogue.Toutes)
+        {
+            var guide = PromptFiche.Guide(definition.Rubrique);
+            Assert.False(string.IsNullOrWhiteSpace(guide), definition.Code);
+            Assert.Contains($"- {definition.Code} : {definition.Libelle}", PromptFiche.Consignes);
+            Assert.Contains(" — " + guide + "\n", PromptFiche.Consignes);
+        }
+
+        foreach (var rubrique in Catalogue.OrdreQuestionnement.Where(rubrique => rubrique != Rubrique.Resume))
+        {
+            var guide = PromptFiche.Guide(rubrique);
+            Assert.Contains(" Question type : « ", guide);
+            Assert.EndsWith(" ? »", guide);
+        }
+
+        Assert.Contains("Pas de question", PromptFiche.Guide(Rubrique.Resume));
+    }
+
+    [Fact]
+    public void Guide_rubrique_inconnue_leve()
+    {
+        var exception = Assert.Throws<ArgumentOutOfRangeException>(() => PromptFiche.Guide((Rubrique)200));
+        Assert.Equal("rubrique", exception.ParamName);
     }
 
     [Fact]

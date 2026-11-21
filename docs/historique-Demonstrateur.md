@@ -596,3 +596,31 @@
   184 → 185, total 636.
 - Vérifié chez l'assistant : syntaxe C# (tree-sitter) ; attendus recalculés par réplique Python ; octets ; prompt
   < 30 720 octets. Non vérifié : compilation, tests, réponses de l'IA réelle.
+
+## 21/11/2026 — A3 appliqué, publié, sauvegardé ; anomalie DEB-A4 ; A4 livré (consignes par rubrique)
+
+- `Appliquer-Lot A3` appliqué et commité (HEAD `e84710c`) ; `Compter-Tests` à l'ouverture : 636 tests, 0 échec
+  (Infrastructure 185 : égal à l'estimation). Session contrôlée : 8 pièces conformes à `PIECES.txt`, archive de 174
+  entrées, commit `e84710c`. Publié (`f44ece5..e84710c`) et sauvegardé (`Sauvegarder-Depots`, 3 dépôts) par le
+  développeur.
+- Navigateur, IA réelle, fiche `01a1ffc7-…` (« mon pc ne s'allume plus », exportée par `GET api/fiches/{id}`) :
+  tour 1, prestation nommée, mais la panne n'est proposée pour aucune rubrique (question sur le modèle du PC) ; tour 2,
+  après « dell x25 », question incohérente « Quel est votre poste de travail ? » ; tour 3, après « je ne comprends pas
+  la question », exemple portant des faits inventés (« depuis ce matin, après une mise à jour logicielle ») ; tour 4,
+  après la description de la panne, « Quelles difficultés rencontrez-vous… ? », vécue comme « quel est le problème ? »
+  une seconde fois.
+- DEB-A4 : les consignes ne donnaient que « code : libellé » ; le modèle forgeait ses questions sur le libellé seul ; la
+  règle 5 ne faisait proposer que l'intitulé et l'application au premier message ; pour une panne, situation actuelle
+  et difficultés se recouvrent si « difficultés » n'est pas défini comme les conséquences sur le travail. L'export ne
+  donne pas les propositions de chaque tour : lecture du tour 2 probable, non certaine.
+- DEB-Q91 (maintenant), DEB-Q92 (rôles et questions types dans `PromptFiche`, pas dans le Domaine), DEB-Q93 (V1 : dix
+  rubriques obligatoires pour une panne aussi), DEB-Q94 (prompt d'abord, modèle inchangé) : « recommandations ok ».
+- A4 : `PromptFiche.Guide` (pur : rôle et question type de chaque rubrique, rubrique inconnue → exception) ; liste des
+  rubriques des consignes « code : libellé (obligatoire) — rôle. Question type : « … » » ; règles 3 (puis règles 5 et
+  6), 5 (toute rubrique renseignée par la demande ; panne → `situationActuelle`), 6 (question type adaptée ; jamais une
+  information déjà donnée), 11 (reformulation sans fait inventé). Tests : `PromptFicheTests` (attendus des consignes ;
+  non-régression DEB-A4 ; guide complet ; rubrique inconnue). Comptes ESTIMÉS : Infrastructure 185 → 188, total 639.
+  Prompt de reprise condensé (≤ 30 720 octets).
+- Vérifié chez l'assistant : syntaxe C# (tree-sitter), équilibre des accolades ; consignes reconstruites depuis les
+  fragments du code par une réplique Python, 20 assertions des tests rejouées, contrôle éprouvé sur une mutation
+  (2 échecs) ; octets (CRLF sans BOM). Non vérifié : compilation, tests, couverture, réponses de l'IA réelle.
