@@ -7,9 +7,9 @@ using ExpressionBesoin.Web.Api;
 namespace ExpressionBesoin.Web.Tests.Api;
 
 /// <summary>
-/// Contrat JSON de la fiche (DEB-Q43) : la sérialisation de l'API est comparée À L'OCTET au fichier de référence du
-/// ClientApp, produit par une réplique Python et lu aussi par Vitest (tests/contrats.test.ts) : un écart d'un côté casse
-/// les deux.
+/// Contrat JSON de la fiche (DEB-Q43), de la consultation et du tour (DEB-Q52) : la sérialisation de l'API est comparée
+/// À L'OCTET aux fichiers de référence du ClientApp, produits par une réplique Python et lus aussi par Vitest
+/// (tests/contrats.test.ts) : un écart d'un côté casse les deux.
 /// </summary>
 public sealed class FicheVueTests
 {
@@ -35,8 +35,28 @@ public sealed class FicheVueTests
             ]));
     }
 
+    /// <summary>Consultation de référence : la fiche de référence et deux échanges (retour à la ligne compris).</summary>
+    internal static FicheConsultee ConsultationReference() =>
+        new(
+            Reference(),
+            ListeImmuable<Echange>.De([
+                new Echange(AuteurEchange.Agent, "Contrôle des plates-formes e-commerce\net prélèvements à distance", new DateTimeOffset(2026, 11, 20, 9, 5, 0, TimeSpan.Zero)),
+                new Echange(AuteurEchange.IA, "Quelle application est concernée ?", new DateTimeOffset(2026, 11, 20, 9, 5, 1, TimeSpan.Zero)),
+            ]));
+
+    /// <summary>Tour de référence : hors périmètre, deux propositions écartées, la fiche de référence.</summary>
+    internal static TourDialogue TourReference() =>
+        new(
+            "Quelle application est concernée ? Précisez « le service » s'il y a lieu.",
+            true,
+            ListeImmuable<PropositionEcartee>.De([
+                new PropositionEcartee(1, "inconnue", MotifEcart.RubriqueInconnue),
+                new PropositionEcartee(2, "intitule", MotifEcart.Doublon),
+            ]),
+            Reference());
+
     /// <summary>Fichier de référence, trouvé en remontant jusqu'à la solution (jamais « le premier trouvé »).</summary>
-    internal static string CheminReference()
+    internal static string CheminReference(string nom = "fiche-reference.json")
     {
         var dossier = new DirectoryInfo(AppContext.BaseDirectory);
         while (dossier is not null && !File.Exists(Path.Combine(dossier.FullName, "ExpressionBesoin.slnx")))
@@ -45,7 +65,7 @@ public sealed class FicheVueTests
         }
 
         Assert.NotNull(dossier);
-        return Path.Combine(dossier.FullName, "src", "ExpressionBesoin.Web", "ClientApp", "tests", "contrats", "fiche-reference.json");
+        return Path.Combine(dossier.FullName, "src", "ExpressionBesoin.Web", "ClientApp", "tests", "contrats", nom);
     }
 
     [Fact]
@@ -53,6 +73,18 @@ public sealed class FicheVueTests
         Assert.Equal(
             File.ReadAllBytes(CheminReference()),
             JsonSerializer.SerializeToUtf8Bytes(FicheVue.De(Reference()), ContratJson.Options));
+
+    [Fact]
+    public void Consultation_de_reference_serialisee_a_l_octet_comme_le_fichier_partage_avec_Vitest() =>
+        Assert.Equal(
+            File.ReadAllBytes(CheminReference("consultation-reference.json")),
+            JsonSerializer.SerializeToUtf8Bytes(ConsultationVue.De(ConsultationReference()), ContratJson.Options));
+
+    [Fact]
+    public void Tour_de_reference_serialise_a_l_octet_comme_le_fichier_partage_avec_Vitest() =>
+        Assert.Equal(
+            File.ReadAllBytes(CheminReference("tour-reference.json")),
+            JsonSerializer.SerializeToUtf8Bytes(TourVue.De(TourReference()), ContratJson.Options));
 
     [Fact]
     public void Fiche_complete_et_sans_question_restante()

@@ -312,3 +312,29 @@
   dotnet-coverage 18.12.0, ReportGenerator 5.6.0. Objectif atteint, on arrête HY1.
 - Ouverture de F2 : questions DEB-Q48 à DEB-Q53 posées avec recommandations (plan v1.11, questions ouvertes) ; critère de
   fin de F2 précisé (prompt, bloc ÉTAT). HY1b : documents seulement.
+
+## 21/11/2026 — F2 : page Dialogue (DEB-Q48 à DEB-Q53)
+
+- Arbitrages : DEB-Q48 à DEB-Q53 « recommandations ok » ; plan v1.12. F2 bâti après la sortie d'`Appliquer-Lot HY1b`.
+- DEB-A1 (anomalie du code de F1, relevée en préparant F2) : `client.fiche(id)` lisait `GET api/fiches/{id}` comme une
+  fiche, alors que la route rend `{ fiche, historique }` (DEB-Q21) ; son test donnait une fiche comme réponse du serveur,
+  l'écart passait. Inutilisée jusque-là, la méthode est remplacée par `consulter` (lecture `lireConsultation`), avec un
+  test de non-régression (une fiche seule est refusée). Close par F2.
+- Web : action `Home/Dialogue/{id}` (Guid non vide, sinon 404) et vue `Dialogue.cshtml` ; bouton « Nouvelle fiche » de
+  l'accueil. Tests : références `consultation-reference.json` et `tour-reference.json` à l'octet (`FicheVueTests`, 2),
+  page Dialogue rendue (1), trois adresses en 404 (théorie, 3) ; total Web estimé 103, solution 531.
+- Front : client complet de l'API (routes du §5, corps JSON, `urlDocument`), `erreurException` (réseau, contrat),
+  `chemins.ts`, contexte injecté aux pages (`ContextePage` : client, agent courant, navigation) ;
+  `features/dialogue/etat.ts` (réducteur pur : une requête à la fois, brouillons gardés et nettoyés, confirmation et
+  commentaire remis à zéro au changement de statut) et `vue.ts` (pur : blocs, badges, progression, actions, « Enregistrer
+  ») ; `PageDialogue.ts` coquille (une frappe ne reconstruit pas la page) ; exclusion de couverture du front réduite à
+  `src/features/**/Page*.ts`. Aucune dépendance ajoutée, `node_modules` inchangé.
+- Vérifié chez l'assistant sur une réplique de ClientApp (Node 22, `npm ci` du lock, moteur hors `engines`) : `tsc -b`
+  sans erreur ; Vitest 165 tests verts (58 → 165 : contrats 41, api 30, dialogueEtat 21, dialogueVue 49, agentCourant
+  13, Url 11) ; couverture du front 153/153 lignes, 123/123 branches ; `vite build` réussi. Mutations sur copie jetable,
+  chacune détectée : MF9 (soumission sans confirmation, 1 échec), MF10 (« Proposée » malgré une valeur, 1), MF11
+  (brouillon enregistré gardé, 2), MF12 (confirmation gardée au changement de statut, 1), MF13 (commentaire de décision
+  omis, 1), MF14 (`horsPerimetre` non vérifié, 1), MF15 (lien du .docx masqué pendant une attente, 1). Références JSON
+  produites par réplique Python, compactes, sans BOM.
+- Non vérifié chez l'assistant : compilation C#, tests .NET, octets émis par `System.Text.Json` (« », `\n`), rendu
+  Razor, parcours dans un navigateur réel : le poste tranche.

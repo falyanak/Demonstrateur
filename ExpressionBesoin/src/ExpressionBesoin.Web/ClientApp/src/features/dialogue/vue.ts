@@ -1,0 +1,145 @@
+import type { FicheVue, RubriqueVue, Statut, TypeDecision } from "../../core/contrats.ts";
+import type { EtatDialogue } from "./etat.ts";
+
+// Modèle d'affichage de la page Dialogue (DEB-Q49) : fonctions PURES, sans DOM. Les actions ne dépendent que des champs
+// calculés par le Domaine (statut, modifiable, complete) et de la case de confirmation (DEB-Q50, DEB-Q53).
+
+export interface Badge {
+  readonly texte: string;
+  /** Suffixe de couleur Bootstrap (`text-bg-…`). */
+  readonly couleur: "secondary" | "warning" | "info" | "primary" | "success" | "danger";
+}
+
+export interface RubriqueAffichee {
+  readonly code: string;
+  readonly libelle: string;
+  readonly obligatoire: boolean;
+  readonly badge: Badge;
+  /** Texte de la zone de saisie : le brouillon s'il existe, sinon la valeur retenue. */
+  readonly saisie: string;
+  readonly proposition: { readonly valeur: string; readonly justification: string } | null;
+  readonly questionnee: boolean;
+}
+
+export interface BlocAffiche {
+  readonly titre: string;
+  readonly rubriques: readonly RubriqueAffichee[];
+}
+
+export interface Actions {
+  readonly dialoguer: boolean;
+  readonly editer: boolean;
+  readonly soumettre: boolean;
+  readonly decider: boolean;
+  readonly reprendre: boolean;
+  readonly telecharger: boolean;
+}
+
+const TITRES_BLOCS: Readonly<Record<string, string>> = {
+  Identification: "Identification",
+  Synthese: "1. Synthèse",
+  Contexte: "2. Contexte",
+  Objectifs: "3. Objectifs",
+  Perimetre: "4. Périmètre",
+  Benefices: "5. Bénéfices",
+  Complements: "6. Compléments",
+};
+
+const STATUTS: Readonly<Record<Statut, Badge>> = {
+  Brouillon: { texte: "Brouillon", couleur: "secondary" },
+  Soumise: { texte: "Soumise", couleur: "info" },
+  Validee: { texte: "Validée", couleur: "success" },
+  ACompleter: { texte: "À compléter", couleur: "warning" },
+  Refusee: { texte: "Refusée", couleur: "danger" },
+};
+
+export const DECISIONS: readonly { readonly valeur: TypeDecision; readonly libelle: string }[] = [
+  { valeur: "Valider", libelle: "Valider" },
+  { valeur: "DemanderComplements", libelle: "Demander des compléments" },
+  { valeur: "Refuser", libelle: "Refuser" },
+];
+
+/** Titre d'un bloc du modèle FEB ; un bloc inconnu garde son nom. Pure. */
+export function titreBloc(bloc: string): string {
+  return Object.hasOwn(TITRES_BLOCS, bloc) ? (TITRES_BLOCS[bloc] as string) : bloc;
+}
+
+export function badgeStatut(statut: Statut): Badge {
+  return STATUTS[statut];
+}
+
+/** Origine affichée (plan §6) : « Proposée » = vide avec une proposition en attente (DEB-Q13). Pure. */
+export function badgeRubrique(rubrique: RubriqueVue): Badge {
+  if (rubrique.valeur === null && rubrique.proposition !== null) return { texte: "Proposée", couleur: "warning" };
+  switch (rubrique.origine) {
+    case "AccepteeIA":
+      return { texte: "IA acceptée", couleur: "info" };
+    case "Manuelle":
+      return { texte: "Manuelle", couleur: "primary" };
+    case "Vide":
+      return { texte: "Vide", couleur: "secondary" };
+  }
+}
+
+/** Progression des rubriques obligatoires : « 7/10 » et pourcentage entier (0 sans obligatoire). Pure. */
+export function progression(fiche: FicheVue): { readonly texte: string; readonly pourcent: number } {
+  const pourcent = fiche.obligatoires === 0 ? 0 : Math.round((fiche.remplies * 100) / fiche.obligatoires);
+  return { texte: `${fiche.remplies}/${fiche.obligatoires}`, pourcent };
+}
+
+export function titreFiche(fiche: FicheVue): string {
+  return fiche.numero ?? "Nouvelle fiche";
+}
+
+/** Rubriques groupées par bloc, dans l'ordre du modèle reçu du serveur. Pure. */
+export function blocs(fiche: FicheVue, brouillons: Readonly<Record<string, string>>): BlocAffiche[] {
+  const resultat: { titre: string; rubriques: RubriqueAffichee[] }[] = [];
+  let bloc = "";
+  for (const rubrique of fiche.rubriques) {
+    if (resultat.length === 0 || rubrique.bloc !== bloc) {
+      bloc = rubrique.bloc;
+      resultat.push({ titre: titreBloc(bloc), rubriques: [] });
+    }
+    const retenue = rubrique.valeur ?? "";
+    const brouillon = brouillons[rubrique.code];
+    (resultat[resultat.length - 1] as { rubriques: RubriqueAffichee[] }).rubriques.push({
+      code: rubrique.code,
+      libelle: rubrique.libelle,
+      obligatoire: rubrique.obligatoire,
+      badge: badgeRubrique(rubrique),
+      saisie: brouillon ?? retenue,
+      proposition: rubrique.proposition,
+      questionnee: rubrique.code === fiche.prochaineRubrique,
+    });
+  }
+  return resultat;
+}
+
+/** Actions permises (DEB-Q53) ; toutes fermées pendant une attente, sauf le lien du document. Pure. */
+export function actions(etat: EtatDialogue): Actions {
+  const fiche = etat.fiche;
+  const libre = !etat.attente && fiche !== null;
+  const statut = fiche?.statut;
+  const modifiable = libre && fiche.modifiable;
+  return {
+    dialoguer: modifiable,
+    editer: modifiable,
+    soumettre: modifiable && fiche.complete && etat.confirme,
+    decider: libre && statut === "Soumise",
+    reprendre: libre && statut === "ACompleter",
+    telecharger: statut === "Validee",
+  };
+}
+
+/** « Enregistrer » d'une rubrique (DEB-Q51) : édition permise et brouillon différent de la valeur retenue. Pure. */
+export function peutEnregistrer(etat: EtatDialogue, code: string): boolean {
+  const brouillon = etat.brouillons[code];
+  const rubrique = etat.fiche?.rubriques.find((r) => r.code === code);
+  return actions(etat).editer && rubrique !== undefined && brouillon !== undefined && brouillon !== (rubrique.valeur ?? "");
+}
+
+/** Note sous une réponse de l'IA : propositions écartées par la lecture de la réponse ; `null` s'il n'y en a pas. Pure. */
+export function noteEcartees(ecartees: number): string | null {
+  if (ecartees <= 0) return null;
+  return ecartees === 1 ? "1 proposition de l'IA écartée (forme non reconnue)." : `${ecartees} propositions de l'IA écartées (forme non reconnue).`;
+}

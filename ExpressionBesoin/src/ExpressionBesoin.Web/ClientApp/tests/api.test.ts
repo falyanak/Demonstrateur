@@ -1,7 +1,10 @@
 import { describe, expect, it } from "vitest";
 import reference from "./contrats/fiche-reference.json?raw";
-import { creerClient, EN_TETE_AGENT, erreurInattendue, interpreter, type Recuperer } from "../src/core/api.ts";
-import { lireAgents } from "../src/core/contrats.ts";
+import referenceConsultation from "./contrats/consultation-reference.json?raw";
+import referenceTour from "./contrats/tour-reference.json?raw";
+import { creerClient, EN_TETE_AGENT, erreurException, erreurInattendue, interpreter, type ClientApi, type Recuperer } from "../src/core/api.ts";
+import { cheminDialogue } from "../src/core/chemins.ts";
+import { ContratInvalide, lireAgents } from "../src/core/contrats.ts";
 
 interface Appel { readonly url: string; readonly init: RequestInit }
 
@@ -15,6 +18,7 @@ function serveur(statut: number, corps: string): { recuperer: Recuperer; appels:
 }
 
 const resoudre = (chemin: string) => `/base/${chemin}`;
+const ecrire = { Accept: "application/json", "Content-Type": "application/json" };
 
 describe("interpreter", () => {
   it("succès : corps lu par le contrat", async () => {
@@ -58,10 +62,81 @@ describe("creerClient", () => {
     ]);
   });
 
-  it("fiche : identifiant encodé dans le chemin", async () => {
+  it("consulter : GET de la consultation (fiche et historique, DEB-A1), identifiant encodé", async () => {
+    const { recuperer, appels } = serveur(200, referenceConsultation);
+    const issue = await creerClient(recuperer, resoudre).consulter("a/b");
+    expect(issue.ok && [issue.valeur.fiche.statut, issue.valeur.historique.length]).toEqual(["ACompleter", 2]);
+    expect(appels).toEqual([{ url: "/base/api/fiches/a%2Fb", init: { headers: { Accept: "application/json" } } }]);
+  });
+
+  it("consulter : une fiche seule n'est pas une consultation (DEB-A1)", async () => {
+    const { recuperer } = serveur(200, reference);
+    await expect(creerClient(recuperer, resoudre).consulter("x")).rejects.toThrow("consultation.fiche devait être un objet");
+  });
+
+  it("envoyerMessage : POST JSON, réponse lue comme un tour", async () => {
+    const { recuperer, appels } = serveur(200, referenceTour);
+    const issue = await creerClient(recuperer, resoudre).envoyerMessage("f1", "Bonjour « vous »");
+    expect(issue.ok && issue.valeur.horsPerimetre).toBe(true);
+    expect(appels).toEqual([{ url: "/base/api/fiches/f1/messages", init: { method: "POST", headers: ecrire, body: '{"message":"Bonjour « vous »"}' } }]);
+  });
+
+  it("modifierChamp : PUT JSON sur la rubrique encodée", async () => {
     const { recuperer, appels } = serveur(200, reference);
-    const issue = await creerClient(recuperer, resoudre).fiche("a/b");
-    expect(issue.ok && issue.valeur.statut).toBe("ACompleter");
-    expect(appels[0]?.url).toBe("/base/api/fiches/a%2Fb");
+    expect((await creerClient(recuperer, resoudre).modifierChamp("f1", "a b", "")).ok).toBe(true);
+    expect(appels).toEqual([{ url: "/base/api/fiches/f1/champs/a%20b", init: { method: "PUT", headers: ecrire, body: '{"valeur":""}' } }]);
+  });
+
+  it.each([
+    ["accepter", (c: ClientApi) => c.accepter("f1", "resume"), "/base/api/fiches/f1/propositions/resume/accepter"],
+    ["rejeter", (c: ClientApi) => c.rejeter("f1", "resume"), "/base/api/fiches/f1/propositions/resume/rejeter"],
+    ["reprendre", (c: ClientApi) => c.reprendre("f1"), "/base/api/fiches/f1/reprendre"],
+  ])("%s : POST sans corps", async (_nom, appeler, url) => {
+    const { recuperer, appels } = serveur(200, reference);
+    expect((await appeler(creerClient(recuperer, resoudre))).ok).toBe(true);
+    expect(appels).toEqual([{ url, init: { method: "POST", headers: { Accept: "application/json" } } }]);
+  });
+
+  it.each([
+    ["soumettre", (c: ClientApi) => c.soumettre("f1", true), "/base/api/fiches/f1/soumettre", '{"confirme":true}'],
+    ["decider", (c: ClientApi) => c.decider("f1", "DemanderComplements", "Préciser"), "/base/api/fiches/f1/decision", '{"decision":"DemanderComplements","commentaire":"Préciser"}'],
+  ])("%s : POST JSON", async (_nom, appeler, url, body) => {
+    const { recuperer, appels } = serveur(200, reference);
+    expect((await appeler(creerClient(recuperer, resoudre))).ok).toBe(true);
+    expect(appels).toEqual([{ url, init: { method: "POST", headers: ecrire, body } }]);
+  });
+
+  it("refus métier : issue en échec, corps { code, message }", async () => {
+    const { recuperer } = serveur(422, '{"code":"soumission.incomplete","message":"Rubriques obligatoires à renseigner : Résumé."}');
+    expect(await creerClient(recuperer, resoudre).soumettre("f1", true)).toEqual({
+      ok: false,
+      statut: 422,
+      erreur: { code: "soumission.incomplete", message: "Rubriques obligatoires à renseigner : Résumé." },
+    });
+  });
+
+  it("urlDocument : adresse résolue, aucun appel", () => {
+    const { recuperer, appels } = serveur(200, "");
+    expect(creerClient(recuperer, resoudre).urlDocument("a/b")).toBe("/base/api/fiches/a%2Fb/document");
+    expect(appels).toEqual([]);
+  });
+});
+
+describe("erreurException", () => {
+  it("réponse hors contrat : message du contrat", () => {
+    expect(erreurException(new ContratInvalide("fiche.id", "un texte"))).toEqual({ code: "contrat.invalide", message: "Contrat de l'API : fiche.id devait être un texte." });
+  });
+
+  it.each([[new TypeError("Failed to fetch")], ["texte"], [undefined]])("autre exception %# : serveur injoignable", (exception) => {
+    expect(erreurException(exception).code).toBe("reseau.indisponible");
+  });
+});
+
+describe("cheminDialogue", () => {
+  it.each([
+    ["6f1c2b3a-0000-4000-8000-0000000000c1", "Home/Dialogue/6f1c2b3a-0000-4000-8000-0000000000c1"],
+    ["a/b?c", "Home/Dialogue/a%2Fb%3Fc"],
+  ])("%s", (id, attendu) => {
+    expect(cheminDialogue(id)).toBe(attendu);
   });
 });

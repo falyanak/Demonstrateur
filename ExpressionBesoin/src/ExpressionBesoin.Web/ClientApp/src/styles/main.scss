@@ -4,3 +4,37 @@
 .en-tete-agent {
   min-width: 14rem;
 }
+
+// Page Dialogue (F2) : fil de conversation défilant, bulles agent à droite, assistant à gauche.
+.dialogue-fil {
+  height: 60vh;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.dialogue-bulle {
+  max-width: 85%;
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.75rem;
+}
+
+.dialogue-agent {
+  align-self: flex-end;
+  background-color: var(--bs-primary-bg-subtle);
+}
+
+.dialogue-ia {
+  align-self: flex-start;
+  background-color: var(--bs-tertiary-bg);
+}
+
+.dialogue-texte {
+  white-space: pre-wrap;
+}
+
+.rubrique-questionnee {
+  border-left: 3px solid var(--bs-primary);
+  padding-left: 0.5rem;
+}

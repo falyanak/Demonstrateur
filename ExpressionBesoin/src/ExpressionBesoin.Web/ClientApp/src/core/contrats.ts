@@ -36,6 +36,18 @@ export interface FicheVue {
   readonly decisions: readonly DecisionVue[];
 }
 
+export type AuteurEchange = "Agent" | "IA";
+
+export interface EchangeVue { readonly auteur: AuteurEchange; readonly texte: string; readonly le: string }
+
+/** `GET api/fiches/{id}` : fiche et historique du dialogue (DEB-Q21). */
+export interface ConsultationVue { readonly fiche: FicheVue; readonly historique: readonly EchangeVue[] }
+
+export interface EcartVue { readonly position: number; readonly code: string; readonly motif: string }
+
+/** `POST api/fiches/{id}/messages` : un tour de dialogue (DEB-Q22, DEB-Q23). */
+export interface TourVue { readonly message: string; readonly horsPerimetre: boolean; readonly ecartees: readonly EcartVue[]; readonly fiche: FicheVue }
+
 export interface AgentVue { readonly identifiant: string; readonly nom: string; readonly bureau: string; readonly valideur: string }
 
 export interface ErreurVue { readonly code: string; readonly message: string }
@@ -45,6 +57,7 @@ type Objet = Readonly<Record<string, unknown>>;
 const STATUTS: readonly string[] = ["Brouillon", "Soumise", "Validee", "ACompleter", "Refusee"];
 const ORIGINES: readonly string[] = ["Vide", "AccepteeIA", "Manuelle"];
 const DECISIONS: readonly string[] = ["Valider", "DemanderComplements", "Refuser"];
+const AUTEURS: readonly string[] = ["Agent", "IA"];
 
 export class ContratInvalide extends Error {
   constructor(chemin: string, attendu: string) {
@@ -144,6 +157,33 @@ export function lireFiche(valeur: unknown, chemin = "fiche"): FicheVue {
     prochaineRubrique: texteOuNul(o, "prochaineRubrique", chemin),
     confirmeeLe: texteOuNul(o, "confirmeeLe", chemin),
     decisions: tableau(o, "decisions", chemin, lireDecision),
+  };
+}
+
+function lireEchange(v: unknown, c: string): EchangeVue {
+  const o = objet(v, c);
+  return { auteur: parmi<AuteurEchange>(o, "auteur", c, AUTEURS), texte: texte(o, "texte", c), le: texte(o, "le", c) };
+}
+
+function lireEcart(v: unknown, c: string): EcartVue {
+  const o = objet(v, c);
+  return { position: entier(o, "position", c), code: texte(o, "code", c), motif: texte(o, "motif", c) };
+}
+
+/** Consultation d'une fiche (GET api/fiches/{id}). Pure. */
+export function lireConsultation(valeur: unknown): ConsultationVue {
+  const o = objet(valeur, "consultation");
+  return { fiche: lireFiche(o["fiche"], "consultation.fiche"), historique: tableau(o, "historique", "consultation", lireEchange) };
+}
+
+/** Réponse d'un tour de dialogue (POST api/fiches/{id}/messages). Pure. */
+export function lireTour(valeur: unknown): TourVue {
+  const o = objet(valeur, "tour");
+  return {
+    message: texte(o, "message", "tour"),
+    horsPerimetre: booleen(o, "horsPerimetre", "tour"),
+    ecartees: tableau(o, "ecartees", "tour", lireEcart),
+    fiche: lireFiche(o["fiche"], "tour.fiche"),
   };
 }
 

@@ -144,5 +144,27 @@ public sealed class PointsFichesTests(UsineWeb usine) : IClassFixture<UsineWeb>
         Assert.Contains("<div id=\"maplayout\" data-url-home-link=\"/\"></div>", html);
         Assert.Contains("id=\"agent-courant\"", html);
         Assert.Contains("data-page=\"accueil\"", html);
+        Assert.Contains("id=\"nouvelle-fiche\"", html);
+    }
+
+    [Fact]
+    public async Task Page_dialogue_rendue_pour_un_identifiant_de_fiche()
+    {
+        using var client = usine.CreateClient();
+        var id = new Guid("6f1c2b3a-0000-4000-8000-0000000000c1");
+        var html = await client.GetStringAsync($"/Home/Dialogue/{id}", Annulation);
+        Assert.Contains("<div id=\"app\" data-page=\"dialogue\" data-fiche=\"6f1c2b3a-0000-4000-8000-0000000000c1\">", html);
+        Assert.DoesNotContain("<vite-scripts", html);
+    }
+
+    [Theory]
+    [InlineData("/Home/Dialogue")]
+    [InlineData("/Home/Dialogue/abc")]
+    [InlineData("/Home/Dialogue/00000000-0000-0000-0000-000000000000")]
+    public async Task Page_dialogue_sans_identifiant_de_fiche_valide_404(string url)
+    {
+        using var client = usine.CreateClient();
+        using var reponse = await client.GetAsync(url, Annulation);
+        Assert.Equal(HttpStatusCode.NotFound, reponse.StatusCode);
     }
 }

@@ -1,6 +1,8 @@
 import { describe, expect, it } from "vitest";
 import reference from "./contrats/fiche-reference.json?raw";
-import { ContratInvalide, lireAgents, lireErreur, lireFiche } from "../src/core/contrats.ts";
+import referenceConsultation from "./contrats/consultation-reference.json?raw";
+import referenceTour from "./contrats/tour-reference.json?raw";
+import { ContratInvalide, lireAgents, lireConsultation, lireErreur, lireFiche, lireTour } from "../src/core/contrats.ts";
 
 // Mêmes octets que FicheVueTests (xUnit) : le contrat est vérifié des deux côtés (règles §7).
 const brut = (): Record<string, unknown> => JSON.parse(reference) as Record<string, unknown>;
@@ -111,5 +113,53 @@ describe("lireAgents et lireErreur", () => {
     ["texte", null],
   ])("erreur %j → %j", (corps, attendu) => {
     expect(lireErreur(corps)).toEqual(attendu);
+  });
+});
+
+describe("lireConsultation et lireTour sur les références partagées avec xUnit (DEB-Q52)", () => {
+  it("consultation : fiche de référence et historique, retour à la ligne intact", () => {
+    const consultation = lireConsultation(JSON.parse(referenceConsultation));
+    expect(consultation.fiche).toEqual(lireFiche(JSON.parse(reference)));
+    expect(consultation.historique).toEqual([
+      { auteur: "Agent", texte: "Contrôle des plates-formes e-commerce\net prélèvements à distance", le: "2026-11-20T09:05:00+00:00" },
+      { auteur: "IA", texte: "Quelle application est concernée ?", le: "2026-11-20T09:05:01+00:00" },
+    ]);
+  });
+
+  it("tour : message, hors périmètre, écarts et fiche", () => {
+    const tour = lireTour(JSON.parse(referenceTour));
+    expect(tour.message).toBe("Quelle application est concernée ? Précisez « le service » s'il y a lieu.");
+    expect(tour.horsPerimetre).toBe(true);
+    expect(tour.ecartees).toEqual([
+      { position: 1, code: "inconnue", motif: "RubriqueInconnue" },
+      { position: 2, code: "intitule", motif: "Doublon" },
+    ]);
+    expect(tour.fiche.numero).toBe("EB-2026-0007");
+  });
+
+  it.each([
+    ["consultation-reference.json", referenceConsultation],
+    ["tour-reference.json", referenceTour],
+  ])("%s : compact, sans BOM ni fin de ligne, contient la fiche de référence à l'octet", (_nom, texte) => {
+    expect(texte.charCodeAt(0)).not.toBe(0xfeff);
+    expect(texte.endsWith("}")).toBe(true);
+    expect(texte).toContain(reference);
+  });
+
+  it.each([
+    [() => lireConsultation([]), "consultation devait être un objet"],
+    [() => lireConsultation({ fiche: null, historique: [] }), "consultation.fiche devait être un objet"],
+    [() => lireConsultation({ ...JSON.parse(referenceConsultation), historique: {} }), "consultation.historique devait être un tableau"],
+    [() => lireConsultation({ ...JSON.parse(referenceConsultation), historique: [{ auteur: "Chef", texte: "t", le: "l" }] }), "consultation.historique[0].auteur devait être l'une de Agent, IA"],
+    [() => lireConsultation({ ...JSON.parse(referenceConsultation), historique: [{ auteur: "IA", texte: 1, le: "l" }] }), "consultation.historique[0].texte devait être un texte"],
+    [() => lireTour(null), "tour devait être un objet"],
+    [() => lireTour({ ...JSON.parse(referenceTour), message: null }), "tour.message devait être un texte"],
+    [() => lireTour({ ...JSON.parse(referenceTour), horsPerimetre: "non" }), "tour.horsPerimetre devait être un booléen"],
+    [() => lireTour({ ...JSON.parse(referenceTour), ecartees: [{ position: 1.5, code: "c", motif: "m" }] }), "tour.ecartees[0].position devait être un entier"],
+    [() => lireTour({ ...JSON.parse(referenceTour), ecartees: [{ position: 1, code: "c" }] }), "tour.ecartees[0].motif devait être un texte"],
+    [() => lireTour({ ...JSON.parse(referenceTour), fiche: { id: 1 } }), "tour.fiche.enTete devait être un objet"],
+  ])("refus %#", (lire, message) => {
+    expect(lire).toThrow(ContratInvalide);
+    expect(lire).toThrow(message);
   });
 });
