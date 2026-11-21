@@ -1,6 +1,6 @@
 # Plan du démonstrateur « Expression de besoin » (version simplifiée)
 
-> Version 1.10 du 21/11/2026 (lot HY1 ; 1.9 au lot F1, 1.8 au lot I2b, 1.7 au lot I2, 1.6 au lot I1, 1.5 au lot B2, 1.4 au lot B1b, 1.3 au lot B1, 1.2 au lot P0c, 1.1 au
+> Version 1.11 du 21/11/2026 (lot HY1b ; 1.10 au lot HY1, 1.9 au lot F1, 1.8 au lot I2b, 1.7 au lot I2, 1.6 au lot I1, 1.5 au lot B2, 1.4 au lot B1b, 1.3 au lot B1, 1.2 au lot P0c, 1.1 au
 > lot P0, 1.0 au lot P0a). Arbitrages DEB-Q1 à DEB-Q8, DEB-Q11 à DEB-Q32 : « recommandations ok » (20/11/2026) ; DEB-Q9 :
 > « ok » (20/11/2026) ; DEB-Q33 à DEB-Q37 : « recommandations ok » (21/11/2026) ;
 > DEB-Q38 à DEB-Q44 : « recommandations ok » (21/11/2026) ; DEB-Q45, DEB-Q46 : « recommandations ok »
@@ -157,7 +157,7 @@ Liste : N°, intitulé, demandeur, date, statut (badge), actions *Reprendre* et 
 | I2 | Génération .docx sur le gabarit FEB (DEB-Q9) | octets stables ; fichier ouvert dans Word |
 | F1 | Socle du front (gabarit Vite, DEB-D7), composition dans `Program`, routes du §5, IA scénarisée (DEB-Q38 à DEB-Q44) | `Appliquer-Lot` vert (tests, couverture) ; `npm test` vert ; `node_modules` commité ; parcours de l'API joué sur 5080 |
 | HY1 | Hygiène DEB-HY1 : paquets NuGet, outils dotnet et SDK alignés sur DEB-D7 (DEB-Q45 à DEB-Q47) | `Appliquer-Lot` vert et commité (525 tests, couverture 100 / 100) ; `Compter-Tests` compte 525 à l'ouverture suivante |
-| F2 | Page Dialogue | parcours complet avec l'IA scénarisée, dans le navigateur |
+| F2 | Page Dialogue (DEB-Q48 à DEB-Q53) | `Appliquer-Lot` vert ; `npm test` vert ; parcours complet avec l'IA scénarisée, dans le navigateur : création, dialogue jusqu'à 10/10, proposition acceptée et rejetée, correction manuelle, soumission, compléments, reprise, validation, .docx ouvert dans Word |
 | F3 | Page Liste | statuts conformes après chaque transition |
 | A1 | Adaptateur IA réel et prompt système (DEB-Q2) | scénario e-commerce joué avec l'IA réelle, sans invention |
 | R1 | Fiche de recette : nominal et retour pour complément | critère de fin du démonstrateur (§1) : **point de terminaison de la V1** |
@@ -229,3 +229,9 @@ Questions ouvertes :
 | N° | Question | Recommandation |
 | --- | --- | --- |
 | DEB-Q2 | Fournisseur de l'IA (à trancher avant A1 ; technologie : DEB-D5) | Albert API (DINUM) si le ministère y a accès (hébergement SecNumCloud, modèles Mistral ; sortie contrainte par schéma à vérifier en A1), sinon API Mistral ; repli hors réseau : IA scénarisée |
+| DEB-Q48 | Adresse de la page Dialogue (F2) | Action `Home/Dialogue/{id}` (route par défaut, `id` Guid ; autre valeur → 404) rendant `<div id="app" data-page="dialogue" data-fiche="{id}">` ; bouton « Nouvelle fiche » de l'accueil : `POST api/fiches` (agent courant), puis navigation vers `Url.resolve("Home/Dialogue/{id}")` ; *Reprendre* de la Liste (F3) y mènera ; fiche inconnue → message `fiche.introuvable` dans la page |
+| DEB-Q49 | Découpage du front de la page | `features/dialogue/` : `etat.ts` (réducteur PUR état × événement → état : une requête à la fois, brouillons de saisie gardés par rubrique, dernière erreur), `vue.ts` (PUR : fiche → modèle d'affichage par bloc, badges d'origine, progression, actions permises), `PageDialogue.ts` (coquille DOM sans décision, `textContent` seulement, jamais `innerHTML`) ; exclusion de couverture du front `src/features/**` remplacée par `src/features/**/Page*.ts` (coquilles seules) ; aucune dépendance ajoutée (ni jsdom ni happy-dom : `node_modules` inchangé), la coquille est éprouvée par le parcours du navigateur |
+| DEB-Q50 | Règles métier côté front | Aucune recopiée : les boutons ne dépendent que des champs calculés par le Domaine (`statut`, `modifiable`, `complete`) et de la case de confirmation ; complétude, propositions en attente, commentaire obligatoire restent arbitrés par le serveur, dont le refus `{ code, message }` est affiché tel quel |
+| DEB-Q51 | Saisie manuelle d'une rubrique | Zone de texte par rubrique et bouton « Enregistrer » actif quand le brouillon diffère de la valeur retenue (`PUT …/champs/{code}`) ; pas d'enregistrement automatique à la sortie du champ (chaque saisie manuelle est un acte explicite, DEB-Q15) ; une proposition en attente s'affiche sous la zone avec ✓ (accepter) et ✗ (rejeter) |
+| DEB-Q52 | Contrat partagé des nouvelles réponses | `tour-reference.json` (`POST …/messages`) et `consultation-reference.json` (`GET api/fiches/{id}`) ajoutés à `ClientApp/tests/contrats/`, figés à l'octet par xUnit (comme `fiche-reference.json`) et lus par Vitest (`lireTour`, `lireConsultation`) |
+| DEB-Q53 | Actions selon le statut | `Brouillon` : dialogue, saisie, propositions, case « Je confirme… » et Soumettre ; `Soumise` : simulation de la décision (Valider, Demander des compléments, Refuser ; commentaire) ; `ACompleter` : Reprendre ; `Validee` : lien de téléchargement du .docx (`Url.resolve`) ; réponse hors périmètre en alerte ; propositions écartées (`ecartees`) en note discrète sous la réponse de l'IA |

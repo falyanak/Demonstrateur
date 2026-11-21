@@ -300,3 +300,15 @@
   l'assistant : JSON et XML bien formés, fins de ligne CRLF conservées, aucun BOM ajouté. Non vérifié : restauration,
   compilation, tests .NET, couverture, format de sortie de xUnit 4 lu par le harnais (SDK .NET et nuget.org refusés au
   shell de l'assistant) : le poste tranche.
+
+## 21/11/2026 — HY1 vérifié et clos, HY1b : clôture et questions de F2
+
+- Ouverture : pièces contrôlées (8, tailles et SHA-256 conformes à `PIECES.txt` ; archive 141 entrées, commit
+  `d307a911a46b`, aucun masquage) ; arbre propre, 0 commit à publier, sauvegarde du jour au même HEAD.
+- Critère de fin de HY1 atteint : HY1 commité par la ligne enchaînée (donc `Appliquer-Lot HY1` vert : compilation,
+  tests, couverture au cliquet 100 / 100) ; `Compter-Tests` (Debug) relit la sortie de xUnit 4 : Domain 207, Application
+  66, Infrastructure 135, Web 97, Architecture 20, total 525, 0 échec. Versions à HEAD : `global.json` 10.0.403
+  (`rollForward: disable`), `xunit.v3` 4.0.3, runner 4.0.1, Test.Sdk 18.12.0, Mvc.Testing et Sqlite 10.0.15,
+  dotnet-coverage 18.12.0, ReportGenerator 5.6.0. Objectif atteint, on arrête HY1.
+- Ouverture de F2 : questions DEB-Q48 à DEB-Q53 posées avec recommandations (plan v1.11, questions ouvertes) ; critère de
+  fin de F2 précisé (prompt, bloc ÉTAT). HY1b : documents seulement.

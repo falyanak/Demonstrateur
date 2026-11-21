@@ -1,6 +1,6 @@
 # Prompt de reprise — Demonstrateur
 
-> Mis à jour le 21/11/2026 par le lot HY1. Règles génériques : harnais central, `regles\regles-de-travail.md` (v5) ;
+> Mis à jour le 21/11/2026 par le lot HY1b. Règles génériques : harnais central, `regles\regles-de-travail.md` (v5) ;
 > modèle de projet : `regles\harnais-modele-generique.md` (v2) ; front : `regles\gabarit-frontend-vite-aspnet.md` ;
 > outillage : `C:\Dev\Harnais\docs\specification-harnais-central.md` (fait foi).
 > Historique détaillé : `docs/historique-Demonstrateur.md` (non envoyé par défaut). Documents hors dépôt dont dépend ce
@@ -8,23 +8,25 @@
 > `Expression_de_besoin_demonstrateur_IA_SICCRF.docx` (document de cadrage, novembre 2026). Le modèle `FEB.docx` est
 > versionné depuis I2, nettoyé de ses métadonnées (DEB-Q9, DEB-Q33).
 
-## ▶ ÉTAT AU 21/11/2026 (hygiène : lot HY1 livré) — À LIRE D'ABORD
+## ▶ ÉTAT AU 21/11/2026 (HY1 clos, HY1b ; F2 en attente d'arbitrage) — À LIRE D'ABORD
 
-**Où on en est** : chantiers P, B, I clos ; F1 clos (F1c commité : `3e45551`, 525 tests .NET mesurés, 58 Vitest).
-**HY1** (DEB-HY1) livré, à appliquer : xUnit 4.0.3 (MTP v2), runner VS 4.0.1, Test.Sdk 18.12.0, Mvc.Testing et
-Sqlite 10.0.15, dotnet-coverage 18.12.0, ReportGenerator 5.6.0 ; SDK bloqué sur 10.0.403 (`global.json`, DEB-Q47).
-**Critère de fin de HY1** : `Appliquer-Lot HY1` vert et commité (compilation, 525 tests, couverture 100 / 100) ;
-`git status` vide ; `Compter-Tests` compte 525 à l'ouverture suivante (format de sortie de xUnit 4 lu par le harnais).
-Échec : rien n'est commité ; remise en état par `git restore .` depuis la racine, puis lot correctif sous un nouveau nom.
+**Où on en est** : chantiers P, B, I clos ; F1 clos ; **HY1 clos** (`d307a91`, critère atteint : commité par la ligne
+enchaînée, arbre propre, `Compter-Tests` compte 525 au format de xUnit 4, 0 échec). HY1b : documents seulement.
+**Prochain pas** : **F2** (page Dialogue), après arbitrage de DEB-Q48 à DEB-Q53 (plan, questions ouvertes) ; aucun code de
+F2 avant ces réponses. **Critère de fin de F2** : `Appliquer-Lot F2` vert et commité (compilation, tests, couverture
+100 / 100) ; `npm test` vert ; parcours joué dans le navigateur sur 5080 avec l'IA scénarisée : création depuis l'accueil,
+dialogue jusqu'à 10/10, une proposition acceptée et une rejetée, une rubrique corrigée à la main, confirmation et
+soumission (numéro `EB-2026-…`), demande de compléments, reprise, nouvelle soumission, validation, .docx téléchargé et
+ouvert dans Word.
 **Point de terminaison de la V1** (DEB-D4) : lot R1, critère du plan §1 ; périmètre gelé jusque-là.
-**Prochain pas** (plan ordonné) : F2 (page Dialogue). **Ouverture de la session suivante** :
+**Ouverture de la session suivante** :
 
     Set-Location C:\Dev\Demonstrateur; . C:\Dev\Harnais\outillage\Charger-Harnais.ps1; Ouvrir-Session -BrancheAttendue main
     # attendu : « SESSION PRÉPARÉE : 8 pièce(s) dans C:\Dev\Sessions\Demonstrateur\<horodatage> » ; joindre toutes les
     # pièces et donner leur compte.
 
 **Décisions récentes** : DEB-Q45 à DEB-Q47 (21/11/2026). **Anomalies ouvertes** : aucune.
-**Questions ouvertes** : DEB-Q2 (fournisseur d'IA). **Hygiène** : aucune.
+**Questions ouvertes** : DEB-Q2 (fournisseur d'IA), DEB-Q48 à DEB-Q53 (F2). **Hygiène** : aucune.
 
 ## §0. Protocole (propre au projet)
 
@@ -40,7 +42,7 @@ Sqlite 10.0.15, dotnet-coverage 18.12.0, ReportGenerator 5.6.0 ; SDK bloqué sur
 | Front | Node.js 26.13.1 LTS et son npm (DEB-D7) ; `node_modules` versionné (DEB-D6), Windows x64 ; `npm ci` seulement s'il manque ; versions exactes (`.npmrc`) |
 | Données | fictives, jamais réelles ; jeux d'essai hors dépôt ; base SQLite hors dépôt, `%LOCALAPPDATA%\Demonstrateur\fiches.db` (DEB-Q31, clé `Fiches:Base` de `appsettings.Localhost.json`) |
 | Dépôt distant | `https://github.com/falyanak/Demonstrateur.git`, **public**, branche `main` ; publication par le développeur seul (`Publier-Branche -Confirmer`, Git Credential Manager) |
-| Identifiants | `DEB-D…`, `DEB-A…`, `DEB-Q…`, `DEB-HY…` ; pris : DEB-D1 à DEB-D7, DEB-Q1 à DEB-Q47, DEB-HY1 (close par HY1) ; mutations M1 à M10, MF1 à MF8 (front) |
+| Identifiants | `DEB-D…`, `DEB-A…`, `DEB-Q…`, `DEB-HY…` ; pris : DEB-D1 à DEB-D7, DEB-Q1 à DEB-Q53, DEB-HY1 (close par HY1) ; mutations M1 à M10, MF1 à MF8 (front) |
 
 Ligne enchaînée du projet (zip portant `DEPOT.txt` = « Demonstrateur ») :
 
@@ -62,27 +64,26 @@ page de liste des fiches et de leur statut. Plan, périmètre et critère de fin
 | P — socle | P0a, P0, P0b | clos le 20/11/2026 : P0a (`56388a3`), P0 (`78ff21b`, base `a73cb7e`), P0b |
 | B — métier (Domain, Application) | B1, B1b, B2, B2b | clos le 20/11/2026 : B1 (`3ee722c`), B1b (`17f3a8d`), B2 (`9007adf`), B2b |
 | I — infrastructure | I1 (SQLite), I2 (.docx) | clos le 21/11/2026 : I1 (`f42de12`), I1b ; I2 relivré en I2a (`e28a964`), I2b |
-| F — front | F1 (socle, API), F2 (Dialogue), F3 (Liste) | F1 clos le 21/11/2026 : F1 (`bfaaf97`), F1b (`fe31e69`), F1c (`3e45551`) ; F2, F3 à faire ; `TestsFront` attendu d'OT2 |
-| Hygiène | HY1 (DEB-HY1 : NuGet, outils dotnet, SDK) | livré le 21/11/2026, à appliquer |
+| F — front | F1 (socle, API), F2 (Dialogue), F3 (Liste) | F1 clos le 21/11/2026 : F1 (`bfaaf97`), F1b (`fe31e69`), F1c (`3e45551`) ; F2 (DEB-Q48 à DEB-Q53 à trancher), F3 à faire ; `TestsFront` attendu d'OT2 |
+| Hygiène | HY1, HY1b (DEB-HY1 : NuGet, outils dotnet, SDK) | clos le 21/11/2026 : HY1 (`d307a91`), HY1b |
 | A — IA réelle | A1 | à faire ; fournisseur à trancher (DEB-Q2) |
 | R — recette | R1 | à faire |
 
-| Projet de tests | P0, poste (20/11/2026) | B1, poste (20/11/2026) | B2, poste (20/11/2026) | I1, poste (20/11/2026) | I2a, poste (21/11/2026) | F1, poste (21/11/2026) |
-| --- | --- | --- | --- | --- | --- | --- |
-| ExpressionBesoin.Domain.Tests | 25 | 189 | 189 | 189 | 207 | 207 |
-| ExpressionBesoin.Application.Tests | — | — | 65 | 65 | 66 | 66 |
-| ExpressionBesoin.Infrastructure.Tests | — | — | — | 48 | 109 | 135 |
-| ExpressionBesoin.Web.Tests | 30 | 30 | 30 | 30 | 30 | 97 |
-| ExpressionBesoin.Architecture.Tests | 20 | 20 | 20 | 20 | 20 | 20 |
-| **Total** | **75** (Release et Debug, 0 échec) | **239** (Release et Debug, 0 échec) | **304** (Debug, 0 échec) | **352** (Release et Debug, 0 échec) | **432** (Release et Debug, 0 échec) | **525** (Debug, 0 échec) ; Vitest **58** |
-| Couverture | Domain, Web : lignes 64/64, branches 16/16 = 100 % | Domain, Web : lignes 410/410, branches 156/156 = 100 % | Domain, Application, Web : lignes 580/580, branches 202/202 = 100 % | Domain, Application, Infrastructure, Web : lignes 918/918, branches 266/266 = 100 % | Domain, Application, Infrastructure, Web : lignes 1181/1181, branches 356/356 = 100 % | conforme au cliquet 100 / 100 (`Appliquer-Lot F1` vert ; comptes non transmis) ; front 74/74 lignes, 57/57 branches (chez l'assistant) |
+| Projet de tests | P0, poste (20/11/2026) | B1, poste (20/11/2026) | B2, poste (20/11/2026) | I1, poste (20/11/2026) | I2a, poste (21/11/2026) | F1, poste (21/11/2026) | HY1, poste (21/11/2026) |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| ExpressionBesoin.Domain.Tests | 25 | 189 | 189 | 189 | 207 | 207 | 207 |
+| ExpressionBesoin.Application.Tests | — | — | 65 | 65 | 66 | 66 | 66 |
+| ExpressionBesoin.Infrastructure.Tests | — | — | — | 48 | 109 | 135 | 135 |
+| ExpressionBesoin.Web.Tests | 30 | 30 | 30 | 30 | 30 | 97 | 97 |
+| ExpressionBesoin.Architecture.Tests | 20 | 20 | 20 | 20 | 20 | 20 | 20 |
+| **Total** | **75** (Release et Debug, 0 échec) | **239** (Release et Debug, 0 échec) | **304** (Debug, 0 échec) | **352** (Release et Debug, 0 échec) | **432** (Release et Debug, 0 échec) | **525** (Debug, 0 échec) ; Vitest **58** | **525** (Debug, xUnit 4, 0 échec) |
+| Couverture | Domain, Web : lignes 64/64, branches 16/16 = 100 % | Domain, Web : lignes 410/410, branches 156/156 = 100 % | Domain, Application, Web : lignes 580/580, branches 202/202 = 100 % | Domain, Application, Infrastructure, Web : lignes 918/918, branches 266/266 = 100 % | Domain, Application, Infrastructure, Web : lignes 1181/1181, branches 356/356 = 100 % | conforme au cliquet 100 / 100 (`Appliquer-Lot F1` vert ; comptes non transmis) ; front 74/74 lignes, 57/57 branches (chez l'assistant) | conforme au cliquet 100 / 100 (`Appliquer-Lot HY1` vert ; comptes non transmis) |
 
 ## §2. Points ouverts
 
 1. Fournisseur d'IA (DEB-Q2) : à trancher avant A1 ; l'IA scénarisée suffit jusque-là. Recommandation : Albert API
    (DINUM) si le ministère y a accès, sinon API Mistral. Technologie : DEB-D5.
-2. HY1 (DEB-HY1, DEB-Q45 à DEB-Q47) : à appliquer ; preuve attendue : sortie d'`Appliquer-Lot HY1`, puis
-   `Compter-Tests` à l'ouverture suivante (525).
+2. F2 : DEB-Q48 à DEB-Q53 (plan, questions ouvertes) à trancher avant tout code ; recommandations jointes.
 3. OT2 du harnais central (`TestsFront`) : sans lui, Vitest est lancé à la main pour F1 à F3.
 4. Côté harnais : HAR-A8 relevée le 20/11/2026 (`Publier-Branche` ne peut pas demander d'identifiant ; échec tardif et
    message trompeur sans `credential.helper`) ; correction recommandée plus tard, par un lot court du harnais.
@@ -189,11 +190,8 @@ synthèse CODIR / COPIL, export PDF, version optimiste des fiches (DEB-Q26) ; to
 
 ## §7. Prochaine session
 
-Acquis : plan v1.9 ; socle P0, Domaine B1, Application B2, Infrastructure I1 et I2, socle du front F1 validés sur le poste
-(525 tests .NET, 58 tests Vitest, couverture 100 %, .docx ouvert dans Word, API jouée sur 5080 avec l'IA scénarisée).
-Audit honnête : chez l'assistant, ni SDK .NET ni NuGet (hôtes refusés par la politique réseau) ; le poste tranche
-compilation, tests .NET, couverture et cibles MSBuild. Le compte d'agents du parcours F1 (1 affiché) vient d'un piège de
-Windows PowerShell 5.1, pas de l'API : le référentiel en compte 4 (`ReferentielOrganisationFictif`), recompté par la
-commande de F1c. Plan ordonné : HY1 (à appliquer), F2, F3, A1, R1 (point de terminaison de la V1, DEB-D4). Non vérifié chez
-l'assistant pour HY1 : restauration NuGet, compilation, analyseurs de xUnit 4, format de sortie des exécutables. Pièces à envoyer :
-toutes celles d'`Ouvrir-Session` (8), avec leur compte.
+Acquis : plan v1.11 ; socle P0, Domaine B1, Application B2, Infrastructure I1 et I2, socle du front F1, hygiène HY1
+validés sur le poste (525 tests .NET sous xUnit 4, 58 tests Vitest, couverture 100 %, .docx ouvert dans Word, API jouée
+sur 5080 avec l'IA scénarisée). Audit honnête : chez l'assistant, ni SDK .NET ni NuGet ; le poste tranche compilation,
+tests .NET, couverture et cibles MSBuild. Plan ordonné : F2 (après DEB-Q48 à DEB-Q53), F3, A1, R1 (point de terminaison
+de la V1, DEB-D4). Pièces à envoyer : toutes celles d'`Ouvrir-Session` (8), avec leur compte.
