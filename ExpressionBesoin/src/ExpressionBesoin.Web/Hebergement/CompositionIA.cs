@@ -24,10 +24,13 @@ public static class CompositionIA
 
     public const string Scenarise = "Scenarise";
 
-    /// <summary>Adaptateur choisi par la configuration finale (lu à la résolution, vérifié au démarrage).</summary>
-    public static IAssistantIA Creer(IConfiguration configuration) =>
+    /// <summary>
+    /// Adaptateur choisi par la configuration finale (lu à la résolution, vérifié au démarrage) ; <paramref name="journal"/>
+    /// reçoit le diagnostic d'une réponse vide de l'IA réelle (DEB-Q114).
+    /// </summary>
+    public static IAssistantIA Creer(IConfiguration configuration, ILogger journal) =>
         Lire(configuration[CleFournisseur], configuration[ClePoint], configuration[CleModele], configuration[VariableCle]) is { } options
-            ? (IAssistantIA)AssistantIAAlbert.Creer(options)
+            ? (IAssistantIA)AssistantIAAlbert.Creer(options, journal: journal)
             : new AssistantIAScenarise();
 
     /// <summary>Options de l'IA réelle, <c>null</c> pour l'IA scénarisée ; configuration fautive → exception.</summary>

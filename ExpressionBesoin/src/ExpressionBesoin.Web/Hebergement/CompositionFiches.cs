@@ -1,6 +1,7 @@
 using ExpressionBesoin.Application.Fiches;
 using ExpressionBesoin.Infrastructure.Documents;
 using ExpressionBesoin.Infrastructure.Fiches;
+using ExpressionBesoin.Infrastructure.IA;
 using ExpressionBesoin.Infrastructure.Organisation;
 using ExpressionBesoin.Infrastructure.Sqlite;
 
@@ -34,7 +35,9 @@ public static class CompositionFiches
         // Un seul exemplaire : le gabarit est lu, décompressé et vérifié une fois (plan §4, performance).
         services.AddSingleton<IGenerateurDocument>(_ => GenerateurDocumentFeb.DepuisRessource());
         // IA réelle (Albert API, lot A1) ou scénarisée (hors réseau, DEB-Q41), selon IA:Fournisseur (DEB-Q86).
-        services.AddSingleton<IAssistantIA>(fournisseur => CompositionIA.Creer(fournisseur.GetRequiredService<IConfiguration>()));
+        services.AddSingleton<IAssistantIA>(fournisseur => CompositionIA.Creer(
+            fournisseur.GetRequiredService<IConfiguration>(),
+            fournisseur.GetRequiredService<ILogger<AssistantIAAlbert>>()));
         services.AddSingleton(fournisseur => new ServiceFiches(
             fournisseur.GetRequiredService<IDepotFiches>(),
             fournisseur.GetRequiredService<IAssistantIA>(),

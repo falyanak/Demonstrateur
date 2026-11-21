@@ -4,6 +4,7 @@ using ExpressionBesoin.Application.Fiches;
 using ExpressionBesoin.Domain;
 using ExpressionBesoin.Domain.Fiches;
 using ExpressionBesoin.Infrastructure.IA;
+using Microsoft.Extensions.Logging;
 
 namespace ExpressionBesoin.Infrastructure.Tests.IA;
 
@@ -24,6 +25,8 @@ public sealed class AssistantIAAlbertTests
 
     private readonly List<TimeSpan> _attentes = [];
 
+    private readonly JournalEssai _journal = new();
+
     private static ContexteTour Contexte() =>
         new(
             "C'est l'application SORA.",
@@ -37,11 +40,15 @@ public sealed class AssistantIAAlbertTests
             "application");
 
     private AssistantIAAlbert Assistant(FauxFournisseurIA faux) =>
-        AssistantIAAlbert.Creer(Options, faux, (attente, _) =>
-        {
-            _attentes.Add(attente);
-            return Task.CompletedTask;
-        });
+        AssistantIAAlbert.Creer(
+            Options,
+            faux,
+            (attente, _) =>
+            {
+                _attentes.Add(attente);
+                return Task.CompletedTask;
+            },
+            _journal);
 
     /// <summary>Texte d'un message OpenAI : chaîne, ou tableau de parties <c>{ type: "text", text }</c>.</summary>
     private static string Texte(JsonElement contenu) =>
@@ -86,6 +93,64 @@ public sealed class AssistantIAAlbertTests
             schema.GetProperty("schema").GetProperty("properties").EnumerateObject().Select(propriete => propriete.Name).ToArray());
         Assert.False(racine.TryGetProperty("tools", out _));
         Assert.Empty(_attentes);
+        Assert.Empty(_journal.Ecritures);
+    }
+
+    /// <summary>
+    /// DEB-Q113 (lot A5b) : ce qui part sur le réseau est le corps nettoyé, comme CSAgent : chaque message n'a que
+    /// <c>role</c> et <c>content</c>, en chaîne, quelle que soit la forme produite par le client OpenAI .NET.
+    /// </summary>
+    [Fact]
+    public async Task Messages_envoyes_role_et_contenu_en_chaine_seulement()
+    {
+        var faux = new FauxFournisseurIA(() => FauxFournisseurIA.Completion(Reponse));
+        using var assistant = Assistant(faux);
+
+        await assistant.Repondre(Contexte(), Essais.Annulation);
+
+        using var corps = JsonDocument.Parse(Assert.Single(faux.Requetes).Corps!);
+        foreach (var message in corps.RootElement.GetProperty("messages").EnumerateArray())
+        {
+            Assert.Equal(new[] { "role", "content" }, message.EnumerateObject().Select(propriete => propriete.Name).ToArray());
+            Assert.Equal(JsonValueKind.String, message.GetProperty("content").ValueKind);
+        }
+
+        Assert.Equal("application/json", Assert.Single(faux.Requetes).TypeContenu?.Split(';')[0]);
+    }
+
+    /// <summary>
+    /// DEB-A5 (21/11/2026 : 2e tour vide, « La réponse de l'IA n'est pas un JSON valide ») et DEB-Q112, DEB-Q114 : une
+    /// réponse vide est journalisée avec la requête envoyée, puis redemandée une fois.
+    /// </summary>
+    [Fact]
+    public async Task Reponse_vide_journalisee_puis_redemandee_une_fois()
+    {
+        var faux = new FauxFournisseurIA(() => FauxFournisseurIA.Completion(null), () => FauxFournisseurIA.Completion(Reponse));
+        using var assistant = Assistant(faux);
+
+        Assert.Equal(Reponse, await assistant.Repondre(Contexte(), Essais.Annulation));
+
+        Assert.Equal(2, faux.Requetes.Count);
+        Assert.Equal(faux.Requetes[0], faux.Requetes[1]);
+        var (niveau, message) = Assert.Single(_journal.Ecritures);
+        Assert.Equal(LogLevel.Warning, niveau);
+        Assert.StartsWith("Réponse vide de l'IA (DEB-A5). Requête envoyée (", message);
+        Assert.Contains(faux.Requetes[0].Corps!, message);
+        Assert.DoesNotContain("cle-essai", message);
+        Assert.Contains("\"content\":null", message);
+    }
+
+    [Fact]
+    public async Task Deux_reponses_vides_panne_jamais_un_refus()
+    {
+        var faux = new FauxFournisseurIA(() => FauxFournisseurIA.Completion(""), () => FauxFournisseurIA.Completion("  "));
+        using var assistant = Assistant(faux);
+
+        var panne = await Assert.ThrowsAsync<InvalidOperationException>(async () => await assistant.Repondre(Contexte(), Essais.Annulation));
+
+        Assert.Equal(AssistantIAAlbert.MessageReponsesVides, panne.Message);
+        Assert.Equal(2, faux.Requetes.Count);
+        Assert.Equal(2, _journal.Ecritures.Count);
     }
 
     [Fact]

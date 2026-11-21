@@ -678,3 +678,28 @@
   contre-épreuve sur une assertion faussée (1 échec) ; dernier message du tour et rubrique questionnée rejoués ;
   octets (CRLF sans BOM) ; prompt de reprise ≤ 30 720 octets. Non vérifié : compilation, tests, couverture (branches du
   garde-fou visées par les cas), mutations, réponses de gemma.
+
+## 21-22/11/2026 — A5 appliqué ; anomalie DEB-A5 ; finalité helpdesk ; A5b
+
+- A5 appliqué et commité (`bf75669`, ligne enchaînée) ; au navigateur, 1er tour conforme (message sans question, question
+  type de l'application) ; 2e tour : « La réponse de l'IA n'est pas un JSON valide : The input does not contain any JSON
+  tokens » (422), deux fois, sur deux fiches : DEB-A5 (contenu vide rendu par Albert, lu comme un refus).
+- Sondes hors dépôt, requête de l'adaptateur reconstituée depuis `GET api/fiches/{id}` : `Sonder-A5` (texte, historique
+  à plat, sans format : 0 vide sur 15 ; sans format, JSON entouré d'une clôture, que `ReponseIA.Lire` tolère) ;
+  `Sonder-A5b` (contenus en tableau de parties, tous ou assistant seul : 0 vide sur 20). Réponses de gemma justes :
+  « difficultés » proposée avec les mots de l'agent, aucune question, aucune invention (« J'ai complété… » au lieu de
+  « je propose » : noté pour R1). `Relais-A5` (relais local) : aucune requête capturée, site non branché sur lui ; puis
+  503 au 2e tour. Conclusion : la requête réelle diffère des requêtes reconstituées.
+- Développeur : prompt « agent de qualification IT (Helpdesk N1) » (finalité du POC) ; DEB-Q109 à DEB-Q111 posées.
+- FlowPortal (`artydev/FlowPortal`) délègue à CSAgent ; `CSAgent/Core/Llm/LlmClient.cs` : `HttpClient` brut, corps
+  `model`, `temperature`, `messages`, sans `response_format`, messages NETTOYÉS avant envoi (clés permises, aucune
+  valeur nulle, `tool_calls` vide retiré, `content` en chaîne) parce que vLLM derrière Albert plante sur des champs
+  renvoyés par le serveur ou nuls. DEB-Q112 à DEB-Q115 : « recommandations ok ».
+- A5b : `CorpsRequete` (pur : `Nettoyer`, `ContenuVide`, `Diagnostic`), `GestionnaireCorpsRequete` (maillon en tête,
+  avant celui du 429), `AssistantIAAlbert` (journal, au plus 2 appels si la réponse est vide, puis exception),
+  `CompositionIA.Creer(configuration, journal)`. Tests : `CorpsRequeteTests` (29), `GestionnaireCorpsRequeteTests` (1),
+  `AssistantIAAlbertTests` (+3 : messages envoyés `role`/`content` en chaîne, réponse vide redemandée et journalisée,
+  deux vides → panne). Comptes ESTIMÉS : Infrastructure 222, total 726.
+- Vérifié chez l'assistant : syntaxe C# (tree-sitter) ; attendus du nettoyage recalculés par une réplique Python ;
+  octets (CRLF sans BOM) ; prompt ≤ 30 720 octets. Non vérifié : compilation (dont la référence transitive à
+  `Microsoft.Extensions.Logging.Abstractions` dans l'Infrastructure), tests, couverture, effet sur Albert.

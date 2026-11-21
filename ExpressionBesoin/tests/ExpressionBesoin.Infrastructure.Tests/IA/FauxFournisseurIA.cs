@@ -44,8 +44,11 @@ internal sealed class FauxFournisseurIA(params Func<HttpResponseMessage>[] repon
         return reponse;
     }
 
-    /// <summary>Réponse <c>chat.completion</c> d'un serveur compatible OpenAI dont le message porte <paramref name="contenu"/>.</summary>
-    public static HttpResponseMessage Completion(string contenu) =>
+    /// <summary>
+    /// Réponse <c>chat.completion</c> d'un serveur compatible OpenAI dont le message porte <paramref name="contenu"/>
+    /// (<c>null</c> : <c>"content": null</c>, réponse vide d'Albert, DEB-A5).
+    /// </summary>
+    public static HttpResponseMessage Completion(string? contenu) =>
         Reponse(HttpStatusCode.OK, JsonSerializer.Serialize(new
         {
             id = "chatcmpl-essai",

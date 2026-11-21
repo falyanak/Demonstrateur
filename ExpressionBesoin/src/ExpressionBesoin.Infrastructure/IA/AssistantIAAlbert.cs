@@ -4,6 +4,8 @@ using System.Net;
 using ExpressionBesoin.Application.Fiches;
 using Microsoft.Agents.AI;
 using Microsoft.Extensions.AI;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using OpenAI;
 
 namespace ExpressionBesoin.Infrastructure.IA;
@@ -12,8 +14,9 @@ namespace ExpressionBesoin.Infrastructure.IA;
 /// Adaptateur d'<see cref="IAssistantIA"/> vers l'IA réelle (lot A1, DEB-D5, DEB-Q83 à DEB-Q88) : un agent Microsoft
 /// Agent Framework (<see cref="ChatClientAgent"/>, sans outils ni session) sur l'<see cref="IChatClient"/> OpenAI de
 /// Microsoft.Extensions.AI, pointé sur Albert API. Coquille sans décision : le prompt est <see cref="PromptFiche"/>, le
-/// nouvel essai <see cref="GestionnaireLimiteDebit"/> ; le texte rendu est relu par <c>ReponseIA.Lire</c>. Une panne
-/// (réseau, délai, statut d'échec) lève une exception : 503 (DEB-Q22).
+/// nouvel essai <see cref="GestionnaireLimiteDebit"/>, le corps nettoyé par <see cref="GestionnaireCorpsRequete"/> (A5b) ;
+/// le texte rendu est relu par <c>ReponseIA.Lire</c>. Une panne (réseau, délai, statut d'échec, deux réponses vides de
+/// suite : DEB-A5, DEB-Q112) lève une exception : 503 (DEB-Q22).
 /// </summary>
 public sealed class AssistantIAAlbert : IAssistantIA, IDisposable
 {
@@ -24,6 +27,12 @@ public sealed class AssistantIAAlbert : IAssistantIA, IDisposable
 
     /// <summary>Clé des options lue par Microsoft.Extensions.AI.OpenAI : schéma de réponse strict (DEB-Q85).</summary>
     public const string CleStrict = "strict";
+
+    /// <summary>Appels au plus pour un tour : une réponse vide est redemandée UNE fois, puis c'est une panne (DEB-Q112).</summary>
+    public const int AppelsParTour = 2;
+
+    public const string MessageReponsesVides =
+        "L'IA a rendu une réponse vide à chaque essai (DEB-A5) : panne technique, détail dans le journal du site.";
 
     private readonly HttpClient _http;
 
@@ -39,19 +48,24 @@ public sealed class AssistantIAAlbert : IAssistantIA, IDisposable
     /// Assemblage. <paramref name="transport"/> remplace le réseau (tests) ; à défaut, connexions directes ou par le proxy
     /// du système, auquel seul sont remis les identifiants Windows (proxy d'entreprise, HTTP 407 ; comme CSAgent).
     /// <paramref name="attendre"/> remplace l'attente du nouvel essai (tests). Les nouvels essais du client OpenAI sont
-    /// désactivés : un seul, décidé par <see cref="LimiteDebit"/>.
+    /// désactivés : un seul, décidé par <see cref="LimiteDebit"/>. <paramref name="journal"/> reçoit le diagnostic d'une
+    /// réponse vide (DEB-Q114) ; à défaut, rien n'est écrit.
     /// </summary>
     public static AssistantIAAlbert Creer(
         OptionsIA options,
         HttpMessageHandler? transport = null,
-        Func<TimeSpan, CancellationToken, Task>? attendre = null)
+        Func<TimeSpan, CancellationToken, Task>? attendre = null,
+        ILogger? journal = null)
     {
-        var maillon = new GestionnaireLimiteDebit(attendre ?? Attendre)
+        var maillon = new GestionnaireCorpsRequete(journal ?? NullLogger.Instance)
         {
-            InnerHandler = transport ?? new SocketsHttpHandler
+            InnerHandler = new GestionnaireLimiteDebit(attendre ?? Attendre)
             {
-                DefaultProxyCredentials = CredentialCache.DefaultCredentials,
-                PooledConnectionLifetime = TimeSpan.FromMinutes(5),
+                InnerHandler = transport ?? new SocketsHttpHandler
+                {
+                    DefaultProxyCredentials = CredentialCache.DefaultCredentials,
+                    PooledConnectionLifetime = TimeSpan.FromMinutes(5),
+                },
             },
         };
         var http = new HttpClient(maillon) { Timeout = options.Delai };
@@ -68,12 +82,25 @@ public sealed class AssistantIAAlbert : IAssistantIA, IDisposable
         return new AssistantIAAlbert(http, agent);
     }
 
+    /// <summary>
+    /// Texte brut de l'IA ; une réponse vide (contenu absent ou blanc, DEB-A5) est redemandée, au plus
+    /// <see cref="AppelsParTour"/> appels, puis lève : panne, 503 (DEB-Q112), jamais un refus « JSON invalide ».
+    /// </summary>
     public async ValueTask<string> Repondre(ContexteTour contexte, CancellationToken annulation)
     {
-        List<ChatMessage> messages = [.. PromptFiche.Messages(contexte).Select(Convertir)];
-        var reponse = await _agent.RunAsync(messages, null, new ChatClientAgentRunOptions(OptionsTour()), annulation)
-            .ConfigureAwait(false);
-        return reponse.Text;
+        for (var appel = 1; appel <= AppelsParTour; appel++)
+        {
+            // Messages et options neufs à chaque appel : le nouvel essai envoie la même requête.
+            List<ChatMessage> messages = [.. PromptFiche.Messages(contexte).Select(Convertir)];
+            var reponse = await _agent.RunAsync(messages, null, new ChatClientAgentRunOptions(OptionsTour()), annulation)
+                .ConfigureAwait(false);
+            if (!string.IsNullOrWhiteSpace(reponse.Text))
+            {
+                return reponse.Text;
+            }
+        }
+
+        throw new InvalidOperationException(MessageReponsesVides);
     }
 
     /// <summary>Options d'un tour, neuves à chaque appel : température, réponse contrainte par le schéma, strict.</summary>
