@@ -1,6 +1,6 @@
 # Prompt de reprise — Demonstrateur
 
-> Mis à jour le 21/11/2026 par le lot F1b. Règles génériques : harnais central, `regles\regles-de-travail.md` (v5) ;
+> Mis à jour le 21/11/2026 par le lot F1c. Règles génériques : harnais central, `regles\regles-de-travail.md` (v5) ;
 > modèle de projet : `regles\harnais-modele-generique.md` (v2) ; front : `regles\gabarit-frontend-vite-aspnet.md` ;
 > outillage : `C:\Dev\Harnais\docs\specification-harnais-central.md` (fait foi).
 > Historique détaillé : `docs/historique-Demonstrateur.md` (non envoyé par défaut). Documents hors dépôt dont dépend ce
@@ -8,22 +8,18 @@
 > `Expression_de_besoin_demonstrateur_IA_SICCRF.docx` (document de cadrage, novembre 2026). Le modèle `FEB.docx` est
 > versionné depuis I2, nettoyé de ses métadonnées (DEB-Q9, DEB-Q33).
 
-## ▶ ÉTAT AU 21/11/2026 (F1 commité, F1b livré) — À LIRE D'ABORD
+## ▶ ÉTAT AU 21/11/2026 (chantier F, lot F1 clos ; F1c livré) — À LIRE D'ABORD
 
-**Où on en est** : chantiers P, B, I clos (I2a `e28a964`, 432 tests, couverture 100 %). **F1 commité** (`bfaaf97`, ligne
-enchaînée : `Appliquer-Lot` vert ; 2 257 fichiers de `node_modules` suivis = 2 233 installés + 24 raccourcis `.bin`) ;
-`npm test` a ensuite laissé 13 fichiers de cache (`node_modules/.vitest-cache/`) : **F1b** ignore tout dossier en point au
-premier niveau de `node_modules` sauf `.bin`. Comptes ESTIMÉS de F1, à mesurer : Infrastructure 109 → 135,
-Web 30 → 97, total 432 → 525 ; Vitest 58 (mesuré chez l'assistant, Node 26.13.1).
-**Prérequis du poste avant F1** : Node.js **26.13.1** (LTS, DEB-D7) dans le `PATH` (`node -v`) ; la première
-compilation lance `npm ci` (accès npm), puis `node_modules` entre dans le commit (DEB-D6).
-**Critère de fin de F1** : `Appliquer-Lot F1` vert et commité (tests .NET, couverture conforme) ; `npm test` vert (sortie
-jointe, OT2 absent) ; `node_modules` commité et `git status` propre ; sur 5080 : `GET api/agents`, création d'une fiche,
-un tour scénarisé.
+**Où on en est** : chantiers P, B, I clos ; **F1 clos** : critère prouvé sur le poste le 21/11/2026 (HEAD `fe31e69`,
+F1b commité). Comptes MESURÉS (`Compter-Tests`) : 525 tests .NET (Domain 207, Application 66, Infrastructure 135, Web
+97, Architecture 20), 0 échec ; `npm test` : 58 tests Vitest dans 4 fichiers, verts ; `git status` vide après
+`npm test` ; parcours sur 5080 joué (`api/sante` avec la version `0.1.0+fe31e69…`, `api/agents`, création d'une fiche
+`Brouillon` 0/10, un tour scénarisé : question sur `application`, proposition en attente sur `intitule`).
+**F1c** : comptes et clôture de F1 reportés dans ce prompt et l'historique, documents seulement.
+**Critère de fin de F1c** : `Appliquer-Lot F1c` vert et commité ; `git status` vide.
 **Point de terminaison de la V1** (DEB-D4) : lot R1, critère du plan §1 ; périmètre gelé jusque-là.
-**Critère de fin de F1b** : cache supprimé, `Appliquer-Lot F1b` vert et commité, `npm test` relancé puis `git status`
-vide. **Prochain pas** : vérifier F1 (comptes de `Compter-Tests`, sortie de `npm test`, parcours sur 5080) ; puis F2.
-**Ouverture de la session suivante** :
+**Prochain pas** (plan ordonné) : DEB-HY1, lot court qui aligne NuGet et les outils dotnet sur DEB-D7, puis F2 (page
+Dialogue). **Ouverture de la session suivante** :
 
     Set-Location C:\Dev\Demonstrateur; . C:\Dev\Harnais\outillage\Charger-Harnais.ps1; Ouvrir-Session -BrancheAttendue main
     # attendu : « SESSION PRÉPARÉE : 8 pièce(s) dans C:\Dev\Sessions\Demonstrateur\<horodatage> » ; joindre toutes les
@@ -68,30 +64,32 @@ page de liste des fiches et de leur statut. Plan, périmètre et critère de fin
 | P — socle | P0a, P0, P0b | clos le 20/11/2026 : P0a (`56388a3`), P0 (`78ff21b`, base `a73cb7e`), P0b |
 | B — métier (Domain, Application) | B1, B1b, B2, B2b | clos le 20/11/2026 : B1 (`3ee722c`), B1b (`17f3a8d`), B2 (`9007adf`), B2b |
 | I — infrastructure | I1 (SQLite), I2 (.docx) | clos le 21/11/2026 : I1 (`f42de12`), I1b ; I2 relivré en I2a (`e28a964`), I2b |
-| F — front | F1 (socle, API), F2 (Dialogue), F3 (Liste) | F1 livré le 21/11/2026, à vérifier ; `TestsFront` attendu d'OT2 |
+| F — front | F1 (socle, API), F2 (Dialogue), F3 (Liste) | F1 clos le 21/11/2026 : F1 (`bfaaf97`), F1b (`fe31e69`), F1c ; F2, F3 à faire ; `TestsFront` attendu d'OT2 |
 | A — IA réelle | A1 | à faire ; fournisseur à trancher (DEB-Q2) |
 | R — recette | R1 | à faire |
 
-| Projet de tests | P0, poste (20/11/2026) | B1, poste (20/11/2026) | B2, poste (20/11/2026) | I1, poste (20/11/2026) | I2a, poste (21/11/2026) |
-| --- | --- | --- | --- | --- | --- |
-| ExpressionBesoin.Domain.Tests | 25 | 189 | 189 | 189 | 207 |
-| ExpressionBesoin.Application.Tests | — | — | 65 | 65 | 66 |
-| ExpressionBesoin.Infrastructure.Tests | — | — | — | 48 | 109 |
-| ExpressionBesoin.Web.Tests | 30 | 30 | 30 | 30 | 30 |
-| ExpressionBesoin.Architecture.Tests | 20 | 20 | 20 | 20 | 20 |
-| **Total** | **75** (Release et Debug, 0 échec) | **239** (Release et Debug, 0 échec) | **304** (Debug, 0 échec) | **352** (Release et Debug, 0 échec) | **432** (Release et Debug, 0 échec) |
-| Couverture | Domain, Web : lignes 64/64, branches 16/16 = 100 % | Domain, Web : lignes 410/410, branches 156/156 = 100 % | Domain, Application, Web : lignes 580/580, branches 202/202 = 100 % | Domain, Application, Infrastructure, Web : lignes 918/918, branches 266/266 = 100 % | Domain, Application, Infrastructure, Web : lignes 1181/1181, branches 356/356 = 100 % |
+| Projet de tests | P0, poste (20/11/2026) | B1, poste (20/11/2026) | B2, poste (20/11/2026) | I1, poste (20/11/2026) | I2a, poste (21/11/2026) | F1, poste (21/11/2026) |
+| --- | --- | --- | --- | --- | --- | --- |
+| ExpressionBesoin.Domain.Tests | 25 | 189 | 189 | 189 | 207 | 207 |
+| ExpressionBesoin.Application.Tests | — | — | 65 | 65 | 66 | 66 |
+| ExpressionBesoin.Infrastructure.Tests | — | — | — | 48 | 109 | 135 |
+| ExpressionBesoin.Web.Tests | 30 | 30 | 30 | 30 | 30 | 97 |
+| ExpressionBesoin.Architecture.Tests | 20 | 20 | 20 | 20 | 20 | 20 |
+| **Total** | **75** (Release et Debug, 0 échec) | **239** (Release et Debug, 0 échec) | **304** (Debug, 0 échec) | **352** (Release et Debug, 0 échec) | **432** (Release et Debug, 0 échec) | **525** (Debug, 0 échec) ; Vitest **58** |
+| Couverture | Domain, Web : lignes 64/64, branches 16/16 = 100 % | Domain, Web : lignes 410/410, branches 156/156 = 100 % | Domain, Application, Web : lignes 580/580, branches 202/202 = 100 % | Domain, Application, Infrastructure, Web : lignes 918/918, branches 266/266 = 100 % | Domain, Application, Infrastructure, Web : lignes 1181/1181, branches 356/356 = 100 % | conforme au cliquet 100 / 100 (`Appliquer-Lot F1` vert ; comptes non transmis) ; front 74/74 lignes, 57/57 branches (chez l'assistant) |
 
 ## §2. Points ouverts
 
-1. Vérifier F1 sur le poste (critère du bloc ÉTAT) ; comptes ESTIMÉS à remplacer par les comptes mesurés.
-2. Fournisseur d'IA (DEB-Q2) : à trancher avant A1 ; l'IA scénarisée suffit jusque-là. Recommandation : Albert API
+1. Fournisseur d'IA (DEB-Q2) : à trancher avant A1 ; l'IA scénarisée suffit jusque-là. Recommandation : Albert API
    (DINUM) si le ministère y a accès, sinon API Mistral. Technologie : DEB-D5.
-3. DEB-HY1 (DEB-D7) : aligner `Directory.Packages.props` et `.config/dotnet-tools.json` sur les dernières versions
-   stables, dont xUnit 4 (révisera la décision « xUnit v3 », §3) ; lot court dédié, après F1 vérifié.
-4. OT2 du harnais central (`TestsFront`) : sans lui, Vitest est lancé à la main pour F1 à F3.
-5. Côté harnais : HAR-A8 relevée le 20/11/2026 (`Publier-Branche` ne peut pas demander d'identifiant ; échec tardif et
+2. DEB-HY1 (DEB-D7) : aligner `Directory.Packages.props` et `.config/dotnet-tools.json` sur les dernières versions
+   stables, dont xUnit 4 (révisera la décision « xUnit v3 », §3) ; lot court dédié, prochain lot.
+3. OT2 du harnais central (`TestsFront`) : sans lui, Vitest est lancé à la main pour F1 à F3.
+4. Côté harnais : HAR-A8 relevée le 20/11/2026 (`Publier-Branche` ne peut pas demander d'identifiant ; échec tardif et
    message trompeur sans `credential.helper`) ; correction recommandée plus tard, par un lot court du harnais.
+5. Côté harnais, leçons à verser aux règles par un lot du harnais : (a) gabarit front F3, ignorer les dossiers en point
+   de `node_modules` (F1b) ; (b) annexe, `Invoke-RestMethod` de Windows PowerShell 5.1 rend un tableau JSON comme UN
+   objet : `@(…).Count` vaut 1 (même piège que `ConvertFrom-Json`) ; compter par `(Invoke-RestMethod …).Count`.
 
 ## §3. Décisions ACTÉES — ne pas rouvrir
 
@@ -190,11 +188,10 @@ synthèse CODIR / COPIL, export PDF, version optimiste des fiches (DEB-Q26) ; to
 
 ## §7. Prochaine session
 
-Acquis : plan v1.9 ; socle P0, Domaine B1, Application B2, Infrastructure I1 et I2 validés sur le poste (432 tests,
-couverture 100 %, .docx ouvert dans Word) ; F1 livré.
-Audit honnête : chez l'assistant, ni SDK .NET ni NuGet (hôtes refusés par la politique réseau) ; le C# de F1 est vérifié
-par analyse syntaxique (tree-sitter, 24 fichiers), relecture des types et réplique Python des attendus (scénario, JSON de
-référence) ; le front est vérifié réellement sous Node 26.13.1 (`tsc -b`, `vite build`, 58 tests Vitest, couverture
-100 %, 8 mutations détectées). Le poste tranche compilation, tests .NET, couverture et le fonctionnement des cibles
-MSBuild. Plan ordonné : vérifier F1, DEB-HY1, F2, F3, A1, R1 (point de terminaison de la V1, DEB-D4). Pièces à
-envoyer : toutes celles d'`Ouvrir-Session` (8), avec leur compte, et la sortie de `npm test`.
+Acquis : plan v1.9 ; socle P0, Domaine B1, Application B2, Infrastructure I1 et I2, socle du front F1 validés sur le poste
+(525 tests .NET, 58 tests Vitest, couverture 100 %, .docx ouvert dans Word, API jouée sur 5080 avec l'IA scénarisée).
+Audit honnête : chez l'assistant, ni SDK .NET ni NuGet (hôtes refusés par la politique réseau) ; le poste tranche
+compilation, tests .NET, couverture et cibles MSBuild. Le compte d'agents du parcours F1 (1 affiché) vient d'un piège de
+Windows PowerShell 5.1, pas de l'API : le référentiel en compte 4 (`ReferentielOrganisationFictif`), recompté par la
+commande de F1c. Plan ordonné : DEB-HY1, F2, F3, A1, R1 (point de terminaison de la V1, DEB-D4). Pièces à envoyer :
+toutes celles d'`Ouvrir-Session` (8), avec leur compte.

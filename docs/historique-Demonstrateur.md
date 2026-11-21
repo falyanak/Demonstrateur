@@ -264,3 +264,21 @@
   `.gitignore` → 5 fichiers de cache visibles (`.vitest-cache`, `.vite-temp`, `.cache`), nouveau → 0 ; `.bin` et les `bin`
   de paquets toujours suivis. Leçon pour le harnais (gabarit F3) : ignorer les dossiers en point de `node_modules`, pas une
   liste de caches.
+
+## 21/11/2026 — F1 vérifié et clos, F1c : comptes et clôture
+
+- Ouverture : pièces contrôlées (8, tailles et SHA-256 conformes à `PIECES.txt` ; archive 141 entrées, commit
+  `fe31e69de65e`, aucun masquage) ; arbre propre, F1b commité.
+- Comptes MESURÉS (`Compter-Tests`, Debug) : Domain 207, Application 66, Infrastructure 135, Web 97, Architecture 20,
+  total 525, 0 échec ; égaux aux estimations de F1 (26 Infrastructure et 67 Web ajoutés).
+- `npm test` sur le poste (Vitest 5.1.1) : 4 fichiers, 58 tests verts (contrats 23, api 11, agentCourant 13, Url 11) ;
+  `git status --short` vide ensuite : F1b tient.
+- Parcours sur 5080 (`dotnet run --launch-profile Localhost`) : `api/sante` « ok », version
+  `0.1.0+fe31e69de65eaadacaaf703e17530ed8800cfff2` ; fiche créée pour `camille.martin` (Bureau 1A, valideur Dominique
+  Bernard), `Brouillon`, 0/10, prochaine `application` ; un tour scénarisé : question sur l'application, proposition en
+  attente sur `intitule` (la demande initiale, DEB-Q41), `horsPerimetre` faux, aucun écart. L'attendu annoncé par
+  l'assistant (« proposition sur la rubrique questionnée ») était inexact pour le premier tour : retiré.
+- `api/agents` affiché « agents : 1 » : défaut de la commande de l'assistant, pas de l'API. Sous Windows PowerShell 5.1,
+  `Invoke-RestMethod` rend un tableau JSON comme UN objet, que `@(…)` emballe (annexe des règles, piège de
+  `ConvertFrom-Json`). Recompté par la commande jointe à F1c. Leçon versée au §2 du prompt pour le harnais.
+- Critère de fin de F1 atteint : objectif atteint, on arrête F1. F1c : documents seulement.
