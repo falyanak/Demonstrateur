@@ -1,4 +1,5 @@
 using ExpressionBesoin.Application.Fiches;
+using ExpressionBesoin.Domain;
 using ExpressionBesoin.Domain.Fiches;
 using static ExpressionBesoin.Application.Tests.Fiches.Essais;
 
@@ -75,19 +76,21 @@ public sealed class DecisionsFichesTests
     [Fact]
     public void Consulter_refuse_une_fiche_absente()
     {
-        Assert.Equal("fiche.introuvable", CodeRefus(DecisionsFiches.Consulter(null, Historique(), IdAbsent)));
+        Assert.Equal("fiche.introuvable", CodeRefus(DecisionsFiches.Consulter(null, Historique(), ListeImmuable<Transition>.Vide, IdAbsent)));
     }
 
     [Fact]
-    public void Consulter_rend_la_fiche_et_son_historique()
+    public void Consulter_rend_la_fiche_son_historique_et_ses_transitions()
     {
         var fiche = Brouillon();
         var historique = Historique(new Echange(AuteurEchange.Agent, "Bonjour", Debut));
+        var transitions = ListeImmuable<Transition>.Vide.Ajouter(new Transition(null, Statut.Brouillon, "Agent Fictif", CreeeLe));
 
-        var consultee = Valeur(DecisionsFiches.Consulter(fiche, historique, Id));
+        var consultee = Valeur(DecisionsFiches.Consulter(fiche, historique, transitions, Id));
 
         Assert.Same(fiche, consultee.Fiche);
         Assert.Same(historique, consultee.Historique);
+        Assert.Same(transitions, consultee.Transitions);
     }
 
     // --- Préparation d'un tour ---

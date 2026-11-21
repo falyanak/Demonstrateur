@@ -35,13 +35,21 @@ public sealed class FicheVueTests
             ]));
     }
 
-    /// <summary>Consultation de référence : la fiche de référence et deux échanges (retour à la ligne compris).</summary>
+    /// <summary>
+    /// Consultation de référence : la fiche de référence, deux échanges (retour à la ligne compris) et son cycle de vie
+    /// (création, soumission, demande de compléments ; DEB-Q77).
+    /// </summary>
     internal static FicheConsultee ConsultationReference() =>
         new(
             Reference(),
             ListeImmuable<Echange>.De([
                 new Echange(AuteurEchange.Agent, "Contrôle des plates-formes e-commerce\net prélèvements à distance", new DateTimeOffset(2026, 11, 20, 9, 5, 0, TimeSpan.Zero)),
                 new Echange(AuteurEchange.IA, "Quelle application est concernée ?", new DateTimeOffset(2026, 11, 20, 9, 5, 1, TimeSpan.Zero)),
+            ]),
+            ListeImmuable<Transition>.De([
+                new Transition(null, Statut.Brouillon, "Camille Martin", Creation),
+                new Transition(Statut.Brouillon, Statut.Soumise, "Camille Martin", new DateTimeOffset(2026, 11, 20, 10, 0, 0, TimeSpan.Zero)),
+                new Transition(Statut.Soumise, Statut.ACompleter, "Dominique Bernard", new DateTimeOffset(2026, 11, 20, 11, 30, 0, TimeSpan.Zero)),
             ]));
 
     /// <summary>Tour de référence : hors périmètre, deux propositions écartées, la fiche de référence.</summary>
@@ -126,10 +134,25 @@ public sealed class FicheVueTests
         var le = new DateTimeOffset(2026, 11, 20, 9, 5, 0, TimeSpan.Zero);
         var consultation = ConsultationVue.De(new FicheConsultee(
             fiche,
-            ListeImmuable<Echange>.De([new Echange(AuteurEchange.Agent, "Bonjour", le), new Echange(AuteurEchange.IA, "Question ?", le)])));
+            ListeImmuable<Echange>.De([new Echange(AuteurEchange.Agent, "Bonjour", le), new Echange(AuteurEchange.IA, "Question ?", le)]),
+            ListeImmuable<Transition>.De([
+                new Transition(null, Statut.Brouillon, "A", le),
+                new Transition(Statut.Soumise, Statut.Refusee, "V", le),
+                new Transition(Statut.ACompleter, Statut.Brouillon, "A", le),
+            ])));
         Assert.Equal(
             new[] { new EchangeVue("Agent", "Bonjour", le), new EchangeVue("IA", "Question ?", le) },
             consultation.Historique.ToArray());
+        Assert.Equal(
+            new[]
+            {
+                new TransitionVue("Creation", null, "Brouillon", "A", le),
+                new TransitionVue("Refus", "Soumise", "Refusee", "V", le),
+                new TransitionVue("Reprise", "ACompleter", "Brouillon", "A", le),
+            },
+            consultation.Cycle.ToArray());
+        var vue = consultation.Cycle[1];
+        Assert.Equal(("Refus", "Soumise", "Refusee", "V", le), (vue.Etape, vue.Avant, vue.Apres, vue.Acteur, vue.Le));
         Assert.Equal("EB-2026-0007", consultation.Fiche.Numero);
 
         var tour = TourVue.De(new TourDialogue(

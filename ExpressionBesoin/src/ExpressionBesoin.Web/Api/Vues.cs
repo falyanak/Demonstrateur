@@ -77,13 +77,32 @@ public sealed record FicheVue(
 
 public sealed record EchangeVue(string Auteur, string Texte, DateTimeOffset Le);
 
-/// <summary><c>GET api/fiches/{id}</c> : fiche et historique du dialogue (DEB-Q21).</summary>
-public sealed record ConsultationVue(FicheVue Fiche, ImmutableArray<EchangeVue> Historique)
+/// <summary>
+/// Étape du cycle de vie (DEB-Q77) : <c>Etape</c> calculée par le Domaine (<see cref="Transitions.EtapeDe"/>), jamais par
+/// le front ; <c>Avant</c> <c>null</c> à la création.
+/// </summary>
+public sealed record TransitionVue(string Etape, string? Avant, string Apres, string Acteur, DateTimeOffset Le)
+{
+    public static TransitionVue De(Transition transition) =>
+        new(
+            Transitions.EtapeDe(transition).ToString(),
+            transition.Avant?.ToString(),
+            transition.Apres.ToString(),
+            transition.Acteur,
+            transition.Le);
+}
+
+/// <summary>
+/// <c>GET api/fiches/{id}</c> : fiche, historique du dialogue (DEB-Q21) et cycle de vie, dans l'ordre (DEB-Q77 ; le champ
+/// <c>cycle</c> vient en dernier : le début du contrat est inchangé).
+/// </summary>
+public sealed record ConsultationVue(FicheVue Fiche, ImmutableArray<EchangeVue> Historique, ImmutableArray<TransitionVue> Cycle)
 {
     public static ConsultationVue De(FicheConsultee consultee) =>
         new(
             FicheVue.De(consultee.Fiche),
-            [.. consultee.Historique.Select(echange => new EchangeVue(echange.Auteur.ToString(), echange.Texte, echange.Le))]);
+            [.. consultee.Historique.Select(echange => new EchangeVue(echange.Auteur.ToString(), echange.Texte, echange.Le))],
+            [.. consultee.Transitions.Select(transition => TransitionVue.De(transition))]);
 }
 
 public sealed record EcartVue(int Position, string Code, string Motif);

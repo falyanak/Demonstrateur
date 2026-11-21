@@ -6,7 +6,8 @@ namespace ExpressionBesoin.Web.Tests.Api;
 
 /// <summary>
 /// Parcours du critère de fin (plan §1) par l'API, sur une base neuve (usine propre à cette classe, numéros prévisibles) :
-/// saisie, soumission, retour pour complément, reprise, nouvelle soumission (numéro gardé), validation, .docx, liste.
+/// saisie, soumission, retour pour complément, reprise, nouvelle soumission (numéro gardé), validation, .docx, liste,
+/// cycle de vie (DEB-Q77 : critère de fin du lot L1).
 /// </summary>
 public sealed class ParcoursFicheTests(UsineWeb usine) : IClassFixture<UsineWeb>
 {
@@ -58,6 +59,20 @@ public sealed class ParcoursFicheTests(UsineWeb usine) : IClassFixture<UsineWeb>
         Assert.Equal(HttpStatusCode.OK, liste);
         var resume = Assert.Single(resumes.EnumerateArray());
         Assert.Equal(("EB-2026-0001", "Validee", "Valeur de intitule", "Camille Martin"), (resume.GetProperty("numero").GetString(), resume.GetProperty("statut").GetString(), resume.GetProperty("intitule").GetString(), resume.GetProperty("demandeur").GetString()));
+
+        var (consultee, consultation) = await Appeler(client, HttpMethod.Get, url);
+        Assert.Equal(HttpStatusCode.OK, consultee);
+        var cycle = consultation.GetProperty("cycle").EnumerateArray().ToArray();
+        Assert.Equal(
+            new[] { "Creation", "Soumission", "DemandeComplements", "Reprise", "Soumission", "Validation" },
+            cycle.Select(transition => transition.GetProperty("etape").GetString()).ToArray());
+        Assert.Equal(
+            new[] { "Camille Martin", "Camille Martin", "Dominique Bernard", "Camille Martin", "Camille Martin", "Dominique Bernard" },
+            cycle.Select(transition => transition.GetProperty("acteur").GetString()).ToArray());
+        Assert.Equal(
+            new[] { null, "Brouillon", "Soumise", "ACompleter", "Brouillon", "Soumise" },
+            cycle.Select(transition => transition.GetProperty("avant").GetString()).ToArray());
+        Assert.All(cycle, transition => Assert.Equal(UsineWeb.Maintenant, transition.GetProperty("le").GetDateTimeOffset()));
     }
 }
 
@@ -72,6 +87,7 @@ public sealed class PanneApiTests(UsinePanne usine) : IClassFixture<UsinePanne>
         Refus(HttpStatusCode.ServiceUnavailable, "panne.technique", await Appeler(client, HttpMethod.Post, $"/api/fiches/{id}/messages", new { message = Demande }));
         var (_, consultation) = await Appeler(client, HttpMethod.Get, $"/api/fiches/{id}");
         Assert.Equal(0, consultation.GetProperty("historique").GetArrayLength());
+        Assert.Equal("Creation", Assert.Single(consultation.GetProperty("cycle").EnumerateArray()).GetProperty("etape").GetString());
         Assert.Equal(System.Text.Json.JsonValueKind.Null, EssaisApi.Rubrique(consultation.GetProperty("fiche"), "intitule").GetProperty("proposition").ValueKind);
     }
 }

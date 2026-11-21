@@ -450,3 +450,29 @@
   critère d'A1, aucune correction).
 - F3b : documents seuls (plan v1.16, prompt de reprise, historique). Vérifié chez l'assistant : octets (CRLF sans BOM
   comme les originaux), taille du prompt < 30 720 octets. Rien à compiler.
+
+## 21/11/2026 — Chantier L ouvert ; L1 livré (cycle de vie, serveur)
+
+- Ouverture (20261121-173256) : 8 pièces conformes à `PIECES.txt` (tailles et SHA-256), archive de 158 entrées au
+  commit `9397dbe`, conforme à `MASQUAGE.txt` ; 2 commits à publier et 2 non sauvegardés signalés ; `Compter-Tests` :
+  539, 0 échec.
+- Demande du développeur : suivre les états d'une demande. Proposition d'un journal Serilog (DEB-Q65 à DEB-Q72,
+  « recommandations ok »), puis alternative du développeur : une table des changements d'états. Recommandation retenue
+  (« accord ») : table métier `Transitions` (DEB-Q73 à DEB-Q78), Serilog en évolution V2 ; DEB-Q67 à DEB-Q72 sans objet.
+  Chantier L ouvert avant A1 (DEB-Q65), en deux lots : L1 serveur, L2 front.
+- L1 : `Transitions` du Domaine (`Entre`, `EtapeDe`, record `Transition`, énumération `Etape`) ; port `IDepotFiches` :
+  `LireTransitions`, `Enregistrer(fiche, échanges, transition?, …)` ; `FicheConsultee.Transitions` ; `ServiceFiches` :
+  une lecture d'horloge par cas d'usage qui date fiche et transition ; `SchemaFiches` : schéma 2 (`TablesSchema1`
+  inchangé, `TableTransitions`, `Creation`, `Migration1Vers2`, `Planifier` pur remplace `DoitCreer`) ;
+  `DepotFichesSqlite` : migration, lecture et ajout dans la transaction de la fiche ; `ConsultationVue.Cycle`
+  (`TransitionVue`), référence `consultation-reference.json` étendue en fin de document.
+- Défaut trouvé AVANT livraison par la réplique sqlite3 : la contrainte écrite `Avant = 0 AND …` admettait une création
+  suivie de n'importe quel statut (avec `Avant` NULL, la comparaison vaut NULL et un CHECK à NULL est satisfait : 10
+  paires admises au lieu de 6) ; corrigée par `IS` ; le test `La_contrainte_du_schema_admet_exactement_les_paires_du_Domaine`
+  compare la contrainte au Domaine sur les 30 paires.
+- Vérifié chez l'assistant : SQL extrait du source et rejoué (création, migration 1 → 2 avec structure identique à une
+  base neuve, 6 paires sur 30, rangs, plans de requête par clé primaire sans tri, cascade) ; tables du schéma 1
+  identiques au texte d'I1 ; octets des BLOB et ticks recalculés en Python ; Vitest 200/200 et `tsc -b` sur une
+  réplique (`npm ci`, Node 22 au lieu de 26) avec la référence étendue ; syntaxe C# par tree-sitter (0 erreur sur les
+  fichiers du lot, contrôle éprouvé sur un cas fautif) ; équilibre des accolades ; CRLF sans BOM comme les originaux.
+  Non vérifié : compilation C#, tests .NET (comptes ESTIMÉS : 568), couverture, mutations C# (aucun SDK).

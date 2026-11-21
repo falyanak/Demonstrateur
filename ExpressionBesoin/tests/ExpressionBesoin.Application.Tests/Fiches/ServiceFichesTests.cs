@@ -1,5 +1,6 @@
 using System.Text;
 using ExpressionBesoin.Application.Fiches;
+using ExpressionBesoin.Domain;
 using ExpressionBesoin.Domain.Fiches;
 using static ExpressionBesoin.Application.Tests.Fiches.Essais;
 
@@ -37,6 +38,8 @@ public sealed class ServiceFichesTests
     }
 
     private static Banc Monter(params string[] reponses) => Monter(false, reponses);
+
+    private static Transition Passage(Statut? avant, Statut apres, string acteur, DateTimeOffset le) => new(avant, apres, acteur, le);
 
     // --- Agents, liste ---
 
@@ -77,6 +80,7 @@ public sealed class ServiceFichesTests
         Assert.Equal(1, banc.Depot.Enregistrements);
         Assert.Equal(fiche, banc.Depot.FicheDe(Id));
         Assert.Empty(banc.Depot.HistoriqueDe(Id));
+        Assert.Equal(new[] { Passage(null, Statut.Brouillon, "Agent Fictif", Maintenant) }, banc.Depot.TransitionsDe(Id).ToArray());
     }
 
     [Fact]
@@ -89,19 +93,22 @@ public sealed class ServiceFichesTests
         Assert.Equal("agent.inconnu", CodeRefus(resultat));
         Assert.Equal(0, banc.Depot.Enregistrements);
         Assert.Null(banc.Depot.FicheDe(Id));
+        Assert.Empty(banc.Depot.TransitionsDe(Id));
     }
 
     [Fact]
-    public async Task Consulter_rend_la_fiche_et_son_historique()
+    public async Task Consulter_rend_la_fiche_son_historique_et_ses_transitions()
     {
         var banc = Monter();
         var echange = new Echange(AuteurEchange.Agent, "Bonjour", Maintenant);
-        banc.Depot.Placer(Brouillon(), Historique(echange));
+        var creation = Passage(null, Statut.Brouillon, "Agent Fictif", CreeeLe);
+        banc.Depot.Placer(Brouillon(), Historique(echange), ListeImmuable<Transition>.Vide.Ajouter(creation));
 
         var consultee = Valeur(await banc.Service.Consulter(Id, Annulation));
 
         Assert.Equal(Brouillon(), consultee.Fiche);
         Assert.Equal(new[] { echange }, consultee.Historique.ToArray());
+        Assert.Equal(new[] { creation }, consultee.Transitions.ToArray());
     }
 
     [Fact]
@@ -136,6 +143,7 @@ public sealed class ServiceFichesTests
         var contexte = Assert.Single(banc.Assistant.Recus);
         Assert.Equal("Bonjour", contexte.Message);
         Assert.Equal("application", contexte.ProchaineRubrique);
+        Assert.Empty(banc.Depot.TransitionsDe(Id));
     }
 
     [Fact]
@@ -208,6 +216,7 @@ public sealed class ServiceFichesTests
         Assert.Equal(new Champ("Titre", Origine.Manuelle, null), fiche.ChampDe(Rubrique.Intitule));
         Assert.Equal(fiche, banc.Depot.FicheDe(Id));
         Assert.Equal(1, banc.Depot.Enregistrements);
+        Assert.Empty(banc.Depot.TransitionsDe(Id));
     }
 
     [Fact]
@@ -273,6 +282,9 @@ public sealed class ServiceFichesTests
         Assert.Equal("EB-2027-0001", fiche.Numero);
         Assert.Equal(VeilleDuNouvelAn, fiche.ConfirmeeLe);
         Assert.Equal(fiche, banc.Depot.FicheDe(Id));
+        Assert.Equal(
+            new[] { Passage(Statut.Brouillon, Statut.Soumise, "Agent Fictif", VeilleDuNouvelAn) },
+            banc.Depot.TransitionsDe(Id).ToArray());
     }
 
     [Fact]
@@ -283,6 +295,7 @@ public sealed class ServiceFichesTests
 
         Assert.Equal("soumission.incomplete", CodeRefus(await banc.Service.Soumettre(Id, true, Annulation)));
         Assert.Equal(0, banc.Depot.Enregistrements);
+        Assert.Empty(banc.Depot.TransitionsDe(Id));
     }
 
     [Fact]
@@ -299,6 +312,9 @@ public sealed class ServiceFichesTests
             new[] { new Decision(TypeDecision.Refuser, "Chef Fictif", VeilleDuNouvelAn, "hors budget") },
             fiche.Decisions.ToArray());
         Assert.Equal(fiche, banc.Depot.FicheDe(Id));
+        Assert.Equal(
+            new[] { Passage(Statut.Soumise, Statut.Refusee, "Chef Fictif", VeilleDuNouvelAn) },
+            banc.Depot.TransitionsDe(Id).ToArray());
     }
 
     [Fact]
@@ -315,6 +331,9 @@ public sealed class ServiceFichesTests
         Assert.Equal(1, banc.Depot.Enregistrements);
         Assert.Equal("cycle.transitionInterdite", CodeRefus(await banc.Service.Reprendre(Id, Annulation)));
         Assert.Equal(1, banc.Depot.Enregistrements);
+        Assert.Equal(
+            new[] { Passage(Statut.ACompleter, Statut.Brouillon, "Agent Fictif", Maintenant) },
+            banc.Depot.TransitionsDe(Id).ToArray());
     }
 
     // --- Document ---
@@ -399,5 +418,20 @@ public sealed class ServiceFichesTests
             new[] { TypeDecision.DemanderComplements, TypeDecision.Valider },
             consultee.Fiche.Decisions.Select(decision => decision.Type).ToArray());
         Assert.Equal(19, banc.Depot.Enregistrements);
+        // Cycle de vie (DEB-Q74) : six transitions, seules les étapes du cycle ; horloge du banc fixe.
+        Assert.Equal(
+            new[]
+            {
+                Passage(null, Statut.Brouillon, "Agent Fictif", Maintenant),
+                Passage(Statut.Brouillon, Statut.Soumise, "Agent Fictif", Maintenant),
+                Passage(Statut.Soumise, Statut.ACompleter, "Chef Fictif", Maintenant),
+                Passage(Statut.ACompleter, Statut.Brouillon, "Agent Fictif", Maintenant),
+                Passage(Statut.Brouillon, Statut.Soumise, "Agent Fictif", Maintenant),
+                Passage(Statut.Soumise, Statut.Validee, "Chef Fictif", Maintenant),
+            },
+            consultee.Transitions.ToArray());
+        Assert.Equal(
+            new[] { Etape.Creation, Etape.Soumission, Etape.DemandeComplements, Etape.Reprise, Etape.Soumission, Etape.Validation },
+            consultee.Transitions.Select(transition => Transitions.EtapeDe(transition)).ToArray());
     }
 }

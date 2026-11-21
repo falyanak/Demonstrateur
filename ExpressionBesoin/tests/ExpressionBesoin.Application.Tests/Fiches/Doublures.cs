@@ -13,6 +13,7 @@ internal sealed class DepotEnMemoire(bool differe = false) : IDepotFiches
 {
     private readonly Dictionary<Guid, FicheBesoin> _fiches = [];
     private readonly Dictionary<Guid, ListeImmuable<Echange>> _historiques = [];
+    private readonly Dictionary<Guid, ListeImmuable<Transition>> _transitions = [];
 
     /// <summary>Nombre d'appels à <see cref="Enregistrer"/>.</summary>
     public int Enregistrements { get; private set; }
@@ -21,16 +22,22 @@ internal sealed class DepotEnMemoire(bool differe = false) : IDepotFiches
     public string? DernierImpose { get; set; }
 
     /// <summary>Mise en place d'un essai, hors compte des enregistrements.</summary>
-    public DepotEnMemoire Placer(FicheBesoin fiche, ListeImmuable<Echange>? historique = null)
+    public DepotEnMemoire Placer(
+        FicheBesoin fiche,
+        ListeImmuable<Echange>? historique = null,
+        ListeImmuable<Transition>? transitions = null)
     {
         _fiches[fiche.Id] = fiche;
         _historiques[fiche.Id] = historique ?? ListeImmuable<Echange>.Vide;
+        _transitions[fiche.Id] = transitions ?? ListeImmuable<Transition>.Vide;
         return this;
     }
 
     public FicheBesoin? FicheDe(Guid id) => _fiches.GetValueOrDefault(id);
 
     public ListeImmuable<Echange> HistoriqueDe(Guid id) => _historiques.GetValueOrDefault(id) ?? ListeImmuable<Echange>.Vide;
+
+    public ListeImmuable<Transition> TransitionsDe(Guid id) => _transitions.GetValueOrDefault(id) ?? ListeImmuable<Transition>.Vide;
 
     public async ValueTask<FicheBesoin?> Lire(Guid id, CancellationToken annulation)
     {
@@ -44,7 +51,17 @@ internal sealed class DepotEnMemoire(bool differe = false) : IDepotFiches
         return HistoriqueDe(id);
     }
 
-    public async ValueTask Enregistrer(FicheBesoin fiche, ListeImmuable<Echange> echangesAjoutes, CancellationToken annulation)
+    public async ValueTask<ListeImmuable<Transition>> LireTransitions(Guid id, CancellationToken annulation)
+    {
+        await Attendre();
+        return TransitionsDe(id);
+    }
+
+    public async ValueTask Enregistrer(
+        FicheBesoin fiche,
+        ListeImmuable<Echange> echangesAjoutes,
+        Transition? transition,
+        CancellationToken annulation)
     {
         await Attendre();
         Enregistrements++;
@@ -56,6 +73,7 @@ internal sealed class DepotEnMemoire(bool differe = false) : IDepotFiches
 
         _fiches[fiche.Id] = fiche;
         _historiques[fiche.Id] = historique;
+        _transitions[fiche.Id] = transition is null ? TransitionsDe(fiche.Id) : TransitionsDe(fiche.Id).Ajouter(transition);
     }
 
     public async ValueTask<ImmutableArray<ResumeFiche>> Lister(CancellationToken annulation)

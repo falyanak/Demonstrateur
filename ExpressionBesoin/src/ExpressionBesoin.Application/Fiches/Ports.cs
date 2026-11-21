@@ -15,11 +15,19 @@ public interface IDepotFiches
     /// <summary>Échanges du dialogue de la fiche, dans l'ordre ; liste vide si aucun (ou fiche inconnue).</summary>
     ValueTask<ListeImmuable<Echange>> LireHistorique(Guid id, CancellationToken annulation);
 
+    /// <summary>Transitions du cycle de vie de la fiche, dans l'ordre ; liste vide si aucune (ou fiche inconnue) (DEB-Q74).</summary>
+    ValueTask<ListeImmuable<Transition>> LireTransitions(Guid id, CancellationToken annulation);
+
     /// <summary>
-    /// Écrit la fiche (création ou remplacement) ET ajoute <paramref name="echangesAjoutes"/> à son historique, en une
-    /// seule transaction (DEB-Q22 : un tour est atomique). Le numéro est unique (index unique, DEB-Q26).
+    /// Écrit la fiche (création ou remplacement), ajoute <paramref name="echangesAjoutes"/> à son historique et, s'il y en
+    /// a une, <paramref name="transition"/> à son cycle de vie, en une seule transaction (DEB-Q22 : un tour est atomique ;
+    /// DEB-Q75 : un changement de statut et sa trace aussi). Le numéro est unique (index unique, DEB-Q26).
     /// </summary>
-    ValueTask Enregistrer(FicheBesoin fiche, ListeImmuable<Echange> echangesAjoutes, CancellationToken annulation);
+    ValueTask Enregistrer(
+        FicheBesoin fiche,
+        ListeImmuable<Echange> echangesAjoutes,
+        Transition? transition,
+        CancellationToken annulation);
 
     /// <summary>Résumés de toutes les fiches (<see cref="ResumeFiche.De"/>), de la plus récente à la plus ancienne.</summary>
     ValueTask<ImmutableArray<ResumeFiche>> Lister(CancellationToken annulation);

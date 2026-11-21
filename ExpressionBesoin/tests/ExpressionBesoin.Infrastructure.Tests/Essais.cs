@@ -118,9 +118,26 @@ internal static class Essais
 internal sealed class BaseTemporaire : IDisposable
 {
     public BaseTemporaire()
+        : this(schema1: false)
+    {
+    }
+
+    /// <summary>
+    /// <paramref name="schema1"/> : base au schéma 1 du lot I1 (mode WAL, tables d'origine, version 1), écrite SANS
+    /// <see cref="DepotFichesSqlite.Initialiser"/> : point de départ d'une migration (DEB-Q76).
+    /// </summary>
+    public BaseTemporaire(bool schema1)
     {
         Depot = new DepotFichesSqlite(Options);
-        Depot.Initialiser();
+        if (schema1)
+        {
+            Executer(SchemaFiches.ModeWal);
+            Executer(SchemaFiches.TablesSchema1 + "PRAGMA user_version = 1;");
+        }
+        else
+        {
+            Depot.Initialiser();
+        }
     }
 
     public string Chemin { get; } = Path.Combine(Path.GetTempPath(), $"deb-i1-{Guid.NewGuid():N}.db");
@@ -143,6 +160,15 @@ internal sealed class BaseTemporaire : IDisposable
         using var commande = connexion.CreateCommand();
         commande.CommandText = sql;
         return commande.ExecuteScalar();
+    }
+
+    /// <summary>Toutes les instructions de <paramref name="sql"/>, hors adaptateur.</summary>
+    public void Executer(string sql)
+    {
+        using var connexion = Brute();
+        using var commande = connexion.CreateCommand();
+        commande.CommandText = sql;
+        commande.ExecuteNonQuery();
     }
 
     public void Dispose()

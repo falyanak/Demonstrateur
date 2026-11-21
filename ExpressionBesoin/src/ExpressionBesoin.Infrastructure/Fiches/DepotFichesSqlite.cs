@@ -20,7 +20,8 @@ public sealed class DepotFichesSqlite(OptionsSqlite options) : IDepotFiches
     private readonly ConnexionsSqlite _connexions = new(options);
 
     /// <summary>
-    /// Crée le schéma d'une base neuve (mode WAL, tables, index, version) ; sans effet sur une base au schéma courant ;
+    /// Met la base au schéma courant (<see cref="SchemaFiches.Planifier"/>) : base neuve créée (mode WAL, tables, index,
+    /// version), base au schéma 1 migrée (DEB-Q76), en une transaction ; sans effet sur une base au schéma courant ;
     /// lève pour une base d'une autre version. Appelé une fois, à la composition (lot F1).
     /// </summary>
     public void Initialiser()
@@ -30,15 +31,19 @@ public sealed class DepotFichesSqlite(OptionsSqlite options) : IDepotFiches
         {
             var commande = connexion.CreateCommand();
             commande.CommandText = SchemaFiches.LectureVersion;
-            if (SchemaFiches.DoitCreer((long)commande.ExecuteScalar()!))
+            if (SchemaFiches.Planifier((long)commande.ExecuteScalar()!) is { } plan)
             {
-                commande.CommandText = SchemaFiches.ModeWal;
-                commande.ExecuteNonQuery();
+                if (plan.PoserWal)
+                {
+                    commande.CommandText = SchemaFiches.ModeWal;
+                    commande.ExecuteNonQuery();
+                }
+
                 var transaction = connexion.BeginTransaction(deferred: false);
                 try
                 {
                     commande.Transaction = transaction;
-                    commande.CommandText = SchemaFiches.Creation;
+                    commande.CommandText = plan.Script;
                     commande.ExecuteNonQuery();
                     transaction.Commit();
                 }
@@ -102,7 +107,46 @@ public sealed class DepotFichesSqlite(OptionsSqlite options) : IDepotFiches
         }
     }
 
-    public ValueTask Enregistrer(FicheBesoin fiche, ListeImmuable<Echange> echangesAjoutes, CancellationToken annulation)
+    public ValueTask<ListeImmuable<Transition>> LireTransitions(Guid id, CancellationToken annulation)
+    {
+        annulation.ThrowIfCancellationRequested();
+        var connexion = _connexions.Ouvrir();
+        try
+        {
+            var commande = connexion.CreateCommand();
+            commande.CommandText = SchemaFiches.LectureTransitions;
+            commande.Parameters.Add("$id", SqliteType.Blob).Value = id;
+            var transitions = new List<Transition>();
+            var lecteur = commande.ExecuteReader();
+            try
+            {
+                while (lecteur.Read())
+                {
+                    transitions.Add(new Transition(
+                        lecteur.IsDBNull(0) ? null : (Statut)lecteur.GetInt32(0),
+                        (Statut)lecteur.GetInt32(1),
+                        lecteur.GetString(2),
+                        Instant(lecteur.GetInt64(3))));
+                }
+            }
+            finally
+            {
+                lecteur.Dispose();
+            }
+
+            return new(ListeImmuable<Transition>.De(transitions));
+        }
+        finally
+        {
+            connexion.Dispose();
+        }
+    }
+
+    public ValueTask Enregistrer(
+        FicheBesoin fiche,
+        ListeImmuable<Echange> echangesAjoutes,
+        Transition? transition,
+        CancellationToken annulation)
     {
         annulation.ThrowIfCancellationRequested();
         var contenu = CodecFiche.Encoder(fiche);
@@ -115,6 +159,11 @@ public sealed class DepotFichesSqlite(OptionsSqlite options) : IDepotFiches
             {
                 EcrireFiche(connexion, transaction, resume, contenu);
                 AjouterEchanges(connexion, transaction, fiche.Id, echangesAjoutes);
+                if (transition is not null)
+                {
+                    AjouterTransition(connexion, transaction, fiche.Id, transition);
+                }
+
                 transaction.Commit();
             }
             finally
@@ -217,6 +266,20 @@ public sealed class DepotFichesSqlite(OptionsSqlite options) : IDepotFiches
             le.Value = echange.Le.UtcTicks;
             commande.ExecuteNonQuery();
         }
+    }
+
+    /// <summary>Dans la transaction de la fiche : un statut hors du cycle est refusé par la contrainte du schéma (panne).</summary>
+    private static void AjouterTransition(SqliteConnection connexion, SqliteTransaction transaction, Guid id, Transition transition)
+    {
+        var commande = connexion.CreateCommand();
+        commande.Transaction = transaction;
+        commande.CommandText = SchemaFiches.AjoutTransition;
+        commande.Parameters.Add("$id", SqliteType.Blob).Value = id;
+        commande.Parameters.Add("$avant", SqliteType.Integer).Value = transition.Avant is { } avant ? (int)avant : DBNull.Value;
+        commande.Parameters.Add("$apres", SqliteType.Integer).Value = (int)transition.Apres;
+        commande.Parameters.Add("$acteur", SqliteType.Text).Value = transition.Acteur;
+        commande.Parameters.Add("$le", SqliteType.Integer).Value = transition.Le.UtcTicks;
+        commande.ExecuteNonQuery();
     }
 
     private static DateTimeOffset Instant(long ticksUtc) => new(ticksUtc, TimeSpan.Zero);

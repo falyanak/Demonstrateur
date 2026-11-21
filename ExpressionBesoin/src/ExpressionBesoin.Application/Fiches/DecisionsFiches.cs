@@ -33,8 +33,12 @@ internal static class DecisionsFiches
             ? new Refus("agent.inconnu", $"Agent inconnu du référentiel : « {identifiantAgent} ».")
             : Resultat.Succes(Fiche.Creer(id, new EnTete(agent.Nom, agent.Bureau, agent.Valideur, maintenant)));
 
-    public static Resultat<FicheConsultee> Consulter(FicheBesoin? fiche, ListeImmuable<Echange> historique, Guid id) =>
-        Existante(fiche, id).Map(trouvee => new FicheConsultee(trouvee, historique));
+    public static Resultat<FicheConsultee> Consulter(
+        FicheBesoin? fiche,
+        ListeImmuable<Echange> historique,
+        ListeImmuable<Transition> transitions,
+        Guid id) =>
+        Existante(fiche, id).Map(trouvee => new FicheConsultee(trouvee, historique, transitions));
 
     /// <summary>
     /// Avant l'appel de l'IA : message non vide (espaces retirés), fiche existante et modifiable (contrôle du Domaine,

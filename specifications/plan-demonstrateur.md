@@ -1,12 +1,14 @@
 # Plan du démonstrateur « Expression de besoin » (version simplifiée)
 
-> Version 1.16 du 21/11/2026 (lot F3b ; 1.15 au lot F3, 1.14 au lot F2c, 1.13 au lot HY2, 1.12 au lot F2, 1.11 au lot HY1b, 1.10 au lot HY1, 1.9 au lot F1, 1.8 au lot I2b, 1.7 au lot I2, 1.6 au lot I1, 1.5 au lot B2, 1.4 au lot B1b, 1.3 au lot B1, 1.2 au lot P0c, 1.1 au
+> Version 1.17 du 21/11/2026 (lot L1 ; 1.16 au lot F3b, 1.15 au lot F3, 1.14 au lot F2c, 1.13 au lot HY2, 1.12 au lot F2, 1.11 au lot HY1b, 1.10 au lot HY1, 1.9 au lot F1, 1.8 au lot I2b, 1.7 au lot I2, 1.6 au lot I1, 1.5 au lot B2, 1.4 au lot B1b, 1.3 au lot B1, 1.2 au lot P0c, 1.1 au
 > lot P0, 1.0 au lot P0a). Arbitrages DEB-Q1 à DEB-Q8, DEB-Q11 à DEB-Q32 : « recommandations ok » (20/11/2026) ; DEB-Q9 :
 > « ok » (20/11/2026) ; DEB-Q33 à DEB-Q37 : « recommandations ok » (21/11/2026) ;
 > DEB-Q38 à DEB-Q44 : « recommandations ok » (21/11/2026) ; DEB-Q45, DEB-Q46 : « recommandations ok »
 > (21/11/2026) ; DEB-Q47 : tranchée par le développeur (21/11/2026) ; DEB-Q48 à DEB-Q53 : « recommandations ok » (21/11/2026) ;
 > DEB-Q54 à DEB-Q57 : « recommandations ok », DEB-Q55 précisée par le développeur (21/11/2026) ; DEB-Q58 : « maintenant,
-> avant F3 » (21/11/2026) ; DEB-Q59 à DEB-Q63 : « recommandations ok » (21/11/2026) ; DEB-Q2, DEB-Q64 : « recommandations ok » (21/11/2026). Décisions : §8. Document d'origine **hors
+> avant F3 » (21/11/2026) ; DEB-Q59 à DEB-Q63 : « recommandations ok » (21/11/2026) ; DEB-Q2, DEB-Q64 : « recommandations ok » (21/11/2026) ;
+> DEB-Q65, DEB-Q66 : « recommandations ok », DEB-Q67 à DEB-Q72 rendues sans objet par DEB-Q73 ; DEB-Q73 à DEB-Q78 :
+> « accord » du développeur (21/11/2026). Décisions : §8. Document d'origine **hors
 > dépôt** (DEB-D2) : cahier des charges « Document de cadrage » (novembre 2026), tenu par le développeur ; le modèle de
 > fiche (FEB) est versionné, nettoyé de ses métadonnées (DEB-Q9, DEB-Q33).
 
@@ -67,13 +69,15 @@ tolérance sont fixées par DEB-Q19. Codes de rubrique (camelCase, `situationAct
 | 6. Compléments | Documents ou références, points restant à clarifier | Agent ; IA |
 | Confirmation | Case « je confirme… », date de confirmation | Agent (DEB-Q5) |
 | Circuit | Décision du chef de service, auteur, date, commentaire | Simulation (DEB-Q3) |
+| Cycle de vie | Une ligne par changement de statut : étape, statuts avant et après, acteur, date (DEB-Q74) | Système, à chaque écriture (DEB-Q75) |
 
 Soit 17 rubriques, dont 10 obligatoires. Chaque champ porte `Valeur`, `Origine` (`Vide`, `AccepteeIA`, `Manuelle` ;
 `ProposeeIA` retirée par DEB-Q13) et au plus une `PropositionEnAttente` ; « Proposée » = vide avec une proposition en
 attente. Une fiche est **complète** quand toutes les rubriques obligatoires ont une valeur acceptée ou manuelle.
 
 **Statuts** : `Brouillon → Soumise → Validee | ACompleter | Refusee` ; `ACompleter → Brouillon` (l'agent reprend la
-fiche). Refus et demande de compléments exigent un commentaire. Seule une fiche `Brouillon` est modifiable (DEB-Q16) ; la
+fiche). Chaque changement de statut laisse une transition (étapes Création, Soumission, Validation, Demande de
+compléments, Refus, Reprise), écrite dans la même transaction que la fiche (DEB-Q73 à DEB-Q76). Refus et demande de compléments exigent un commentaire. Seule une fiche `Brouillon` est modifiable (DEB-Q16) ; la
 reprise d'une fiche `ACompleter` demande une nouvelle confirmation.
 
 ## 4. Architecture (modèle générique du harnais central)
@@ -85,13 +89,14 @@ ExpressionBesoin/src/
                                    Completude.Manquantes, Dialogue.ProchaineRubrique, Cycle.Soumettre, Cycle.Decider,
                                    Cycle.Reprendre (une fonction par transition, horloge en paramètre),
                                    Numerotation.Suivant(annee, dernier), ReponseIA.Lire ; ContenuDocument.Construire
-                                   (I2 : textes du .docx, dates dans le fuseau, dernière décision)
+                                   (I2 : textes du .docx, dates dans le fuseau, dernière décision) ; Transitions.Entre,
+                                   Transitions.EtapeDe (L1 : cycle de vie)
   ExpressionBesoin.Application     cas d'usage lire -> décider -> écrire (B2) : ServiceFiches (coquille, une méthode par
                                    route du §5), DecisionsFiches (pures) ; ports IDepotFiches (fiche + historique du
                                    dialogue, écrits ensemble), IAssistantIA (contexte du tour -> texte brut, relu par
                                    ReponseIA.Lire), IGenerateurDocument, IReferentielOrganisation ; TimeProvider, fuseau
                                    et générateur d'identifiants injectés
-  ExpressionBesoin.Infrastructure  SQLite (fiche en JSON + colonnes de liste) ; .docx sur le gabarit FEB embarqué
+  ExpressionBesoin.Infrastructure  SQLite (fiche en JSON + colonnes de liste ; table Transitions, schéma 2, L1) ; .docx sur le gabarit FEB embarqué
                                    (zip + XML, sans SDK OpenXML, DEB-Q34 ; placement par libellé, DEB-Q35) ;
                                    AssistantIA réel ; AssistantIA scénarisé (démonstration et tests hors réseau)
   ExpressionBesoin.Web             API minimale, deux vues Razor ; ClientApp Vite + TypeScript (features/dialogue,
@@ -113,7 +118,7 @@ Performance :
 | --- | --- | --- |
 | `POST` / `GET` | `api/fiches` | créer un brouillon ; lister (résumés) |
 | `GET` | `api/agents` | agents fictifs du sélecteur de l'en-tête (DEB-Q6) |
-| `GET` | `api/fiches/{id}` | fiche complète et historique du dialogue (DEB-Q21) |
+| `GET` | `api/fiches/{id}` | fiche complète, historique du dialogue (DEB-Q21) et cycle de vie `cycle` (DEB-Q77, L1) |
 | `POST` | `api/fiches/{id}/messages` | un tour de dialogue → `{ message, horsPerimetre, fiche }` (DEB-Q22, DEB-Q23) |
 | `PUT` | `api/fiches/{id}/champs/{rubrique}` | saisie manuelle |
 | `POST` | `api/fiches/{id}/propositions/{rubrique}/accepter`, `…/rejeter` | décision sur une proposition |
@@ -164,6 +169,8 @@ AG Grid inutile). Réponse de l'IA affichée entière, avec indicateur d'attente
 | HY2 | Hygiène DEB-HY2 : dossier de données fixé par environnement (DEB-Q54 à DEB-Q57) | `Appliquer-Lot HY2` vert et commité ; site lancé au profil `Localhost` : `C:\Dev\Demonstrateur-data\fiches.db` créé, `GET api/sante` « ok » |
 | HY3 | Correction de DEB-A2 (DEB-Q58) : `global.json` à la racine du dépôt, garde du SDK dans `Directory.Build.props`, tests d'architecture ; précédé de F2c (racine de lot) | `Appliquer-Lot HY3` vert et commité ; `dotnet --version` rend 10.0.403 à la racine ; garde éprouvée sur une version forcée ; `Compter-Tests` à l'ouverture suivante |
 | F3 | Page Liste à l'accueil (DEB-Q59 à DEB-Q63) | `Appliquer-Lot F3` vert ; `npm test` vert ; dans le navigateur, statut de la liste conforme après chaque transition : création (Brouillon), soumission (Soumise, numéro), compléments (À compléter), reprise (Brouillon), validation (Validée, « Télécharger »), refus (Refusée) |
+| L1 | Cycle de vie, serveur (DEB-Q73 à DEB-Q78) : `Transitions` du Domaine, table SQLite et migration du schéma 1 au schéma 2, dépôt, service, champ `cycle` de `GET api/fiches/{id}` | `Appliquer-Lot L1` vert (tests, couverture 100 / 100) et commité ; base du poste migrée au schéma 2 au premier lancement (`Localhost`) ; parcours création → soumission → compléments → reprise → nouvelle soumission → validation : six transitions dans `GET api/fiches/{id}`, dans l'ordre, acteurs conformes ; un refus ajoute « Refus » |
+| L2 | Cycle de vie, front : panneau « Cycle de vie » de la page Dialogue (vue pure, coquille sans `innerHTML`) | `npm test` vert ; dans le navigateur, le panneau montre le parcours de L1 et se met à jour après chaque action |
 | A1 | Adaptateur IA réel et prompt système (DEB-Q2 : accès à Albert API vérifié à l'ouverture du lot, sinon API Mistral) | scénario e-commerce joué avec l'IA réelle, sans invention ; une demande d'assistance (« pc ne démarre plus », « copieur en panne ») signalée hors périmètre, sans proposition (DEB-Q64) |
 | R1 | Fiche de recette : nominal et retour pour complément | critère de fin du démonstrateur (§1) : **point de terminaison de la V1** |
 
@@ -247,5 +254,15 @@ sont lancés à la main (`npm test`) et leur sortie jointe au compte rendu.
 
 | DEB-Q2 | (21/11/2026, « recommandations ok » ; tranche la question ouverte au 20/11/2026) Fournisseur de l'IA réelle (A1, technologie DEB-D5) : **Albert API** (DINUM : hébergement SecNumCloud, modèles Mistral) si le ministère y a accès, sinon **API Mistral** ; l'accès est vérifié à l'ouverture d'A1, avant tout code ; sortie contrainte par schéma vérifiée en A1 ; repli hors réseau : IA scénarisée (démonstration jouable sans réseau) |
 | DEB-Q64 | (21/11/2026, « recommandations ok ») Observation du parcours de F3 : « pc ne démarre plus » (aucun mot de la liste de DEB-Q41) et « copieur en panne » (contient « panne » : signalée au tour concerné ; la fiche a pu être remplie à la main ensuite, non vérifié) ont été validées. Limite connue de l'IA scénarisée, pas un défaut de F3 : aucune correction de `ScenarioDialogue` ; la détection du hors périmètre entre dans le critère de fin d'A1, jugée sur l'IA réelle. Le système n'interdit pas de remplir à la main une demande d'assistance : la décision du chef de service reste le filtre (V1) |
+
+| DEB-Q65 | (21/11/2026, « recommandations ok ») Suivi des états d'une demande : chantier **L** ouvert avant A1, par décision du développeur (exception au gel du périmètre, DEB-D4) |
+| DEB-Q66 | (21/11/2026, « recommandations ok ») Aucun texte libre dans la trace des états : codes, statuts, acteur, instant ; le commentaire d'une décision reste dans les décisions de la fiche |
+| DEB-Q67 à DEB-Q72 | (21/11/2026) Journal Serilog (frontière, dossier par environnement, configuration en code, écriture, Seq, versions) : sans objet, Serilog écarté par DEB-Q73 |
+| DEB-Q73 | (21/11/2026, accord du développeur) Le cycle de vie est une donnée MÉTIER : table SQLite `Transitions`, écrite dans la transaction de la fiche ; Serilog (observabilité technique) rejoint les évolutions V2, ou A1 par une nouvelle décision si le diagnostic de l'IA réelle l'exige |
+| DEB-Q74 | (21/11/2026, accord) Ligne : `FicheId`, `Rang`, `Le` (ticks UTC), `Avant` (NULL à la création), `Apres`, `Acteur` (demandeur ; valideur pour une décision, DEB-Q25) ; `STRICT`, `WITHOUT ROWID`, clé (fiche, rang) ; contrainte CHECK limitée aux six transitions du cycle ; l'étape (Creation, Soumission, Validation, DemandeComplements, Refus, Reprise) se calcule, elle n'est pas stockée |
+| DEB-Q75 | (21/11/2026, accord) Transition déduite par la fonction pure `Transitions.Entre(avant, apres, instant)` du Domaine (`null` si le statut ne change pas) ; `Cycle` inchangé ; `IDepotFiches.Enregistrer` reçoit fiche, échanges et transition en une transaction ; une lecture d'horloge par cas d'usage date la fiche et sa transition |
+| DEB-Q76 | (21/11/2026, accord) Migration au démarrage, en transaction : schéma 0 → création (WAL), 1 → ajout de la table, 2 → rien, autre → arrêt (`SchemaFiches.Planifier`, pur) ; aucune reconstitution : le cycle de vie d'une fiche existante commence à la migration |
+| DEB-Q77 | (21/11/2026, accord) Exposition : champ `cycle` en fin de `GET api/fiches/{id}` (`etape, avant, apres, acteur, le`), référence `consultation-reference.json` figée à l'octet par xUnit et lue par Vitest ; panneau « Cycle de vie » de la page Dialogue |
+| DEB-Q78 | (21/11/2026, accord) Deux lots : L1 serveur, L2 front ; L2 bâti après la vérification de L1 |
 
 Questions ouvertes : aucune.

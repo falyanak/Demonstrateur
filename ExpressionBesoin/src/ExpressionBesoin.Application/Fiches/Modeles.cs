@@ -53,8 +53,11 @@ public sealed record ContexteTour(
     ListeImmuable<string> Manquantes,
     string? ProchaineRubrique);
 
-/// <summary>Fiche et historique de son dialogue, pour l'affichage et la reprise (DEB-Q21).</summary>
-public sealed record FicheConsultee(FicheBesoin Fiche, ListeImmuable<Echange> Historique);
+/// <summary>
+/// Fiche, historique de son dialogue (DEB-Q21) et transitions de son cycle de vie (DEB-Q77), pour l'affichage et la
+/// reprise.
+/// </summary>
+public sealed record FicheConsultee(FicheBesoin Fiche, ListeImmuable<Echange> Historique, ListeImmuable<Transition> Transitions);
 
 /// <summary>
 /// Issue d'un tour (plan §5 : <c>{ message, fiche }</c>) : réponse de l'IA, indicateur hors périmètre (DEB-Q23),
