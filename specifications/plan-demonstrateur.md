@@ -1,8 +1,9 @@
 # Plan du démonstrateur « Expression de besoin » (version simplifiée)
 
-> Version 1.8 du 21/11/2026 (lot I2b ; 1.7 au lot I2, 1.6 au lot I1, 1.5 au lot B2, 1.4 au lot B1b, 1.3 au lot B1, 1.2 au lot P0c, 1.1 au
+> Version 1.9 du 21/11/2026 (lot F1 ; 1.8 au lot I2b, 1.7 au lot I2, 1.6 au lot I1, 1.5 au lot B2, 1.4 au lot B1b, 1.3 au lot B1, 1.2 au lot P0c, 1.1 au
 > lot P0, 1.0 au lot P0a). Arbitrages DEB-Q1 à DEB-Q8, DEB-Q11 à DEB-Q32 : « recommandations ok » (20/11/2026) ; DEB-Q9 :
-> « ok » (20/11/2026) ; DEB-Q33 à DEB-Q37 : « recommandations ok » (21/11/2026). Décisions : §8. Document d'origine **hors
+> « ok » (20/11/2026) ; DEB-Q33 à DEB-Q37 : « recommandations ok » (21/11/2026) ;
+> DEB-Q38 à DEB-Q44 : « recommandations ok » (21/11/2026). Décisions : §8. Document d'origine **hors
 > dépôt** (DEB-D2) : cahier des charges « Document de cadrage » (novembre 2026), tenu par le développeur ; le modèle de
 > fiche (FEB) est versionné, nettoyé de ses métadonnées (DEB-Q9, DEB-Q33).
 
@@ -115,13 +116,16 @@ Performance :
 | `POST` | `api/fiches/{id}/propositions/{rubrique}/accepter`, `…/rejeter` | décision sur une proposition |
 | `POST` | `api/fiches/{id}/soumettre` | confirmation et soumission (contrôle de complétude) |
 | `POST` | `api/fiches/{id}/decision` | simulation du chef de service `{ decision, commentaire }` |
+| `POST` | `api/fiches/{id}/reprendre` | reprise d'une fiche à compléter (`ACompleter → Brouillon`, DEB-Q16) ; ajoutée au lot F1, le cas d'usage existait |
 | `GET` | `api/fiches/{id}/document` | .docx ; 409 si la fiche n'est pas validée |
 
 Refus de l'Application (B2), en plus de ceux du Domaine : `fiche.introuvable`, `agent.inconnu`, `rubrique.inconnue`
-(DEB-Q27), `message.vide`, `document.nonValidee` (409).
+(DEB-Q27), `message.vide`, `document.nonValidee` (409) ; du Web (F1) : `decision.inconnue`. Statuts (DEB-Q42) :
+`*.introuvable` → 404, `document.nonValidee` → 409, tout autre refus → 422, panne d'un port → 503 `panne.technique` ;
+corps d'erreur `{ code, message }`. Contrat JSON des réponses (DEB-Q43) : `ExpressionBesoin.Web/Api/Vues.cs`.
 
-Identité : sélecteur d'agent fictif dans l'en-tête, sans connexion (DEB-Q6) ; l'API reçoit l'agent courant par un
-en-tête simple, jamais pris pour une autorisation.
+Identité : sélecteur d'agent fictif dans l'en-tête, sans connexion (DEB-Q6) ; l'API reçoit l'agent courant par l'en-tête
+`X-Agent` (création d'une fiche), jamais pris pour une autorisation.
 
 ## 6. Les deux pages
 
@@ -150,14 +154,15 @@ Liste : N°, intitulé, demandeur, date, statut (badge), actions *Reprendre* et 
 | B2 | Application : cas d'usage, ports, doublures | cas d'usage testés sans E/S |
 | I1 | SQLite, référentiel fictif agent → service → chef | tests d'intégration sur le schéma de production |
 | I2 | Génération .docx sur le gabarit FEB (DEB-Q9) | octets stables ; fichier ouvert dans Word |
-| F1 | Front (gabarit Vite) et page Dialogue | parcours complet avec l'IA scénarisée |
-| F2 | Page Liste | statuts conformes après chaque transition |
+| F1 | Socle du front (gabarit Vite, DEB-D7), composition dans `Program`, routes du §5, IA scénarisée (DEB-Q38 à DEB-Q44) | `Appliquer-Lot` vert (tests, couverture) ; `npm test` vert ; `node_modules` commité ; parcours de l'API joué sur 5080 |
+| F2 | Page Dialogue | parcours complet avec l'IA scénarisée, dans le navigateur |
+| F3 | Page Liste | statuts conformes après chaque transition |
 | A1 | Adaptateur IA réel et prompt système (DEB-Q2) | scénario e-commerce joué avec l'IA réelle, sans invention |
 | R1 | Fiche de recette : nominal et retour pour complément | critère de fin du démonstrateur (§1) : **point de terminaison de la V1** |
 
 L'IA scénarisée précède l'IA réelle : la démonstration reste jouable sans réseau le jour du séminaire. Dépendance :
-l'étape `TestsFront` d'`Appliquer-Lot` arrive avec le lot OT2 du harnais central ; sans lui, les tests Vitest de F1 et
-F2 sont lancés à la main (`npm test`) et leur sortie jointe au compte rendu.
+l'étape `TestsFront` d'`Appliquer-Lot` arrive avec le lot OT2 du harnais central ; sans lui, les tests Vitest de F1 à F3
+sont lancés à la main (`npm test`) et leur sortie jointe au compte rendu.
 
 ## 8. Arbitrages et décisions
 
@@ -204,10 +209,18 @@ F2 sont lancés à la main (`npm test`) et leur sortie jointe au compte rendu.
 | DEB-Q35 | (21/11/2026, « recommandations ok ») Placement par libellé : le modèle n'a ni signet ni contrôle de contenu ; un paragraphe est repéré par le début de son premier run (libellé en gras → le texte remplace l'aide ; ligne d'en-tête → réécrite avec son préfixe) ; ligne « Chef de service » du circuit : décision et observations ; case ☒ si la fiche est confirmée ; saut de ligne → retour à la ligne Word ; caractères interdits en XML retirés. Gabarit écarté du plan → panne au démarrage (`InvalidDataException`), jamais au téléchargement. |
 | DEB-Q36 | (21/11/2026, « recommandations ok ») `ContenuDocument.Construire(fiche, fuseau)` (Domaine) : dates jj/mm/aaaa dans le fuseau du numéro (DEB-Q24), culture invariante ; rubrique sans valeur retenue → « Non renseigné » ; décision = la dernière (DEB-Q18), observations « auteur, le date : commentaire ». Le port `IGenerateurDocument` reçoit ce contenu, plus la fiche. |
 | DEB-Q37 | (21/11/2026, « recommandations ok ») Octets stables : parties recopiées dans l'ordre du gabarit, horodatage fixe des entrées (01/01/1980), métadonnées tirées du contenu (création de la fiche, dernière décision), aucune lecture d'horloge ; vérifié par deux générations identiques à l'octet, culture indifférente. |
+| DEB-D6 | (21/11/2026, révise la recommandation de DEB-Q10) `ClientApp/node_modules` **versionné** : build hors ligne, binaires Windows x64 seulement ; dossiers `bin` ré-autorisés au `.gitignore`, caches `.vite`, `.tmp` ignorés ; octets tels que publiés (`-text` au `.gitattributes` : sans lui, un clone Windows réécrit 1 836 fichiers sur 2 233) ; `npm ci` seulement s'il manque. |
+| DEB-D7 | (21/11/2026, demande du développeur) **Principe des versions** : dernière version STABLE de chaque outil et bibliothèque, dernière LTS des environnements d'exécution, épinglées exactement (lock, `save-exact`, `Directory.Packages.props`) ; prime sur la marge de 14 jours du modèle générique. Front : Node.js 26.13 LTS (`engines ^26.13.0`, 26.13.1 installé : correctif de sécurité du 11/11/2026) et son npm, TypeScript 7.0.2, Vite 8.3.8, Vitest 5.1.1, Sass 1.108.2, Bootstrap 5.3.9. .NET 10 (LTS) inchangé ; paquets NuGet et outils dotnet alignés par un lot dédié (DEB-HY1). |
+| DEB-Q38 | (21/11/2026, « recommandations ok ») Découpage : F1 socle du front, composition, routes, IA scénarisée ; F2 page Dialogue ; F3 page Liste. |
+| DEB-Q39 | (21/11/2026) Bibliothèques du front : `bootstrap` et `@popperjs/core` seulement (Sass) ; ni AG Grid, ni `xlsx`, ni Chart.js, ni htmx, ni jQuery. |
+| DEB-Q40 | (21/11/2026) npm : lock livré par le lot, `ClientApp/.npmrc` (`ignore-scripts`, `engine-strict`, `save-exact`) ; cible `NpmInstall` = `npm ci`. |
+| DEB-Q41 | (21/11/2026) IA scénarisée (`ScenarioDialogue`, Infrastructure, pure) : reprend les mots de l'agent pour la rubrique questionnée (la demande initiale pour l'intitulé), résumé = rubriques retenues, hors périmètre par mots-clés ; adaptateur par défaut jusqu'à A1. |
+| DEB-Q42 | (21/11/2026) Refus → HTTP : 404, 409, 422, panne 503 (§5) ; agent courant par l'en-tête `X-Agent`. |
+| DEB-Q43 | (21/11/2026) Contrat JSON : projections pures du Web, camelCase, énumérations par leur nom ; même fichier de référence testé à l'octet par xUnit et lu par Vitest. |
+| DEB-Q44 | (21/11/2026) `<vite-scripts />` sans exclusion de couverture : `ViteTags` pur (table de vérité), coquille testée par ses E/S réelles. |
 
 Questions ouvertes :
 
 | N° | Question | Recommandation |
 | --- | --- | --- |
 | DEB-Q2 | Fournisseur de l'IA (à trancher avant A1 ; technologie : DEB-D5) | Albert API (DINUM) si le ministère y a accès (hébergement SecNumCloud, modèles Mistral ; sortie contrainte par schéma à vérifier en A1), sinon API Mistral ; repli hors réseau : IA scénarisée |
-| DEB-Q10 | `node_modules` versionné (gabarit F3) ? | Non : dépôt public, poste avec accès npm ; `package-lock.json` versionné, `npm ci` |

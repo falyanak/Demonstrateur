@@ -1,0 +1,14 @@
+// main.ts ne fait que l'aiguillage (gabarit F2) : chaque vue déclare sa page par <div id="app" data-page="…">, le
+// module de la page est chargé à la demande (un fichier par page).
+
+export interface Page {
+  monter(racine: HTMLElement): void | Promise<void>;
+}
+
+export type ChargeurPage = () => Promise<Page>;
+
+/** Chargeur de la page nommée ; `null` pour une vue sans page ou une page inconnue. Pure. */
+export function choisirPage(pages: Readonly<Record<string, ChargeurPage>>, nom: string | undefined): ChargeurPage | null {
+  // hasOwn : « toString », « __proto__ »… du prototype ne sont pas des pages.
+  return nom !== undefined && Object.hasOwn(pages, nom) ? (pages[nom] as ChargeurPage) : null;
+}

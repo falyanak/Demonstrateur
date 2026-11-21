@@ -6,14 +6,21 @@
     <title>@ViewData["Title"] — Expression de besoin</title>
 </head>
 <body>
-    @* Layout provisoire (lot P0) : le front Vite arrive au chantier F (F1). *@
-    <header>
-        <nav>
-            <a asp-controller="Home" asp-action="Index">Expression de besoin</a>
+    @* Base des URL du front (Url.resolve) : PathBase d'ASP.NET, « / » à la racine. *@
+    <div id="maplayout" data-url-home-link="@Url.Content("~/")"></div>
+    <header class="navbar navbar-expand bg-body-tertiary border-bottom mb-3">
+        <nav class="container-fluid">
+            <a class="navbar-brand" asp-controller="Home" asp-action="Index">Expression de besoin</a>
+            @* Identité de démonstration (DEB-Q6) : agent fictif, jamais une autorisation. Rempli par main.ts. *@
+            <label class="d-flex align-items-center gap-2 mb-0">
+                <span class="small text-body-secondary">Agent</span>
+                <select id="agent-courant" class="form-select form-select-sm en-tete-agent" disabled></select>
+            </label>
         </nav>
     </header>
-    <main>
+    <main class="container-fluid">
         @RenderBody()
     </main>
+    <vite-scripts entry="src/main.ts" />
 </body>
 </html>

@@ -224,3 +224,30 @@
 - Exemplaire EB-2026-0007 (commande de l'entrée I2) : ouvert dans Word sans réparation, conforme au modèle FEB (en-tête,
   logo, case ☒, « Validée » dans la ligne du chef), déclaration du développeur du 21/11/2026.
 - DEB-Q33 à DEB-Q37 : « recommandations ok » (21/11/2026) ; plan v1.8. Chantier I clos. I2b : documents seuls.
+
+## 21/11/2026 — F1 : socle du front, composition, API, IA scénarisée
+
+- Ouverture : pièces contrôlées (8, tailles et SHA-256 conformes à `PIECES.txt` ; archive 98 entrées, commit
+  `4c6c984e`, aucun masquage). DEB-Q10 tranchée par le développeur à l'inverse de la recommandation : `node_modules`
+  versionné (DEB-D6). Principe des versions demandé par le développeur (DEB-D7) : Node.js 26.13 LTS et dernières
+  versions stables. DEB-Q38 à DEB-Q44 : « recommandations ok » (21/11/2026). Plan v1.9 (F1 socle, F2 Dialogue, F3 Liste ;
+  route `reprendre` ajoutée au §5 : le cas d'usage existait depuis B2, la route manquait au plan).
+- Mesures de l'assistant (Windows x64 simulé par `npm ci --os=win32 --cpu=x64`) : `node_modules` de 103 Mo, 2 233
+  fichiers, 63 paquets installés ; plus gros fichier 23 Mo (binaire Rolldown) ; 5 dossiers `bin` (dont `vite`, `typescript`)
+  ignorés par `[Bb]in/` sans ré-autorisation. npm 10.9 (Node 22) plante sur Vitest 4.1 (`edgesOut`) : sans objet avec
+  Node 26 (npm 11.20). Clone Windows (`core.autocrlf=true`) sans `-text` : 1 836 fichiers sur 2 233 réécrits en CRLF ;
+  avec : 0. Hypothèse retirée : un « diff fantôme » après `npm ci` (mesuré : aucun, avec ou sans l'attribut).
+- Contenu : `ClientApp/` (package.json et lock aux versions de DEB-D7, `.npmrc`, configurations TypeScript 7, Vite 8.3,
+  Vitest 5 ; `core/` pur : Url, contrats, client d'API, agent courant, aiguillage ; page accueil ; tests Vitest et JSON de
+  référence partagé) ; Web : `<vite-scripts />` (`ViteTags` pur, `LecteurManifeste` en cache sur la date,
+  `ViteScriptsTagHelper`), routes des fiches (`PointsFiches`, `Vues`, `StatutHttp`, `ContratJson`), composition
+  (`CompositionFiches` : base `Fiches:Base`, schéma et gabarit vérifiés au démarrage, `Guid.CreateVersion7`, fuseau
+  Europe/Paris), cibles MSBuild (`NpmInstall` = `npm ci`, `ViteBuild` incrémental, `IncludeViteDist`, `ViteClean`) ;
+  Infrastructure : `ScenarioDialogue` (pur) et `AssistantIAScenarise` ; `.gitignore`, `.gitattributes`.
+- Vérifié par l'assistant : sous Node 26.13.1, `tsc -b` et `vite build` sans avertissement, 58 tests Vitest, couverture du
+  front 100 % (lignes 74/74, branches 57/57) ; mutations MF1 à MF8 (Url ×2, aiguillage, agent courant, contrat ×2, client
+  ×2) : chacune fait échouer au moins un test (1 à 3). C# : 24 fichiers sans erreur de syntaxe (tree-sitter, contrôle qui
+  échoue sur un cas fautif) ; attendus de `ScenarioDialogueTests` recalculés par une réplique Python ; JSON de référence
+  produit par une réplique Python (3 267 octets). Non vérifié : compilation C#, tests .NET (93 ajoutés, ESTIMÉS : 26
+  Infrastructure, 67 Web), couverture .NET, cibles MSBuild sous Windows (SDK .NET et nuget.org refusés par la politique
+  réseau de l'assistant).

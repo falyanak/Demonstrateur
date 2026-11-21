@@ -1,15 +1,7 @@
 using System.Net;
 using System.Text.Json;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Mvc.Testing;
 
 namespace ExpressionBesoin.Web.Tests;
-
-/// <summary>Usine de l'application pour les tests : environnement fixé ici, jamais hérité (règles §6).</summary>
-public sealed class UsineWeb : WebApplicationFactory<Program>
-{
-    protected override void ConfigureWebHost(IWebHostBuilder builder) => builder.UseEnvironment("Production");
-}
 
 public sealed class SanteContratTests(UsineWeb usine) : IClassFixture<UsineWeb>
 {

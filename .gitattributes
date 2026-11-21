@@ -5,3 +5,6 @@
 *.cs text eol=crlf
 *.sh text eol=lf
 *.docx binary
+# node_modules versionné (DEB-D6) : octets tels que publiés sur npm. Sans cette ligne, un clone Windows (autocrlf)
+# réécrit en CRLF 1 836 fichiers sur 2 233 (mesuré le 21/11/2026).
+**/ClientApp/node_modules/** -text

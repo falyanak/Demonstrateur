@@ -1,4 +1,4 @@
-# Demonstrateur : rien de généré, aucune donnée locale n'est versionné.
+# Demonstrateur : rien de généré, aucune donnée locale n'est versionné ; exception assumée : node_modules du front (DEB-D6).
 .vs/
 [Bb]in/
 [Oo]bj/
@@ -10,3 +10,11 @@ ExpressionBesoin/coverage-report/
 *.db-shm
 *.db-wal
 *.zip
+
+# Front (DEB-D6) : node_modules VERSIONNÉ (build hors ligne, binaires Windows x64). Ses dossiers bin sont ré-autorisés
+# APRÈS la règle [Bb]in/ (sinon vite, tsc… manquent après un clone) ; ses caches et les sorties du front sont ignorés.
+!**/ClientApp/node_modules/**/[Bb]in/
+**/ClientApp/node_modules/.vite/
+**/ClientApp/node_modules/.tmp/
+**/ClientApp/coverage/
+*.tsbuildinfo

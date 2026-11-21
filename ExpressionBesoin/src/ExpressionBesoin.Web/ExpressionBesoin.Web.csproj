@@ -1,5 +1,14 @@
 <Project Sdk="Microsoft.NET.Sdk.Web">
   <!-- Web : composition. Toutes les couches ; paquets permis. -->
+  <PropertyGroup>
+    <!-- Le TypeScript est compilé par Vite (npm run build), jamais par Visual Studio en parallèle (gabarit F5). -->
+    <TypeScriptCompileBlocked>true</TypeScriptCompileBlocked>
+    <ClientApp>ClientApp\</ClientApp>
+    <ViteDist>wwwroot\dist\</ViteDist>
+    <!-- node_modules (versionné, DEB-D6 : 2 000+ fichiers) et le dist ne sont jamais parcourus par les globs par défaut :
+         évaluation du projet plus rapide, aucun fichier du front publié par erreur. -->
+    <DefaultItemExcludes>$(DefaultItemExcludes);$(ClientApp)**;$(ViteDist)**</DefaultItemExcludes>
+  </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\ExpressionBesoin.Domain\ExpressionBesoin.Domain.csproj" />
     <ProjectReference Include="..\ExpressionBesoin.Application\ExpressionBesoin.Application.csproj" />
@@ -8,4 +17,36 @@
   <ItemGroup>
     <InternalsVisibleTo Include="ExpressionBesoin.Web.Tests" />
   </ItemGroup>
+
+  <!-- Front (gabarit F8, cibles MSBuild). node_modules est versionné (DEB-D6) : npm ci ne tourne que s'il manque. -->
+  <ItemGroup>
+    <ViteEntrees Include="$(ClientApp)src\**\*;$(ClientApp)package.json;$(ClientApp)package-lock.json;$(ClientApp)tsconfig*.json;$(ClientApp)vite.config.ts" />
+  </ItemGroup>
+
+  <Target Name="NpmInstall" BeforeTargets="ViteBuild" Condition="!Exists('$(ClientApp)node_modules')">
+    <Exec Command="npm ci" WorkingDirectory="$(ClientApp)" />
+  </Target>
+
+  <!-- Vérification des types puis compilation ; sautée si aucune source du front n'a changé depuis le dernier manifeste. -->
+  <Target Name="ViteBuild" BeforeTargets="BeforeBuild" Inputs="@(ViteEntrees)" Outputs="$(ViteDist).vite\manifest.json"
+          Condition="'$(SkipViteBuild)' != 'true'">
+    <!-- emptyOutDir : le manifeste est réécrit à chaque build, sa date suffit à l'incrémental. -->
+    <Exec Command="npm run build" WorkingDirectory="$(ClientApp)" />
+  </Target>
+
+  <!-- Liste du dist construite APRÈS sa génération (un Content Include serait évalué au chargement, dist vide). -->
+  <Target Name="IncludeViteDist" AfterTargets="ComputeFilesToPublish">
+    <ItemGroup>
+      <ViteFichiers Include="$(ViteDist)**" />
+      <ResolvedFileToPublish Include="@(ViteFichiers->'%(FullPath)')" Exclude="@(ResolvedFileToPublish)">
+        <RelativePath>%(ViteFichiers.Identity)</RelativePath>
+        <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+        <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      </ResolvedFileToPublish>
+    </ItemGroup>
+  </Target>
+
+  <Target Name="ViteClean" AfterTargets="Clean">
+    <RemoveDir Directories="$(ViteDist)" />
+  </Target>
 </Project>
