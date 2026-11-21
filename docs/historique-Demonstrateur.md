@@ -648,3 +648,33 @@
   Leçon : la mécanique de questionnement relève du déterministe ; mesurer un modèle sur la requête exacte de
   l'adaptateur, cas du critère compris, avant tout lot.
 - A4b : documents seuls (plan 1.23, historique, prompt de reprise), appliqué seulement si A4 est commité.
+
+## 21/11/2026 — A5 : question déterministe (DEB-Q100 à DEB-Q104)
+
+- Ouverture : 8 pièces reçues, empreintes conformes à `PIECES.txt` ; archive de 174 entrées (= `MASQUAGE.txt`, rien
+  masqué), commit `345a707` = HEAD. A4 commité : `Compter-Tests` 639 (Domain 229, Application 66, Infrastructure 188,
+  Web 133, Architecture 23), conforme à l'estimation ; 2 commits à publier, sauvegarde provisoire.
+- Domaine : `DefinitionRubrique.QuestionType` (textes d'A4, repris à l'identique ; `null` pour le résumé et les points
+  à clarifier) ; `Dialogue.Relance` (question type de la prochaine rubrique, `RelanceResume`, `RelanceFin`, DEB-Q102),
+  `Dialogue.SansQuestion` (garde-fou DEB-Q103 : phrases dont la ponctuation finale contient « ? », fermants compris ;
+  « 2.0 » ne coupe pas ; un saut de ligne finit une phrase), `Dialogue.Composer` (message sans questions + relance
+  calculée APRÈS la fusion ; hors périmètre sans relance ; repli DEB-Q108 posée), `Dialogue.RubriqueQuestionnee`
+  (rubrique dont la question type termine le dernier message de l'application).
+- Application : `ConclureTour` compose le message ; c'est lui qui est enregistré et rendu (l'IA voit dans l'historique
+  la question réellement posée). Contrat de l'API, front, base, .docx inchangés.
+- Infrastructure : consignes sans question (règle 6 : « Ne pose aucune question… » ; règle 10 : résumé quand la
+  rubrique questionnée est resume ; règle 11 : expliquer sans question) ; `Guide` réduit au rôle ; dernier message :
+  « Rubrique questionnée : » lue dans l'historique (exacte même après une saisie manuelle entre deux tours, leçon de
+  DEB-A3), à défaut la prochaine rubrique ; `AQuestionner` retiré. IA scénarisée sans question
+  (`MessageIntitule`, `MessageReprise`, `MessageRien`) ; `Question`, `Suivante`, `MessageFin` retirés.
+- Web : `IA:Modele = gemma-4-31b-it` dans Localhost, Staging, Production (DEB-Q104).
+- Tests : `DialogueTests` (nouveau : relances, composition, rubrique questionnée, 20 cas du garde-fou), `CatalogueTests`
+  (questions types), `DecisionsFichesTests` (question de l'IA sur la rubrique tout juste proposée remplacée),
+  `ServiceFichesTests`, `PromptFicheTests`, `ScenarioDialogueTests`, `PointsFichesTests`,
+  `ConfigurationEnvironnementsTests`. Comptes ESTIMÉS : Domain 281, Application 67, Infrastructure 189, Web 133,
+  Architecture 23, total 693.
+- Vérifié chez l'assistant : syntaxe C# (tree-sitter, contrôle éprouvé sur un fichier cassé) ; garde-fou rejoué par une
+  réplique Python (attendus des 20 cas) ; consignes reconstruites depuis les fragments du code, 25 assertions rejouées,
+  contre-épreuve sur une assertion faussée (1 échec) ; dernier message du tour et rubrique questionnée rejoués ;
+  octets (CRLF sans BOM) ; prompt de reprise ≤ 30 720 octets. Non vérifié : compilation, tests, couverture (branches du
+  garde-fou visées par les cas), mutations, réponses de gemma.

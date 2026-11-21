@@ -62,13 +62,15 @@ public sealed class PointsFichesTests(UsineWeb usine) : IClassFixture<UsineWeb>
     }
 
     [Fact]
-    public async Task Premier_tour_scenarise_intitule_propose_question_sur_l_application_historique_ecrit()
+    public async Task Premier_tour_scenarise_intitule_propose_question_de_l_application_historique_ecrit()
     {
         using var client = usine.CreateClient();
         var id = await Creer(client);
         var (statut, tour) = await Appeler(client, HttpMethod.Post, $"/api/fiches/{id}/messages", new { message = "  " + Demande + " " });
         Assert.Equal(HttpStatusCode.OK, statut);
-        Assert.Equal("Quel service, quelle application ou quel élément (poste de travail, serveur, réseau) est concerné ?", tour.GetProperty("message").GetString());
+        // DEB-Q100 : message de l'IA, puis la question type de la rubrique suivante, posée par l'application.
+        const string compose = "Je propose votre demande comme intitulé.\n\nQuelle application ou quel équipement est concerné ?";
+        Assert.Equal(compose, tour.GetProperty("message").GetString());
         Assert.False(tour.GetProperty("horsPerimetre").GetBoolean());
         Assert.Equal(0, tour.GetProperty("ecartees").GetArrayLength());
         var intitule = Rubrique(tour.GetProperty("fiche"), "intitule");
@@ -81,6 +83,7 @@ public sealed class PointsFichesTests(UsineWeb usine) : IClassFixture<UsineWeb>
         Assert.Equal(new[] { "Agent", "IA" }, historique.Select(echange => echange.GetProperty("auteur").GetString()).ToArray());
         Assert.Equal(Demande, historique[0].GetProperty("texte").GetString());
         Assert.Equal(UsineWeb.Maintenant, historique[1].GetProperty("le").GetDateTimeOffset());
+        Assert.Equal(compose, historique[1].GetProperty("texte").GetString());
     }
 
     [Fact]

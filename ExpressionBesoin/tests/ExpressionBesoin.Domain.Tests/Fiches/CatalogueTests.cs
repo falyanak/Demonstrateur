@@ -51,6 +51,40 @@ public sealed class CatalogueTests
         Assert.Equal(obligatoire, definition.Obligatoire);
     }
 
+    /// <summary>Question type posée par l'application (DEB-Q101) : textes d'A4 (DEB-Q92), repris à l'identique.</summary>
+    [Theory]
+    [InlineData(Rubrique.Application, "Quelle application ou quel équipement est concerné ?")]
+    [InlineData(Rubrique.Intitule, "Comment intituleriez-vous votre demande en quelques mots ?")]
+    [InlineData(Rubrique.Resume, null)]
+    [InlineData(Rubrique.SituationActuelle, "Que se passe-t-il aujourd'hui, concrètement ?")]
+    [InlineData(Rubrique.Difficultes, "Qu'est-ce que cela vous empêche de faire dans votre travail ?")]
+    [InlineData(Rubrique.ExempleRepresentatif, "Pouvez-vous citer un cas précis ?")]
+    [InlineData(Rubrique.ResultatRecherche, "Qu'attendez-vous du service informatique ?")]
+    [InlineData(Rubrique.CriteresReussite, "À quoi verrez-vous que c'est réglé ?")]
+    [InlineData(Rubrique.SolutionEnvisagee, "Avez-vous une solution en tête ?")]
+    [InlineData(Rubrique.UtilisateursConcernes, "Qui est concerné : vous seul, votre bureau, d'autres services ?")]
+    [InlineData(Rubrique.ProcessusMetier, "Pour quelle activité de votre travail en avez-vous besoin ?")]
+    [InlineData(Rubrique.Liens, "Cette demande est-elle liée à un autre outil ou à une autre demande ?")]
+    [InlineData(Rubrique.BeneficesAttendus, "Qu'est-ce que cela vous permettra de faire une fois réglé ?")]
+    [InlineData(Rubrique.Echeance, "Pour quand en avez-vous besoin, et pourquoi ?")]
+    [InlineData(Rubrique.Contraintes, "Y a-t-il des contraintes à respecter ?")]
+    [InlineData(Rubrique.DocumentsReferences, "Avez-vous des documents ou des références à signaler ?")]
+    [InlineData(Rubrique.PointsAClarifier, null)]
+    public void Question_type_de_chaque_rubrique(Rubrique rubrique, string? question)
+    {
+        Assert.Equal(question, Catalogue.Definition(rubrique).QuestionType);
+    }
+
+    /// <summary>Garantie dont dépend <c>Dialogue.Relance</c> : toute rubrique questionnée, sauf le résumé, a sa question.</summary>
+    [Fact]
+    public void Toute_rubrique_questionnee_hors_resume_a_une_question_qui_finit_par_un_point_d_interrogation()
+    {
+        foreach (var rubrique in Catalogue.OrdreQuestionnement.Where(rubrique => rubrique != Rubrique.Resume))
+        {
+            Assert.EndsWith(" ?", Catalogue.Definition(rubrique).QuestionType);
+        }
+    }
+
     [Theory]
     [InlineData("situationActuelle", true, Rubrique.SituationActuelle)]
     [InlineData("SITUATIONACTUELLE", true, Rubrique.SituationActuelle)]

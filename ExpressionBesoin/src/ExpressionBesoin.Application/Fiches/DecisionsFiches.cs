@@ -63,20 +63,26 @@ internal static class DecisionsFiches
 
     /// <summary>
     /// Après l'appel de l'IA : réponse relue (refus → rien à écrire, DEB-Q22) ; hors périmètre → propositions ignorées
-    /// (DEB-Q23) ; sinon fusion du Domaine. Deux échanges à ajouter : l'agent à <paramref name="debut"/>, l'IA à
-    /// <paramref name="fin"/>.
+    /// (DEB-Q23) ; sinon fusion du Domaine. Le message rendu est COMPOSÉ sur la fiche fusionnée (lot A5, DEB-Q100 à
+    /// DEB-Q103, <see cref="Dialogue.Composer"/>) : message de l'IA sans ses questions, puis la question de l'application.
+    /// C'est lui qui est enregistré : l'historique montre à l'IA la question réellement posée. Deux échanges à ajouter :
+    /// l'agent à <paramref name="debut"/>, l'IA à <paramref name="fin"/>.
     /// </summary>
     public static Resultat<IssueTour> ConclureTour(TourPrepare tour, string texteIA, DateTimeOffset debut, DateTimeOffset fin) =>
         ReponseIA.Lire(texteIA).Bind(reponse =>
             Fiche.AppliquerPropositions(
                     tour.Fiche,
                     reponse.HorsPerimetre ? ListeImmuable<PropositionRubrique>.Vide : reponse.Propositions)
-                .Map(fiche => new IssueTour(
-                    fiche,
-                    ListeImmuable<Echange>.Vide
-                        .Ajouter(new Echange(AuteurEchange.Agent, tour.Contexte.Message, debut))
-                        .Ajouter(new Echange(AuteurEchange.IA, reponse.Message, fin)),
-                    new TourDialogue(reponse.Message, reponse.HorsPerimetre, reponse.Ecartees, fiche))));
+                .Map(fiche =>
+                {
+                    var message = Dialogue.Composer(reponse.Message, reponse.HorsPerimetre, fiche);
+                    return new IssueTour(
+                        fiche,
+                        ListeImmuable<Echange>.Vide
+                            .Ajouter(new Echange(AuteurEchange.Agent, tour.Contexte.Message, debut))
+                            .Ajouter(new Echange(AuteurEchange.IA, message, fin)),
+                        new TourDialogue(message, reponse.HorsPerimetre, reponse.Ecartees, fiche));
+                }));
 
     /// <summary>
     /// Soumission (DEB-Q17, DEB-Q24) : une fiche déjà numérotée garde son numéro (le dernier numéro n'est pas lu) ; sinon

@@ -67,11 +67,12 @@ internal static class Essais
     public static ListeImmuable<Echange> Historique(params Echange[] echanges) => ListeImmuable<Echange>.De(echanges);
 
     /// <summary>
-    /// Réponse de l'IA : application et intitulé proposés, une rubrique inconnue écartée (position 2).
+    /// Réponse de l'IA : application et intitulé proposés, une rubrique inconnue écartée (position 2) ; message terminé
+    /// par une question, retirée à la composition (DEB-Q103).
     /// </summary>
     public const string ReponseAvecPropositions = """
         {
-          "message": "Quel est le processus actuel ?",
+          "message": "J'ai noté l'outil de contrôle. Quel est le processus actuel ?",
           "propositions": [
             { "rubrique": "application", "valeur": "Outil de contrôle", "justification": "cité par l'agent" },
             { "rubrique": "intitule", "valeur": "Contrôle e-commerce", "justification": "reformulation" },
@@ -89,4 +90,11 @@ internal static class Essais
         """;
 
     public const string ReponseSansProposition = """{ "message": "Pouvez-vous préciser ?" }""";
+
+    /// <summary>
+    /// Message composé pour <see cref="ReponseAvecPropositions"/> sur un brouillon vierge : phrase de l'IA, puis question
+    /// type de la situation actuelle (application et intitulé proposés, donc sautés).
+    /// </summary>
+    public const string MessageComposeAvecPropositions =
+        "J'ai noté l'outil de contrôle.\n\nQue se passe-t-il aujourd'hui, concrètement ?";
 }

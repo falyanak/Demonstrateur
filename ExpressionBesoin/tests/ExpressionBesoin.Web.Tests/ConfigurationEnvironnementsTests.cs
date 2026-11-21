@@ -27,7 +27,10 @@ public sealed class ConfigurationEnvironnementsTests
     public void Configuration_commune_sans_chemin_de_base() =>
         Assert.Null(Lire("appsettings.json")[CompositionFiches.CleBase]);
 
-    /// <summary>IA réelle (lot A1, DEB-Q84, DEB-Q86) : Albert API, modèle mesuré par la sonde du 21/11/2026.</summary>
+    /// <summary>
+    /// IA réelle (lot A1, DEB-Q86) : Albert API ; modèle <c>gemma-4-31b-it</c> figé par son nom exact (lot A5, DEB-Q104, qui
+    /// révise DEB-Q84 : l'alias <c>openweight-medium</c> change de modèle le 01/12/2026).
+    /// </summary>
     [Theory]
     [InlineData("Localhost")]
     [InlineData("Staging")]
@@ -37,7 +40,7 @@ public sealed class ConfigurationEnvironnementsTests
         var configuration = Lire($"appsettings.{environnement}.json");
         var lu = (configuration[CompositionIA.CleFournisseur], configuration[CompositionIA.ClePoint], configuration[CompositionIA.CleModele]);
 
-        Assert.Equal(("Albert", "https://albert.api.etalab.gouv.fr/v1", "openweight-medium"), lu);
+        Assert.Equal(("Albert", "https://albert.api.etalab.gouv.fr/v1", "gemma-4-31b-it"), lu);
         Assert.Null(configuration[CompositionIA.VariableCle]);
         Assert.NotNull(CompositionIA.Lire(lu.Item1, lu.Item2, lu.Item3, "cle-" + "essai"));
     }

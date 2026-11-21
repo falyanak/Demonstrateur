@@ -210,10 +210,10 @@ public sealed class DecisionsFichesTests
         Assert.Equal("Bonjour", issue.Echanges[0].Texte);
         Assert.Equal(Debut, issue.Echanges[0].Le);
         Assert.Equal(AuteurEchange.IA, issue.Echanges[1].Auteur);
-        Assert.Equal("Quel est le processus actuel ?", issue.Echanges[1].Texte);
+        Assert.Equal(MessageComposeAvecPropositions, issue.Echanges[1].Texte);
         Assert.Equal(Fin, issue.Echanges[1].Le);
 
-        Assert.Equal("Quel est le processus actuel ?", issue.Tour.Message);
+        Assert.Equal(MessageComposeAvecPropositions, issue.Tour.Message);
         Assert.False(issue.Tour.HorsPerimetre);
         Assert.Same(issue.Fiche, issue.Tour.Fiche);
         var ecartee = Assert.Single(issue.Tour.Ecartees);
@@ -235,6 +235,28 @@ public sealed class DecisionsFichesTests
         Assert.Equal("Cette demande relève de l'assistance.", issue.Tour.Message);
         Assert.Empty(issue.Tour.Ecartees);
         Assert.Equal("Cette demande relève de l'assistance.", issue.Echanges[1].Texte);
+    }
+
+    /// <summary>
+    /// DEB-Q100 : la question vient de l'application, calculée sur la fiche APRÈS la fusion ; l'IA qui questionne la
+    /// rubrique qu'elle vient de proposer ne l'impose plus (constat des sondes du 21/11/2026, DEB-Q98, DEB-Q99).
+    /// </summary>
+    [Fact]
+    public void ConclureTour_question_sur_la_rubrique_tout_juste_proposee_remplacee_par_la_relance()
+    {
+        const string reponse = """
+            {
+              "message": "Je comprends une demande d'assistance utilisateur. Quel équipement est concerné ?",
+              "propositions": [ { "rubrique": "application", "valeur": "Poste de travail", "justification": "« mon pc »" } ]
+            }
+            """;
+
+        var issue = Valeur(DecisionsFiches.ConclureTour(Prepare(), reponse, Debut, Fin));
+
+        const string attendu =
+            "Je comprends une demande d'assistance utilisateur.\n\nComment intituleriez-vous votre demande en quelques mots ?";
+        Assert.Equal(attendu, issue.Tour.Message);
+        Assert.Equal(attendu, issue.Echanges[1].Texte);
     }
 
     // --- Soumission ---

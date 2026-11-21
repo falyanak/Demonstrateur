@@ -128,7 +128,7 @@ public sealed class ServiceFichesTests
 
         var tour = Valeur(await banc.Service.EnvoyerMessage(Id, " Bonjour ", Annulation));
 
-        Assert.Equal("Quel est le processus actuel ?", tour.Message);
+        Assert.Equal(MessageComposeAvecPropositions, tour.Message);
         Assert.Equal("Outil de contrôle", tour.Fiche.ChampDe(Rubrique.Application).PropositionEnAttente!.Valeur);
         Assert.Equal(1, banc.Depot.Enregistrements);
         Assert.Equal(tour.Fiche, banc.Depot.FicheDe(Id));
@@ -137,7 +137,7 @@ public sealed class ServiceFichesTests
             new[]
             {
                 new Echange(AuteurEchange.Agent, "Bonjour", Maintenant),
-                new Echange(AuteurEchange.IA, "Quel est le processus actuel ?", Maintenant.AddSeconds(4)),
+                new Echange(AuteurEchange.IA, MessageComposeAvecPropositions, Maintenant.AddSeconds(4)),
             },
             historique.ToArray());
         var contexte = Assert.Single(banc.Assistant.Recus);

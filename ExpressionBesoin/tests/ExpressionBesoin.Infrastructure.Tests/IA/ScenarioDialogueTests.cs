@@ -7,7 +7,8 @@ namespace ExpressionBesoin.Infrastructure.Tests.IA;
 
 /// <summary>
 /// IA scénarisée (DEB-Q41) : chaque réponse est relue par <see cref="ReponseIA.Lire"/>, comme celle de l'IA réelle ; les
-/// attendus sont écrits à la main, jamais recopiés de la sortie.
+/// attendus sont écrits à la main, jamais recopiés de la sortie. Depuis A5 (DEB-Q100), aucun message ne pose de question :
+/// <see cref="Aucun_message_ne_pose_de_question"/>.
 /// </summary>
 public sealed class ScenarioDialogueTests
 {
@@ -62,24 +63,23 @@ public sealed class ScenarioDialogueTests
     [Fact]
     public void Texte_exact_d_une_reponse_du_premier_tour() =>
         Assert.Equal(
-            "{\"message\":\"Quel service, quelle application ou quel élément (poste de travail, serveur, réseau) est "
-            + "concerné ?\",\"propositions\":[{\"rubrique\":\"intitule\",\"valeur\":\"panne réseau\","
-            + "\"justification\":\"Reprend les mots de l'agent.\"}],\"horsPerimetre\":false}",
+            "{\"message\":\"Je propose votre demande comme intitulé.\",\"propositions\":[{\"rubrique\":\"intitule\","
+            + "\"valeur\":\"panne réseau\",\"justification\":\"Reprend les mots de l'agent.\"}],\"horsPerimetre\":false}",
             ScenarioDialogue.Repondre(Contexte("panne réseau", "application")));
 
     [Fact]
-    public void Plus_de_rubrique_a_questionner_invitation_a_soumettre()
+    public void Plus_de_rubrique_questionnee_rien_a_proposer()
     {
         var reponse = Lue(Contexte(Message, null, echanges: 4));
-        Assert.Equal((ScenarioDialogue.MessageFin, false), (reponse.Message, reponse.HorsPerimetre));
+        Assert.Equal(("Je n'ai rien de plus à proposer.", false), (reponse.Message, reponse.HorsPerimetre));
         Assert.Empty(reponse.Propositions);
     }
 
     [Fact]
-    public void Premier_tour_la_demande_devient_l_intitule_question_sur_l_application()
+    public void Premier_tour_la_demande_devient_l_intitule()
     {
         var reponse = Lue(Contexte(Message, "application"));
-        Assert.Equal("Quel service, quelle application ou quel élément (poste de travail, serveur, réseau) est concerné ?", reponse.Message);
+        Assert.Equal("Je propose votre demande comme intitulé.", reponse.Message);
         Assert.Equal(new[] { (Rubrique.Intitule, Message, "Reprend les mots de l'agent.") }, Propositions(reponse));
     }
 
@@ -87,7 +87,7 @@ public sealed class ScenarioDialogueTests
     public void Premier_tour_intitule_deja_saisi_la_reponse_va_a_l_application()
     {
         var reponse = Lue(Contexte("SICCRF", "application", valeurs: new Dictionary<string, string> { ["intitule"] = "Contrôle" }));
-        Assert.Equal("Comment cela se passe-t-il aujourd'hui ?", reponse.Message);
+        Assert.Equal("Je propose votre réponse pour la rubrique questionnée.", reponse.Message);
         Assert.Equal(new[] { (Rubrique.Application, "SICCRF", "Reprend les mots de l'agent.") }, Propositions(reponse));
     }
 
@@ -102,29 +102,17 @@ public sealed class ScenarioDialogueTests
     public void Premier_tour_sur_l_intitule_meme_la_demande_y_va()
     {
         var reponse = Lue(Contexte(Message, "intitule", valeurs: new Dictionary<string, string> { ["application"] = "SICCRF" }));
-        Assert.Equal("Comment cela se passe-t-il aujourd'hui ?", reponse.Message);
+        Assert.Equal(ScenarioDialogue.MessageReprise, reponse.Message);
         Assert.Equal(new[] { (Rubrique.Intitule, Message, "Reprend les mots de l'agent.") }, Propositions(reponse));
     }
 
     [Fact]
-    public void Tour_courant_la_reponse_va_a_la_rubrique_questionnee_question_suivante()
+    public void Tour_courant_la_reponse_va_a_la_rubrique_questionnee()
     {
         var valeurs = new Dictionary<string, string> { ["application"] = "SICCRF", ["intitule"] = "Contrôle", ["situationActuelle"] = "Manuel" };
         var reponse = Lue(Contexte("Les relevés sont ressaisis", "difficultes", echanges: 6, valeurs: valeurs));
-        Assert.Equal("Quel résultat recherchez-vous ?", reponse.Message);
+        Assert.Equal(ScenarioDialogue.MessageReprise, reponse.Message);
         Assert.Equal(new[] { (Rubrique.Difficultes, "Les relevés sont ressaisis", "Reprend les mots de l'agent.") }, Propositions(reponse));
-    }
-
-    [Fact]
-    public void Derniere_question_avant_un_resume_deja_propose_invitation_a_soumettre()
-    {
-        var reponse = Lue(Contexte(
-            "Gain de temps",
-            "beneficesAttendus",
-            echanges: 2,
-            propositions: new Dictionary<string, string> { ["resume"] = "Résumé" }));
-        Assert.Equal(ScenarioDialogue.MessageFin, reponse.Message);
-        Assert.Equal(new[] { (Rubrique.BeneficesAttendus, "Gain de temps", "Reprend les mots de l'agent.") }, Propositions(reponse));
     }
 
     [Fact]
@@ -158,10 +146,10 @@ public sealed class ScenarioDialogueTests
     }
 
     [Fact]
-    public void Rubriques_absentes_du_contexte_aucune_question_suivante()
+    public void Rubriques_absentes_du_contexte_la_reponse_va_a_la_rubrique_questionnee()
     {
         var reponse = Lue(Contexte("SICCRF", "application", sansRubriques: true));
-        Assert.Equal(ScenarioDialogue.MessageFin, reponse.Message);
+        Assert.Equal(ScenarioDialogue.MessageReprise, reponse.Message);
         Assert.Equal(new[] { (Rubrique.Application, "SICCRF", "Reprend les mots de l'agent.") }, Propositions(reponse));
     }
 
@@ -173,12 +161,24 @@ public sealed class ScenarioDialogueTests
         Assert.Equal(special, Assert.Single(reponse.Propositions).Proposition.Valeur);
     }
 
-    [Theory]
-    [InlineData("exempleRepresentatif", "Pouvez-vous préciser : Exemple représentatif ?")]
-    [InlineData("codeInconnu", "Pouvez-vous préciser : codeInconnu ?")]
-    [InlineData("criteresReussite", "À quoi verra-t-on que la demande est satisfaite ?")]
-    public void Question_ecrite_ou_generique(string code, string attendue) =>
-        Assert.Equal(attendue, ScenarioDialogue.Question(Contexte("x", null), code));
+    /// <summary>DEB-Q100, DEB-Q103 : aucun message de l'IA scénarisée ne contient de point d'interrogation.</summary>
+    [Fact]
+    public void Aucun_message_ne_pose_de_question()
+    {
+        string[] messages =
+        [
+            ScenarioDialogue.MessageIntitule,
+            ScenarioDialogue.MessageReprise,
+            ScenarioDialogue.MessageRien,
+            ScenarioDialogue.MessageResume,
+            ScenarioDialogue.MessageResumeImpossible,
+        ];
+        foreach (var message in messages)
+        {
+            Assert.DoesNotContain("?", message);
+            Assert.Equal(message, Dialogue.SansQuestion(message));
+        }
+    }
 
     [Fact]
     public async Task Adaptateur_rend_le_scenario_et_respecte_l_annulation()

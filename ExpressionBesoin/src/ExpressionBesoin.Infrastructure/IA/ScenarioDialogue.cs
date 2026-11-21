@@ -1,5 +1,4 @@
 using System.Buffers;
-using System.Collections.Frozen;
 using System.Text;
 using System.Text.Encodings.Web;
 using System.Text.Json;
@@ -15,19 +14,24 @@ namespace ExpressionBesoin.Infrastructure.IA;
 /// Elle ne classe jamais une demande hors périmètre (DEB-Q89) : toute demande adressée au service informatique
 /// (assistance, exploitation, réseau, applications, développement) est une fiche ; reconnaître une demande étrangère
 /// au service informatique relève de l'IA réelle, aucune liste de mots ne le fait sûrement.
+/// Comme l'IA réelle depuis A5 (DEB-Q100), elle ne pose aucune question : l'application ajoute la question type de la
+/// rubrique suivante après la fusion (<see cref="Dialogue.Composer"/>). La rubrique questionnée est la prochaine
+/// rubrique du contexte.
 /// <list type="number">
-/// <item>Premier tour : la demande initiale est proposée comme intitulé ; la question porte sur la prochaine rubrique.</item>
-/// <item>Prochaine rubrique = résumé : synthèse des rubriques obligatoires retenues, une ligne « libellé : valeur » chacune ;
-/// aucune retenue → rien à proposer, l'agent est invité à trancher les propositions en attente.</item>
-/// <item>Sinon : le message répond à la question posée, il est proposé pour la prochaine rubrique ; question suivante.</item>
-/// <item>Plus de rubrique à questionner : invitation à relire, confirmer et soumettre.</item>
+/// <item>Premier tour : la demande initiale est proposée comme intitulé.</item>
+/// <item>Rubrique questionnée = résumé : synthèse des rubriques obligatoires retenues, une ligne « libellé : valeur »
+/// chacune ; aucune retenue → rien à proposer, l'agent est invité à trancher les propositions en attente.</item>
+/// <item>Sinon : le message répond à la question posée, il est proposé pour la rubrique questionnée.</item>
+/// <item>Plus de rubrique questionnée : rien à proposer.</item>
 /// </list>
 /// </summary>
 public static class ScenarioDialogue
 {
-    public const string MessageFin =
-        "Les rubriques obligatoires sont renseignées ou proposées. Relisez la fiche, acceptez ou corrigez les "
-        + "propositions, puis confirmez et soumettez.";
+    public const string MessageIntitule = "Je propose votre demande comme intitulé.";
+
+    public const string MessageReprise = "Je propose votre réponse pour la rubrique questionnée.";
+
+    public const string MessageRien = "Je n'ai rien de plus à proposer.";
 
     public const string MessageResume = "Voici un résumé tiré des rubriques retenues : acceptez-le ou corrigez-le.";
 
@@ -37,19 +41,6 @@ public static class ScenarioDialogue
     public const string JustificationReprise = "Reprend les mots de l'agent.";
 
     public const string JustificationResume = "Synthèse des rubriques retenues, sans ajout.";
-
-    private static readonly FrozenDictionary<string, string> Questions = new Dictionary<string, string>
-    {
-        ["application"] = "Quel service, quelle application ou quel élément (poste de travail, serveur, réseau) est concerné ?",
-        ["intitule"] = "Quel intitulé court donneriez-vous à cette demande ?",
-        ["situationActuelle"] = "Comment cela se passe-t-il aujourd'hui ?",
-        ["difficultes"] = "Quelles difficultés rencontrez-vous ?",
-        ["resultatRecherche"] = "Quel résultat recherchez-vous ?",
-        ["criteresReussite"] = "À quoi verra-t-on que la demande est satisfaite ?",
-        ["utilisateursConcernes"] = "Quels utilisateurs ou services sont concernés ?",
-        ["processusMetier"] = "Quel processus métier est touché ?",
-        ["beneficesAttendus"] = "Quels bénéfices attendez-vous ?",
-    }.ToFrozenDictionary(StringComparer.Ordinal);
 
     private static readonly JsonWriterOptions Ecriture = new() { Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping };
 
@@ -62,12 +53,12 @@ public static class ScenarioDialogue
         var cible = contexte.ProchaineRubrique;
         if (cible is null)
         {
-            return Json(MessageFin, []);
+            return Json(MessageRien, []);
         }
 
         if (contexte.Historique.Count == 0 && cible != CodeIntitule && EstLibre(contexte, CodeIntitule))
         {
-            return Json(Question(contexte, cible), [(CodeIntitule, contexte.Message, JustificationReprise)]);
+            return Json(MessageIntitule, [(CodeIntitule, contexte.Message, JustificationReprise)]);
         }
 
         if (cible == CodeResume)
@@ -78,33 +69,7 @@ public static class ScenarioDialogue
                 : Json(MessageResume, [(CodeResume, synthese, JustificationResume)]);
         }
 
-        var suivante = Suivante(contexte, cible);
-        return Json(
-            suivante is null ? MessageFin : Question(contexte, suivante),
-            [(cible, contexte.Message, JustificationReprise)]);
-    }
-
-    /// <summary>Question de la rubrique ; à défaut d'une question écrite, formulation générique sur son libellé.</summary>
-    internal static string Question(ContexteTour contexte, string code) =>
-        Questions.GetValueOrDefault(code)
-        ?? $"Pouvez-vous préciser : {Etat(contexte, code)?.Libelle ?? code} ?";
-
-    /// <summary>Rubrique questionnée après <paramref name="cible"/> : ordre de questionnement, vide et sans proposition.</summary>
-    internal static string? Suivante(ContexteTour contexte, string cible)
-    {
-        var apres = false;
-        foreach (var rubrique in Catalogue.OrdreQuestionnement)
-        {
-            var code = Catalogue.Definition(rubrique).Code;
-            if (apres && EstLibre(contexte, code))
-            {
-                return code;
-            }
-
-            apres |= code == cible;
-        }
-
-        return null;
+        return Json(MessageReprise, [(cible, contexte.Message, JustificationReprise)]);
     }
 
     internal static string Synthese(ContexteTour contexte) =>
