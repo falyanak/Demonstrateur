@@ -1,12 +1,12 @@
 # Plan du démonstrateur « Expression de besoin » (version simplifiée)
 
-> Version 1.15 du 21/11/2026 (lot F3 ; 1.14 au lot F2c, 1.13 au lot HY2, 1.12 au lot F2, 1.11 au lot HY1b, 1.10 au lot HY1, 1.9 au lot F1, 1.8 au lot I2b, 1.7 au lot I2, 1.6 au lot I1, 1.5 au lot B2, 1.4 au lot B1b, 1.3 au lot B1, 1.2 au lot P0c, 1.1 au
+> Version 1.16 du 21/11/2026 (lot F3b ; 1.15 au lot F3, 1.14 au lot F2c, 1.13 au lot HY2, 1.12 au lot F2, 1.11 au lot HY1b, 1.10 au lot HY1, 1.9 au lot F1, 1.8 au lot I2b, 1.7 au lot I2, 1.6 au lot I1, 1.5 au lot B2, 1.4 au lot B1b, 1.3 au lot B1, 1.2 au lot P0c, 1.1 au
 > lot P0, 1.0 au lot P0a). Arbitrages DEB-Q1 à DEB-Q8, DEB-Q11 à DEB-Q32 : « recommandations ok » (20/11/2026) ; DEB-Q9 :
 > « ok » (20/11/2026) ; DEB-Q33 à DEB-Q37 : « recommandations ok » (21/11/2026) ;
 > DEB-Q38 à DEB-Q44 : « recommandations ok » (21/11/2026) ; DEB-Q45, DEB-Q46 : « recommandations ok »
 > (21/11/2026) ; DEB-Q47 : tranchée par le développeur (21/11/2026) ; DEB-Q48 à DEB-Q53 : « recommandations ok » (21/11/2026) ;
 > DEB-Q54 à DEB-Q57 : « recommandations ok », DEB-Q55 précisée par le développeur (21/11/2026) ; DEB-Q58 : « maintenant,
-> avant F3 » (21/11/2026) ; DEB-Q59 à DEB-Q63 : « recommandations ok » (21/11/2026). Décisions : §8. Document d'origine **hors
+> avant F3 » (21/11/2026) ; DEB-Q59 à DEB-Q63 : « recommandations ok » (21/11/2026) ; DEB-Q2, DEB-Q64 : « recommandations ok » (21/11/2026). Décisions : §8. Document d'origine **hors
 > dépôt** (DEB-D2) : cahier des charges « Document de cadrage » (novembre 2026), tenu par le développeur ; le modèle de
 > fiche (FEB) est versionné, nettoyé de ses métadonnées (DEB-Q9, DEB-Q33).
 
@@ -164,7 +164,7 @@ AG Grid inutile). Réponse de l'IA affichée entière, avec indicateur d'attente
 | HY2 | Hygiène DEB-HY2 : dossier de données fixé par environnement (DEB-Q54 à DEB-Q57) | `Appliquer-Lot HY2` vert et commité ; site lancé au profil `Localhost` : `C:\Dev\Demonstrateur-data\fiches.db` créé, `GET api/sante` « ok » |
 | HY3 | Correction de DEB-A2 (DEB-Q58) : `global.json` à la racine du dépôt, garde du SDK dans `Directory.Build.props`, tests d'architecture ; précédé de F2c (racine de lot) | `Appliquer-Lot HY3` vert et commité ; `dotnet --version` rend 10.0.403 à la racine ; garde éprouvée sur une version forcée ; `Compter-Tests` à l'ouverture suivante |
 | F3 | Page Liste à l'accueil (DEB-Q59 à DEB-Q63) | `Appliquer-Lot F3` vert ; `npm test` vert ; dans le navigateur, statut de la liste conforme après chaque transition : création (Brouillon), soumission (Soumise, numéro), compléments (À compléter), reprise (Brouillon), validation (Validée, « Télécharger »), refus (Refusée) |
-| A1 | Adaptateur IA réel et prompt système (DEB-Q2) | scénario e-commerce joué avec l'IA réelle, sans invention |
+| A1 | Adaptateur IA réel et prompt système (DEB-Q2 : accès à Albert API vérifié à l'ouverture du lot, sinon API Mistral) | scénario e-commerce joué avec l'IA réelle, sans invention ; une demande d'assistance (« pc ne démarre plus », « copieur en panne ») signalée hors périmètre, sans proposition (DEB-Q64) |
 | R1 | Fiche de recette : nominal et retour pour complément | critère de fin du démonstrateur (§1) : **point de terminaison de la V1** |
 
 L'IA scénarisée précède l'IA réelle : la démonstration reste jouable sans réseau le jour du séminaire. Dépendance :
@@ -245,8 +245,7 @@ sont lancés à la main (`npm test`) et leur sortie jointe au compte rendu.
 | DEB-Q62 | (21/11/2026, « recommandations ok ») Date affichée : création, jj/mm/aaaa à l'heure de Paris (comme DEB-Q24, DEB-Q36), fuseau en paramètre de la fonction pure |
 | DEB-Q63 | (21/11/2026, « recommandations ok ») Toutes les fiches, sans filtre par agent, ordre du serveur (plus récente d'abord), sans pagination ; rechargement à l'affichage de la page, retour arrière compris (`pageshow`), sans interrogation périodique |
 
-Questions ouvertes :
+| DEB-Q2 | (21/11/2026, « recommandations ok » ; tranche la question ouverte au 20/11/2026) Fournisseur de l'IA réelle (A1, technologie DEB-D5) : **Albert API** (DINUM : hébergement SecNumCloud, modèles Mistral) si le ministère y a accès, sinon **API Mistral** ; l'accès est vérifié à l'ouverture d'A1, avant tout code ; sortie contrainte par schéma vérifiée en A1 ; repli hors réseau : IA scénarisée (démonstration jouable sans réseau) |
+| DEB-Q64 | (21/11/2026, « recommandations ok ») Observation du parcours de F3 : « pc ne démarre plus » (aucun mot de la liste de DEB-Q41) et « copieur en panne » (contient « panne » : signalée au tour concerné ; la fiche a pu être remplie à la main ensuite, non vérifié) ont été validées. Limite connue de l'IA scénarisée, pas un défaut de F3 : aucune correction de `ScenarioDialogue` ; la détection du hors périmètre entre dans le critère de fin d'A1, jugée sur l'IA réelle. Le système n'interdit pas de remplir à la main une demande d'assistance : la décision du chef de service reste le filtre (V1) |
 
-| N° | Question | Recommandation |
-| --- | --- | --- |
-| DEB-Q2 | Fournisseur de l'IA (à trancher avant A1 ; technologie : DEB-D5) | Albert API (DINUM) si le ministère y a accès (hébergement SecNumCloud, modèles Mistral ; sortie contrainte par schéma à vérifier en A1), sinon API Mistral ; repli hors réseau : IA scénarisée |
+Questions ouvertes : aucune.

@@ -432,3 +432,21 @@
   de la liste), MF20 (statut non vérifié), MF21 (libellé du badge) : chacune fait échouer 1 à 4 tests. Octets : CRLF
   sans BOM comme les originaux, référence JSON compacte sans fin de ligne. Non vérifié : compilation C# et tests .NET
   (`FicheVueTests` tranche la réplique Python de la sérialisation), coquille `PageListe.ts` dans un navigateur.
+
+## 21/11/2026 — F3 vérifié et clos ; F3b : DEB-Q2 et DEB-Q64
+
+- Ouvertures (20261121-170915, 171214, 172639) : 8 pièces conformes à `PIECES.txt` à chaque fois (tailles et
+  SHA-256) ; archives de 158 entrées au commit `ce06fe6` (F3 commité), conformes à `MASQUAGE.txt` ; 1 commit à publier
+  et 1 commit non sauvegardé signalés. `Compter-Tests` (Debug) : Domain 207, Application 66, Infrastructure 135,
+  Web 108, Architecture 23, total 539, 0 échec, égal à l'estimation de F3.
+- Preuves du poste pour F3 : `npm test` 200/200 (7 fichiers, Vitest 5.1.1) ; capture de la liste (EB-2026-0004 à
+  0007 : Validée avec « Télécharger », Refusée sans ; plus récente en tête ; date du 21/11/2026) ; statuts
+  intermédiaires (Brouillon, Soumise, À compléter, reprise) déclarés conformes par le développeur. Objectif de F3
+  atteint, chantier F clos.
+- Un « recommandations ok » reçu à l'ouverture, sans question posée dans la session : non appliqué, question renvoyée au
+  développeur (DEB-Q2 ou questions d'une conversation antérieure non versionnées ?) ; puis « recommandations ok » sur
+  les deux points posés : DEB-Q2 tranchée (Albert API si accès, sinon Mistral ; accès à confirmer à l'ouverture d'A1),
+  DEB-Q64 (observation du parcours : demandes d'assistance validées, limite de l'IA scénarisée, détection reportée au
+  critère d'A1, aucune correction).
+- F3b : documents seuls (plan v1.16, prompt de reprise, historique). Vérifié chez l'assistant : octets (CRLF sans BOM
+  comme les originaux), taille du prompt < 30 720 octets. Rien à compiler.

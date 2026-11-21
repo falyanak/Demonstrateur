@@ -1,6 +1,6 @@
 # Prompt de reprise — Demonstrateur
 
-> Mis à jour le 21/11/2026 par le lot F3. Règles génériques : harnais central, `regles\regles-de-travail.md` (v5) ;
+> Mis à jour le 21/11/2026 par le lot F3b. Règles génériques : harnais central, `regles\regles-de-travail.md` (v5) ;
 > modèle de projet : `regles\harnais-modele-generique.md` (v2) ; front : `regles\gabarit-frontend-vite-aspnet.md` ;
 > outillage : `C:\Dev\Harnais\docs\specification-harnais-central.md` (fait foi).
 > Historique détaillé : `docs/historique-Demonstrateur.md` (non envoyé par défaut). Documents hors dépôt dont dépend ce
@@ -8,26 +8,28 @@
 > `Expression_de_besoin_demonstrateur_IA_SICCRF.docx` (document de cadrage, novembre 2026). Le modèle `FEB.docx` est
 > versionné depuis I2, nettoyé de ses métadonnées (DEB-Q9, DEB-Q33).
 
-## ▶ ÉTAT AU 21/11/2026 (HY3 clos ; lot F3 livré : page Liste) — À LIRE D'ABORD
+## ▶ ÉTAT AU 21/11/2026 (chantier F clos par F3b ; prochain : A1) — À LIRE D'ABORD
 
-**Où on en est** : chantiers P, B, I clos ; F1, F2 clos ; hygiène HY1, HY2, HY3 close (DEB-A2 corrigée : `dotnet
---version` rend 10.0.403 à la racine, garde DEB0001 éprouvée, 538 tests au commit `fcdb37a`). **F3** (DEB-Q59 à
-DEB-Q63) livré, à appliquer : liste des fiches à l'accueil, actions « Ouvrir » et « Télécharger », vue pure, coquille
-`PageListe.ts`, référence `liste-reference.json` partagée xUnit / Vitest ; `features/accueil` retiré.
-**Critère de fin de F3** : `Appliquer-Lot F3` vert et commité (539 tests estimés) ; `npm test` vert (200 chez
-l'assistant) ; dans le navigateur (profil `Localhost` + `npm run dev`), statut de la liste conforme après chaque
-transition : création (Brouillon), soumission (Soumise, numéro), compléments (À compléter), reprise (Brouillon),
-validation (Validée, « Télécharger » ouvre le .docx), refus (Refusée).
-**Prochain pas** (plan ordonné) : F3, puis A1 (fournisseur à trancher, DEB-Q2), puis R1.
-**Point de terminaison de la V1** (DEB-D4) : lot R1, critère du plan §1 ; périmètre gelé jusque-là.
+**Où on en est** : chantiers P, B, I, F clos ; hygiène HY1 à HY3 close. F3 vérifié au poste (21/11/2026) : 539 tests
+.NET mesurés (`Compter-Tests`, 0 échec), `npm test` 200/200, statuts de la liste conformes après chaque transition dans le
+navigateur (Brouillon, Soumise et numéro, À compléter, reprise, Validée et « Télécharger », Refusée). Commit de F3 :
+`ce06fe6`. **DEB-Q2 tranchée** : Albert API si le ministère y a accès, sinon API Mistral (DEB-D5). **DEB-Q64** : la
+détection d'une demande d'assistance entre dans le critère d'A1.
+**Prochain lot : A1** (adaptateur IA réel, prompt système). **Première action à son ouverture** : le développeur dit si
+le ministère a accès à Albert API (sinon : clé d'API Mistral), sans jamais donner de secret dans la conversation ; la clé
+passe par une variable d'environnement. **Critère de fin d'A1** : scénario e-commerce joué avec l'IA réelle, sans
+invention ; « pc ne démarre plus » signalée hors périmètre, sans proposition ; tests verts, couverture conforme.
+**Ensuite** : R1, **point de terminaison de la V1** (DEB-D4) ; périmètre gelé jusque-là.
+**Avant R1** : publier et sauvegarder le dernier commit (critère de fin de la V1 ; 1 commit à publier à l'ouverture du
+21/11/2026, 17:26).
 **Ouverture de la session suivante** (site arrêté : il verrouille les DLL de `bin\Debug`) :
 
     Set-Location C:\Dev\Demonstrateur; . C:\Dev\Harnais\outillage\Charger-Harnais.ps1; Ouvrir-Session -BrancheAttendue main
     # attendu : « SESSION PRÉPARÉE : 8 pièce(s) dans C:\Dev\Sessions\Demonstrateur\<horodatage> » ; joindre toutes les
     # pièces et donner leur compte.
 
-**Décisions récentes** : DEB-Q59 à DEB-Q63 (21/11/2026). **Anomalies ouvertes** : aucune (DEB-A2 close par HY3).
-**Questions ouvertes** : DEB-Q2 (fournisseur d'IA). **Hygiène** : aucune en cours.
+**Décisions récentes** : DEB-Q2, DEB-Q64 (21/11/2026). **Anomalies ouvertes** : aucune. **Questions ouvertes** :
+aucune. **Hygiène** : aucune en cours.
 
 ## §0. Protocole (propre au projet)
 
@@ -43,7 +45,7 @@ validation (Validée, « Télécharger » ouvre le .docx), refus (Refusée).
 | Front | Node.js 26.13.1 LTS et son npm (DEB-D7) ; `node_modules` versionné (DEB-D6), Windows x64 ; `npm ci` seulement s'il manque ; versions exactes (`.npmrc`) |
 | Données | fictives, jamais réelles ; jeux d'essai hors dépôt ; base SQLite hors dépôt, clé `Fiches:Base` fixée par environnement (DEB-Q54, DEB-Q55) : poste `C:\Dev\Demonstrateur-data\fiches.db` (`appsettings.Localhost.json`) ; serveurs `appsettings.Staging.json`, `appsettings.Production.json` (`D:\Donnees\Demonstrateur-data[-staging]`, à confirmer) ; variable `Fiches__Base` prioritaire ; rien dans `appsettings.json` |
 | Dépôt distant | `https://github.com/falyanak/Demonstrateur.git`, **public**, branche `main` ; publication par le développeur seul (`Publier-Branche -Confirmer`, Git Credential Manager) |
-| Identifiants | `DEB-D…`, `DEB-A…`, `DEB-Q…`, `DEB-HY…` ; pris : DEB-D1 à DEB-D7, DEB-Q1 à DEB-Q63, DEB-A1 (close par F2), DEB-A2 (close par HY3), DEB-HY1 (close par HY1), DEB-HY2 (close par HY2) ; mutations M1 à M10, MF1 à MF21 (front) |
+| Identifiants | `DEB-D…`, `DEB-A…`, `DEB-Q…`, `DEB-HY…` ; pris : DEB-D1 à DEB-D7, DEB-Q1 à DEB-Q64, DEB-A1 (close par F2), DEB-A2 (close par HY3), DEB-HY1 (close par HY1), DEB-HY2 (close par HY2) ; mutations M1 à M10, MF1 à MF21 (front) |
 
 Ligne enchaînée du projet (zip portant `DEPOT.txt` = « Demonstrateur ») :
 
@@ -66,29 +68,30 @@ page de liste des fiches et de leur statut. Plan, périmètre et critère de fin
 | P — socle | P0a, P0, P0b | clos le 20/11/2026 : P0a (`56388a3`), P0 (`78ff21b`, base `a73cb7e`), P0b |
 | B — métier (Domain, Application) | B1, B1b, B2, B2b | clos le 20/11/2026 : B1 (`3ee722c`), B1b (`17f3a8d`), B2 (`9007adf`), B2b |
 | I — infrastructure | I1 (SQLite), I2 (.docx) | clos le 21/11/2026 : I1 (`f42de12`), I1b ; I2 relivré en I2a (`e28a964`), I2b |
-| F — front | F1 (socle, API), F2 (Dialogue), F3 (Liste) | F1 clos le 21/11/2026 : F1 (`bfaaf97`), F1b (`fe31e69`), F1c (`3e45551`) ; F2 clos le 21/11/2026 : F2 (`ba3aafd`), F2c (`50ccdb4`) ; F3 livré, à appliquer ; `TestsFront` attendu d'OT2 |
+| F — front | F1 (socle, API), F2 (Dialogue), F3 (Liste) | F1 clos le 21/11/2026 : F1 (`bfaaf97`), F1b (`fe31e69`), F1c (`3e45551`) ; F2 clos le 21/11/2026 : F2 (`ba3aafd`), F2c (`50ccdb4`) ; F3 clos le 21/11/2026 : F3 (`ce06fe6`), F3b ; `TestsFront` attendu d'OT2 |
 | Hygiène | HY1, HY1b (DEB-HY1 : NuGet, outils dotnet, SDK) ; HY2 (DEB-HY2 : dossier de données par environnement) ; HY3 (DEB-A2 : SDK depuis la racine) | HY1 clos le 21/11/2026 : HY1 (`d307a91`), HY1b ; HY2 clos le 21/11/2026 : HY2 (`9b21bdb`) ; HY3 clos le 21/11/2026 : HY3 (`fcdb37a`) |
-| A — IA réelle | A1 | à faire ; fournisseur à trancher (DEB-Q2) |
+| A — IA réelle | A1 | à faire ; Albert API si accès, sinon Mistral (DEB-Q2) ; critère élargi par DEB-Q64 |
 | R — recette | R1 | à faire |
 
 Comptes de P0 à I1 : historique. Depuis I2a :
 
-| Projet de tests | I2a, poste | F1, poste | HY1, poste | F2, poste | HY2, poste | HY3, poste (21/11/2026) | F3, ESTIMÉ |
+| Projet de tests | I2a, poste | F1, poste | HY1, poste | F2, poste | HY2, poste | HY3, poste | F3, poste (21/11/2026) |
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | ExpressionBesoin.Domain.Tests | 207 | 207 | 207 | 207 | 207 | 207 | 207 |
 | ExpressionBesoin.Application.Tests | 66 | 66 | 66 | 66 | 66 | 66 | 66 |
 | ExpressionBesoin.Infrastructure.Tests | 109 | 135 | 135 | 135 | 135 | 135 | 135 |
 | ExpressionBesoin.Web.Tests | 30 | 97 | 97 | 103 | 107 | 107 | 108 |
 | ExpressionBesoin.Architecture.Tests | 20 | 20 | 20 | 20 | 20 | 23 | 23 |
-| **Total** | **432** | **525** ; Vitest **58** | **525** (xUnit 4) | **531** ; Vitest **165** | **535** | **538** (Debug, `Compter-Tests`, 0 échec, SDK 10.0.403) | **539** (+1 Web : référence de la liste) ; Vitest **200** chez l'assistant |
-| Couverture | 1181/1181 lignes, 356/356 branches | cliquet 100 / 100 ; front 74/74, 57/57 | cliquet 100 / 100 | cliquet 100 / 100 ; front 153/153, 123/123 | cliquet 100 / 100 | cliquet 100 / 100 (`Appliquer-Lot HY3` vert) | à mesurer (`Appliquer-Lot F3`) ; aucun code .NET ajouté ; front 167/167 lignes, 131/131 branches (chez l'assistant) |
+| **Total** | **432** | **525** ; Vitest **58** | **525** (xUnit 4) | **531** ; Vitest **165** | **535** | **538** (Debug, `Compter-Tests`, 0 échec, SDK 10.0.403) | **539** (Debug, `Compter-Tests`, 0 échec) ; Vitest **200** au poste |
+| Couverture | 1181/1181 lignes, 356/356 branches | cliquet 100 / 100 ; front 74/74, 57/57 | cliquet 100 / 100 | cliquet 100 / 100 ; front 153/153, 123/123 | cliquet 100 / 100 | cliquet 100 / 100 (`Appliquer-Lot HY3` vert) | cliquet 100 / 100 (`Appliquer-Lot F3` vert) ; front 167/167 lignes, 131/131 branches (chez l'assistant) |
 
 Comptes .NET mesurés de HY1 à HY2 : compilés par le SDK 11.0.100 (DEB-A2), cible `net10.0` inchangée ; depuis HY3 : SDK 10.0.403.
 
 ## §2. Points ouverts
 
-1. Fournisseur d'IA (DEB-Q2) : à trancher avant A1 ; l'IA scénarisée suffit jusque-là. Recommandation : Albert API
-   (DINUM) si le ministère y a accès, sinon API Mistral. Technologie : DEB-D5.
+1. Accès à Albert API (DEB-Q2) : à confirmer par le développeur à l'ouverture d'A1 ; sinon API Mistral. Clé hors
+   dépôt, par variable d'environnement (règles §13).
+2. Publication et sauvegarde du dernier commit : exigées par le critère de fin de la V1 (R1).
 6. Chemins des serveurs (DEB-Q55) : `D:\Donnees\Demonstrateur-data\fiches.db` (Production) et
    `D:\Donnees\Demonstrateur-data-staging\fiches.db` (Staging), à confirmer avec l'exploitation avant toute
    publication (évolution V2, DEB-Q56) ; un changement = retouche des deux fichiers et de `ConfigurationEnvironnementsTests`.
@@ -107,6 +110,7 @@ Comptes .NET mesurés de HY1 à HY2 : compilés par le SDK 11.0.100 (DEB-A2), ci
 | N° | Décision |
 | --- | --- |
 | DEB-Q1 à DEB-Q8 | Arbitrages du 20/11/2026, « recommandations ok » : plan §8. |
+| DEB-Q2, DEB-Q64 | Fournisseur de l'IA réelle : Albert API si le ministère y a accès, sinon API Mistral, accès vérifié à l'ouverture d'A1 ; repli hors réseau : IA scénarisée. Demandes d'assistance validées au parcours de F3 (« pc ne démarre plus ») : limite connue de l'IA scénarisée, non corrigée ; détection jugée dans le critère d'A1 : plan §7, §8 (« recommandations ok », 21/11/2026). |
 | DEB-D1 | Dépôt `Demonstrateur` (nom du distant GitHub), racine `C:\Dev\Demonstrateur`, solution `ExpressionBesoin/`, préfixe `DEB` ; révise DEB-Q1 pour la racine (20/11/2026). |
 | DEB-D2 | Dépôt public : aucun document interne versionné (cahier des charges, modèle FEB) tant que DEB-Q9 n'est pas tranchée ; le plan en tient lieu (20/11/2026). |
 | DEB-Q9 | Modèle FEB vierge versionné, s'il ne porte aucune donnée (« ok », 20/11/2026) : métadonnées nettoyées par I2 (DEB-Q33). |
@@ -210,11 +214,10 @@ synthèse CODIR / COPIL, export PDF, version optimiste des fiches (DEB-Q26) ; to
 
 ## §7. Prochaine session
 
-Acquis : plan v1.15 ; socle P0, Domaine B1, Application B2, Infrastructure I1 et I2, front F1 et F2, hygiène HY1 à HY3
-validés sur le poste (538 tests .NET sous xUnit 4 et SDK 10.0.403, couverture 100 %, Vitest 165, parcours de la page
-Dialogue joué ; .docx ouvert dans Word). Audit honnête : chez l'assistant, ni SDK .NET ni NuGet ; F3 non compilé en C# :
-la référence `liste-reference.json` est écrite par une réplique Python de la sérialisation, le test xUnit qui la fige
-(`FicheVueTests`) tranche au poste ; front vérifié chez l'assistant (`tsc -b`, `vite build`, Vitest 200, couverture
-100 %, mutations MF16 à MF21 détectées) ; coquille `PageListe.ts` non exercée hors navigateur. Plan ordonné : F3 (à
-appliquer, parcours dans le navigateur), A1, R1 (point de terminaison de la V1, DEB-D4). Pièces à envoyer : toutes celles
-d'`Ouvrir-Session` (8), avec leur compte, site arrêté.
+Acquis : plan v1.16 ; socle P0, Domaine B1, Application B2, Infrastructure I1 et I2, front F1 à F3, hygiène HY1 à HY3
+validés sur le poste (539 tests .NET sous xUnit 4 et SDK 10.0.403, couverture 100 %, Vitest 200, parcours des pages
+Dialogue et Liste joués ; .docx ouvert dans Word). Audit honnête : chez l'assistant, ni SDK .NET ni NuGet ni accès
+réseau au fournisseur d'IA ; A1 sera compilé et éprouvé au poste ; les réponses de l'IA réelle ne sont pas
+déterministes : les tests figent l'adaptateur sur des réponses enregistrées, le scénario réel se joue au poste. Plan
+ordonné : A1 (accès Albert à confirmer d'abord), R1 (point de terminaison de la V1, DEB-D4). Pièces à envoyer : toutes
+celles d'`Ouvrir-Session` (8), avec leur compte, site arrêté ; et la réponse sur l'accès à Albert API.
