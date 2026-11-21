@@ -133,10 +133,18 @@ public sealed class PromptFicheTests
         var consignes = PromptFiche.Consignes;
 
         Assert.StartsWith(
-            "Tu aides un agent de l'administration à rédiger la fiche d'expression de besoin (FEB) d'une demande d'évolution du système d'information.",
+            "Tu aides un agent de l'administration à rédiger la fiche d'expression de besoin (FEB) d'une demande adressée au service informatique.",
             consignes);
         Assert.Contains("1. N'invente jamais rien.", consignes);
-        Assert.Contains("réponds horsPerimetre = true, sans aucune proposition", consignes);
+        Assert.Contains(
+            "assistance utilisateur (poste de travail, matériel, logiciels, comptes, accès et habilitations), exploitation des serveurs, réseau et télécommunications, applications existantes (maintenance, évolution), développement applicatif.",
+            consignes);
+        Assert.Contains("repère dans la demande le service, la tâche ou la prestation attendue du service informatique", consignes);
+        Assert.Contains("seulement si la demande ne porte sur aucun service, aucune tâche ni aucune prestation", consignes);
+        Assert.Contains("réponds alors horsPerimetre = true, sans aucune proposition", consignes);
+        Assert.Contains(
+            "Une panne, un incident, une demande de matériel, d'accès ou d'habilitation relèvent du service informatique : horsPerimetre = false.",
+            consignes);
         Assert.Contains("Quand c'est resume, ne pose pas de question : propose le résumé", consignes);
         Assert.Contains(
             "Réponse : un objet JSON seulement, { \"message\": texte pour l'agent, \"propositions\": [ { \"rubrique\": code, \"valeur\": texte, \"justification\": texte } ], \"horsPerimetre\": booléen }.",

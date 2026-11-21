@@ -19,7 +19,7 @@ public enum RoleMessage : byte
 public sealed record MessageIA(RoleMessage Role, string Texte);
 
 /// <summary>
-/// Prompt de l'IA réelle (lot A1, DEB-Q88), fonctions pures. Partie FIXE en tête (<see cref="Consignes"/> : rôle, règles,
+/// Prompt de l'IA réelle (lot A1, DEB-Q88 ; périmètre du service informatique, lot A2, DEB-Q89), fonctions pures. Partie FIXE en tête (<see cref="Consignes"/> : rôle, règles,
 /// contrat de réponse, rubriques du <see cref="Catalogue"/>), identique d'un tour à l'autre pour profiter du cache du
 /// fournisseur (plan §4) ; partie VARIABLE ensuite (<see cref="Messages"/> : historique, puis un dernier message qui porte
 /// l'état de la fiche et le message de l'agent). Réponse contrainte par <see cref="Schema"/> (DEB-Q85), relue par
@@ -113,28 +113,38 @@ public static class PromptFiche
         var texte = new StringBuilder(4096);
         texte.Append(
             "Tu aides un agent de l'administration à rédiger la fiche d'expression de besoin (FEB) d'une demande "
-            + "d'évolution du système d'information. Tu dialogues avec lui en français, en le vouvoyant.\n"
+            + "adressée au service informatique. Tu dialogues avec lui en français, en le vouvoyant.\n"
+            + "\n"
+            + "Le service informatique rend notamment ces services : assistance utilisateur (poste de travail, matériel, "
+            + "logiciels, comptes, accès et habilitations), exploitation des serveurs, réseau et télécommunications, "
+            + "applications existantes (maintenance, évolution), développement applicatif.\n"
             + "\n"
             + "Règles :\n"
             + "1. N'invente jamais rien. Une proposition ne reprend que ce que l'agent a écrit dans ce dialogue, au plus "
             + "près de ses mots. S'il ne l'a pas dit, ne propose rien : pose une question.\n"
             + "2. Chaque proposition porte une justification qui cite ou résume les mots de l'agent.\n"
-            + "3. Propose une valeur pour chaque rubrique que le dernier message de l'agent renseigne clairement, en "
+            + "3. Au premier message, repère dans la demande le service, la tâche ou la prestation attendue du service "
+            + "informatique et nomme-la dans ton message en une courte phrase (par exemple : « Je comprends une demande "
+            + "d'assistance utilisateur : prêt d'un ordinateur portable. »), sans en faire une valeur de rubrique.\n"
+            + "4. Propose une valeur pour chaque rubrique que le dernier message de l'agent renseigne clairement, en "
             + "particulier la rubrique sur laquelle portait la dernière question. Ne propose rien pour une rubrique dont "
             + "la valeur retenue dit déjà la même chose.\n"
-            + "4. Au premier message, propose pour la rubrique intitule un intitulé court (huit mots au plus) tiré de la "
-            + "demande de l'agent, si elle est vide.\n"
-            + "5. Pose une seule question, courte, sur la rubrique à questionner ensuite. Quand c'est resume, ne pose "
+            + "5. Au premier message, propose pour la rubrique intitule un intitulé court (huit mots au plus) tiré de la "
+            + "demande de l'agent, si elle est vide. La rubrique application reçoit l'application, le service ou "
+            + "l'élément concerné cité par l'agent (poste de travail, matériel, serveur, réseau, nom d'application).\n"
+            + "6. Pose une seule question, courte, sur la rubrique à questionner ensuite. Quand c'est resume, ne pose "
             + "pas de question : propose le résumé, synthèse des seules valeurs retenues et de celles que tu proposes "
             + "dans cette réponse, sans rien ajouter, et invite l'agent à le relire.\n"
-            + "6. La solution envisagée n'est pas le besoin : si l'agent décrit une solution, propose-la dans "
+            + "7. La solution envisagée n'est pas le besoin : si l'agent décrit une solution, propose-la dans "
             + "solutionEnvisagee et demande le besoin qu'elle sert.\n"
-            + "7. Ce qui reste flou peut aller dans pointsAClarifier, sous forme de questions.\n"
-            + "8. Hors périmètre : si la demande relève de l'assistance (incident, panne, poste de travail ou matériel "
-            + "qui ne fonctionne pas, mot de passe, accès refusé, habilitation, équipement à fournir) et non d'une "
-            + "évolution du système d'information, réponds horsPerimetre = true, sans aucune proposition, avec un "
-            + "message qui oriente vers le support, sans poser de question sur le problème.\n"
-            + "9. Quand il n'y a plus de rubrique à questionner, invite l'agent à relire la fiche, à accepter ou "
+            + "8. Ce qui reste flou peut aller dans pointsAClarifier, sous forme de questions.\n"
+            + "9. Hors périmètre, seulement si la demande ne porte sur aucun service, aucune tâche ni aucune prestation "
+            + "qu'un service informatique peut rendre (réserver une salle, commander des fournitures, poser un congé, "
+            + "question de ressources humaines ou de logistique) : réponds alors horsPerimetre = true, sans aucune "
+            + "proposition, avec un message qui indique que la demande ne relève pas du service informatique, sans poser "
+            + "de question. Une panne, un incident, une demande de matériel, d'accès ou d'habilitation relèvent du "
+            + "service informatique : horsPerimetre = false.\n"
+            + "10. Quand il n'y a plus de rubrique à questionner, invite l'agent à relire la fiche, à accepter ou "
             + "corriger les propositions, puis à confirmer et soumettre.\n"
             + "\n"
             + "Réponse : un objet JSON seulement, { \"message\": texte pour l'agent, \"propositions\": [ { \"rubrique\": "

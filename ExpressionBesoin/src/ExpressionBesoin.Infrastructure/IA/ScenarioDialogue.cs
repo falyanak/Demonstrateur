@@ -12,8 +12,10 @@ namespace ExpressionBesoin.Infrastructure.IA;
 /// IA SCÉNARISÉE (plan §7, DEB-Q41), fonction pure : rend une réponse au contrat du plan §2, relue par
 /// <see cref="ReponseIA.Lire"/> comme celle de l'IA réelle. Elle n'invente rien : ses propositions reprennent mot pour
 /// mot le message de l'agent, ou les valeurs déjà retenues pour le résumé.
+/// Elle ne classe jamais une demande hors périmètre (DEB-Q89) : toute demande adressée au service informatique
+/// (assistance, exploitation, réseau, applications, développement) est une fiche ; reconnaître une demande étrangère
+/// au service informatique relève de l'IA réelle, aucune liste de mots ne le fait sûrement.
 /// <list type="number">
-/// <item>Message de demande hors périmètre (incident, assistance, équipement, habilitation) → <c>horsPerimetre</c>.</item>
 /// <item>Premier tour : la demande initiale est proposée comme intitulé ; la question porte sur la prochaine rubrique.</item>
 /// <item>Prochaine rubrique = résumé : synthèse des rubriques obligatoires retenues, une ligne « libellé : valeur » chacune ;
 /// aucune retenue → rien à proposer, l'agent est invité à trancher les propositions en attente.</item>
@@ -23,14 +25,6 @@ namespace ExpressionBesoin.Infrastructure.IA;
 /// </summary>
 public static class ScenarioDialogue
 {
-    /// <summary>Mots qui signalent une demande d'assistance plutôt qu'une évolution du SI (minuscules, sans accent).</summary>
-    public static readonly FrozenSet<string> MotsHorsPerimetre =
-        new[] { "incident", "panne", "mot de passe", "imprimante", "ordinateur", "habilitation", "acces refuse" }.ToFrozenSet(StringComparer.Ordinal);
-
-    public const string MessageHorsPerimetre =
-        "Cette demande relève de l'assistance (incident, équipement ou habilitation), pas d'une évolution du système "
-        + "d'information : adressez-la au support. Je reste disponible pour une demande d'évolution.";
-
     public const string MessageFin =
         "Les rubriques obligatoires sont renseignées ou proposées. Relisez la fiche, acceptez ou corrigez les "
         + "propositions, puis confirmez et soumettez.";
@@ -46,7 +40,7 @@ public static class ScenarioDialogue
 
     private static readonly FrozenDictionary<string, string> Questions = new Dictionary<string, string>
     {
-        ["application"] = "Quelle application ou quel service du système d'information est concerné ?",
+        ["application"] = "Quel service, quelle application ou quel élément (poste de travail, serveur, réseau) est concerné ?",
         ["intitule"] = "Quel intitulé court donneriez-vous à cette demande ?",
         ["situationActuelle"] = "Comment cela se passe-t-il aujourd'hui ?",
         ["difficultes"] = "Quelles difficultés rencontrez-vous ?",
@@ -65,65 +59,29 @@ public static class ScenarioDialogue
 
     public static string Repondre(ContexteTour contexte)
     {
-        if (EstHorsPerimetre(contexte.Message))
-        {
-            return Json(MessageHorsPerimetre, [], horsPerimetre: true);
-        }
-
         var cible = contexte.ProchaineRubrique;
         if (cible is null)
         {
-            return Json(MessageFin, [], horsPerimetre: false);
+            return Json(MessageFin, []);
         }
 
         if (contexte.Historique.Count == 0 && cible != CodeIntitule && EstLibre(contexte, CodeIntitule))
         {
-            return Json(Question(contexte, cible), [(CodeIntitule, contexte.Message, JustificationReprise)], horsPerimetre: false);
+            return Json(Question(contexte, cible), [(CodeIntitule, contexte.Message, JustificationReprise)]);
         }
 
         if (cible == CodeResume)
         {
             var synthese = Synthese(contexte);
             return synthese.Length == 0
-                ? Json(MessageResumeImpossible, [], horsPerimetre: false)
-                : Json(MessageResume, [(CodeResume, synthese, JustificationResume)], horsPerimetre: false);
+                ? Json(MessageResumeImpossible, [])
+                : Json(MessageResume, [(CodeResume, synthese, JustificationResume)]);
         }
 
         var suivante = Suivante(contexte, cible);
         return Json(
             suivante is null ? MessageFin : Question(contexte, suivante),
-            [(cible, contexte.Message, JustificationReprise)],
-            horsPerimetre: false);
-    }
-
-    /// <summary>Recherche des mots hors périmètre, casse et accents ignorés.</summary>
-    internal static bool EstHorsPerimetre(string message)
-    {
-        var normalise = SansAccents(message.ToLowerInvariant());
-        foreach (var mot in MotsHorsPerimetre)
-        {
-            if (normalise.Contains(mot, StringComparison.Ordinal))
-            {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    internal static string SansAccents(string texte)
-    {
-        var decompose = texte.Normalize(NormalizationForm.FormD);
-        var resultat = new StringBuilder(decompose.Length);
-        foreach (var caractere in decompose)
-        {
-            if (char.GetUnicodeCategory(caractere) != System.Globalization.UnicodeCategory.NonSpacingMark)
-            {
-                resultat.Append(caractere);
-            }
-        }
-
-        return resultat.ToString().Normalize(NormalizationForm.FormC);
+            [(cible, contexte.Message, JustificationReprise)]);
     }
 
     /// <summary>Question de la rubrique ; à défaut d'une question écrite, formulation générique sur son libellé.</summary>
@@ -160,7 +118,7 @@ public static class ScenarioDialogue
     private static bool EstLibre(ContexteTour contexte, string code) =>
         Etat(contexte, code) is { Valeur: null, PropositionEnAttente: null };
 
-    private static string Json(string message, (string Rubrique, string Valeur, string Justification)[] propositions, bool horsPerimetre)
+    private static string Json(string message, (string Rubrique, string Valeur, string Justification)[] propositions)
     {
         var tampon = new ArrayBufferWriter<byte>(256);
         using (var ecrivain = new Utf8JsonWriter(tampon, Ecriture))
@@ -178,7 +136,7 @@ public static class ScenarioDialogue
             }
 
             ecrivain.WriteEndArray();
-            ecrivain.WriteBoolean("horsPerimetre", horsPerimetre);
+            ecrivain.WriteBoolean("horsPerimetre", false);
             ecrivain.WriteEndObject();
         }
 

@@ -68,7 +68,7 @@ public sealed class PointsFichesTests(UsineWeb usine) : IClassFixture<UsineWeb>
         var id = await Creer(client);
         var (statut, tour) = await Appeler(client, HttpMethod.Post, $"/api/fiches/{id}/messages", new { message = "  " + Demande + " " });
         Assert.Equal(HttpStatusCode.OK, statut);
-        Assert.Equal("Quelle application ou quel service du système d'information est concerné ?", tour.GetProperty("message").GetString());
+        Assert.Equal("Quel service, quelle application ou quel élément (poste de travail, serveur, réseau) est concerné ?", tour.GetProperty("message").GetString());
         Assert.False(tour.GetProperty("horsPerimetre").GetBoolean());
         Assert.Equal(0, tour.GetProperty("ecartees").GetArrayLength());
         var intitule = Rubrique(tour.GetProperty("fiche"), "intitule");
@@ -84,7 +84,7 @@ public sealed class PointsFichesTests(UsineWeb usine) : IClassFixture<UsineWeb>
     }
 
     [Fact]
-    public async Task Message_vide_422_hors_perimetre_sans_proposition()
+    public async Task Message_vide_422_demande_d_assistance_traitee_comme_une_autre()
     {
         using var client = usine.CreateClient();
         var id = await Creer(client);
@@ -93,10 +93,11 @@ public sealed class PointsFichesTests(UsineWeb usine) : IClassFixture<UsineWeb>
 
         var (statut, tour) = await Appeler(client, HttpMethod.Post, $"/api/fiches/{id}/messages", new { message = "Mon imprimante est en panne" });
         Assert.Equal(HttpStatusCode.OK, statut);
-        Assert.True(tour.GetProperty("horsPerimetre").GetBoolean());
-        Assert.Equal(ScenarioDialogue.MessageHorsPerimetre, tour.GetProperty("message").GetString());
-        Assert.All(tour.GetProperty("fiche").GetProperty("rubriques").EnumerateArray(), rubrique =>
-            Assert.Equal(System.Text.Json.JsonValueKind.Null, rubrique.GetProperty("proposition").ValueKind));
+        // DEB-Q89 : une panne relève du service informatique ; l'IA scénarisée la traite comme toute demande.
+        Assert.False(tour.GetProperty("horsPerimetre").GetBoolean());
+        Assert.Equal(
+            "Mon imprimante est en panne",
+            Rubrique(tour.GetProperty("fiche"), "intitule").GetProperty("proposition").GetProperty("valeur").GetString());
     }
 
     [Fact]

@@ -43,25 +43,28 @@ public sealed class ScenarioDialogueTests
         [.. reponse.Propositions.Select(proposition =>
             (proposition.Rubrique, proposition.Proposition.Valeur, proposition.Proposition.Justification))];
 
+    /// <summary>
+    /// DEB-Q89 : une demande d'assistance, d'équipement, d'accès ou une panne relève du service informatique ; l'IA
+    /// scénarisée la traite comme toute autre (ancienne liste de mots retirée).
+    /// </summary>
     [Theory]
     [InlineData("Mon IMPRIMANTE ne fonctionne plus")]
     [InlineData("Accès refusé à l'application")]
-    [InlineData("Je n'ai plus mon mot de passe")]
-    [InlineData("Habilitation à ouvrir pour un collègue")]
-    public void Hors_perimetre_sans_proposition(string message)
+    [InlineData("Demande de prêt d'un ordinateur portable")]
+    [InlineData("Incident : le copieur est en panne")]
+    public void Demande_d_assistance_traitee_comme_une_autre(string message)
     {
         var reponse = Lue(Contexte(message, "application"));
-        Assert.True(reponse.HorsPerimetre);
-        Assert.Empty(reponse.Propositions);
-        Assert.Equal(ScenarioDialogue.MessageHorsPerimetre, reponse.Message);
+        Assert.False(reponse.HorsPerimetre);
+        Assert.Equal(new[] { (Rubrique.Intitule, message, "Reprend les mots de l'agent.") }, Propositions(reponse));
     }
 
     [Fact]
-    public void Texte_exact_de_la_reponse_hors_perimetre() =>
+    public void Texte_exact_d_une_reponse_du_premier_tour() =>
         Assert.Equal(
-            "{\"message\":\"Cette demande relève de l'assistance (incident, équipement ou habilitation), pas d'une évolution "
-            + "du système d'information : adressez-la au support. Je reste disponible pour une demande d'évolution.\","
-            + "\"propositions\":[],\"horsPerimetre\":true}",
+            "{\"message\":\"Quel service, quelle application ou quel élément (poste de travail, serveur, réseau) est "
+            + "concerné ?\",\"propositions\":[{\"rubrique\":\"intitule\",\"valeur\":\"panne réseau\","
+            + "\"justification\":\"Reprend les mots de l'agent.\"}],\"horsPerimetre\":false}",
             ScenarioDialogue.Repondre(Contexte("panne réseau", "application")));
 
     [Fact]
@@ -76,7 +79,7 @@ public sealed class ScenarioDialogueTests
     public void Premier_tour_la_demande_devient_l_intitule_question_sur_l_application()
     {
         var reponse = Lue(Contexte(Message, "application"));
-        Assert.Equal("Quelle application ou quel service du système d'information est concerné ?", reponse.Message);
+        Assert.Equal("Quel service, quelle application ou quel élément (poste de travail, serveur, réseau) est concerné ?", reponse.Message);
         Assert.Equal(new[] { (Rubrique.Intitule, Message, "Reprend les mots de l'agent.") }, Propositions(reponse));
     }
 
@@ -176,18 +179,6 @@ public sealed class ScenarioDialogueTests
     [InlineData("criteresReussite", "À quoi verra-t-on que la demande est satisfaite ?")]
     public void Question_ecrite_ou_generique(string code, string attendue) =>
         Assert.Equal(attendue, ScenarioDialogue.Question(Contexte("x", null), code));
-
-    [Theory]
-    [InlineData("Éléphant à l'œil", "Elephant a l'œil")]
-    [InlineData("ACCÈS REFUSÉ", "ACCES REFUSE")]
-    [InlineData("", "")]
-    public void Accents_retires(string texte, string attendu) => Assert.Equal(attendu, ScenarioDialogue.SansAccents(texte));
-
-    [Theory]
-    [InlineData("Contrôle des prélèvements", false)]
-    [InlineData("Un INCIDENT bloque l'outil", true)]
-    [InlineData("passe", false)]
-    public void Detection_hors_perimetre(string message, bool attendu) => Assert.Equal(attendu, ScenarioDialogue.EstHorsPerimetre(message));
 
     [Fact]
     public async Task Adaptateur_rend_le_scenario_et_respecte_l_annulation()

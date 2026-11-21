@@ -551,3 +551,25 @@
   documentation de MAF (1.13, dépôt source inaccessible) ; JSON des `appsettings` ; octets (CRLF sans BOM comme les
   originaux) ; taille du prompt < 30 720 octets. Non vérifié : compilation, restauration NuGet, tests, couverture,
   mutations du back-end, IA réelle : `Appliquer-Lot A1` et le critère au poste tranchent.
+
+## 21/11/2026 — A1 appliqué ; périmètre élargi au service informatique (DEB-Q89, DEB-Q90) ; A2 livré
+
+- `Appliquer-Lot A1` : 23 fichiers écrits et relus à l'octet près, compilation Release, 641 tests .NET, 0 échec
+  (Infrastructure 190, Web 133 : égal à l'estimation) ; commit `27ec900` par la ligne enchaînée (cliquet de couverture
+  conforme). Clé `ALBERT_API_KEY` posée en variable utilisateur par saisie masquée.
+- Navigateur (capture du développeur), IA réelle : « demande de prêt d'un ordinateur portable » signalée hors périmètre,
+  mais avec une question sur l'application (réponse contradictoire, écart signalé sous le nom provisoire DEB-A3, non
+  numéroté) ; « assistance utilisateur » hors périmètre, orientée vers le support. Rien proposé à droite (DEB-Q23).
+- Le développeur précise l'objet : tout besoin que le service informatique peut traiter (assistance utilisateur,
+  exploitation des serveurs, réseau, applications, développement applicatif) ; l'IA doit repérer dans la demande le
+  service, la tâche ou la prestation. DEB-Q89 et DEB-Q90 posées, « recommandations ok » ; DEB-A3 sans objet.
+- A2 : `PromptFiche` (objet, services du service informatique, règle 3 : prestation nommée au premier message sans
+  devenir une valeur ; règle 5 : élément concerné dans `application` ; règle 9 : hors périmètre = demande non
+  informatique, sans question) ; `ScenarioDialogue` (liste de mots, `EstHorsPerimetre`, `SansAccents`,
+  `MessageHorsPerimetre` retirés ; question de la rubrique `application` élargie) ; `PageDialogue.ts` (libellé « Demande
+  hors du périmètre du service informatique. ») ; tests : `PromptFicheTests`, `ScenarioDialogueTests` (11 cas retirés,
+  5 ajoutés), `PointsFichesTests` (une panne traitée comme toute demande). Comptes ESTIMÉS : Infrastructure 190 → 184,
+  total 635 ; Vitest inchangé (249).
+- Vérifié chez l'assistant : syntaxe C# (tree-sitter) ; attendus des consignes recalculés depuis les fragments du code
+  (réplique Python) ; octets (CRLF sans BOM) ; taille du prompt < 30 720 octets. Non vérifié : compilation, tests,
+  couverture, `tsc` et `vite build` (un libellé changé dans une coquille), réponses de l'IA réelle.

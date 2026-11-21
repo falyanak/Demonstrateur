@@ -92,7 +92,7 @@ export const page: Page = {
         const agent = ligne.auteur === "Agent";
         const bulle = el("div", `dialogue-bulle ${agent ? "dialogue-agent" : "dialogue-ia"}${ligne.horsPerimetre ? " border border-warning" : ""}`);
         bulle.append(el("div", "small fw-semibold", agent ? "Agent" : "Assistant"), el("div", "dialogue-texte", ligne.texte));
-        if (ligne.horsPerimetre) bulle.append(el("div", "small text-warning-emphasis mt-1", "Demande hors du périmètre des évolutions du SI."));
+        if (ligne.horsPerimetre) bulle.append(el("div", "small text-warning-emphasis mt-1", "Demande hors du périmètre du service informatique."));
         const note = noteEcartees(ligne.ecartees);
         if (note !== null) bulle.append(el("div", "small text-body-secondary mt-1", note));
         fil.append(bulle);

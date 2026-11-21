@@ -1,6 +1,6 @@
 # Plan du démonstrateur « Expression de besoin » (version simplifiée)
 
-> Version 1.19 du 21/11/2026 (lot A1 ; 1.18 au lot L2, 1.17 au lot L1, 1.16 au lot F3b, 1.15 au lot F3, 1.14 au lot F2c, 1.13 au lot HY2, 1.12 au lot F2, 1.11 au lot HY1b, 1.10 au lot HY1, 1.9 au lot F1, 1.8 au lot I2b, 1.7 au lot I2, 1.6 au lot I1, 1.5 au lot B2, 1.4 au lot B1b, 1.3 au lot B1, 1.2 au lot P0c, 1.1 au
+> Version 1.20 du 21/11/2026 (lot A2 ; 1.19 au lot A1, 1.18 au lot L2, 1.17 au lot L1, 1.16 au lot F3b, 1.15 au lot F3, 1.14 au lot F2c, 1.13 au lot HY2, 1.12 au lot F2, 1.11 au lot HY1b, 1.10 au lot HY1, 1.9 au lot F1, 1.8 au lot I2b, 1.7 au lot I2, 1.6 au lot I1, 1.5 au lot B2, 1.4 au lot B1b, 1.3 au lot B1, 1.2 au lot P0c, 1.1 au
 > lot P0, 1.0 au lot P0a). Arbitrages DEB-Q1 à DEB-Q8, DEB-Q11 à DEB-Q32 : « recommandations ok » (20/11/2026) ; DEB-Q9 :
 > « ok » (20/11/2026) ; DEB-Q33 à DEB-Q37 : « recommandations ok » (21/11/2026) ;
 > DEB-Q38 à DEB-Q44 : « recommandations ok » (21/11/2026) ; DEB-Q45, DEB-Q46 : « recommandations ok »
@@ -9,14 +9,15 @@
 > avant F3 » (21/11/2026) ; DEB-Q59 à DEB-Q63 : « recommandations ok » (21/11/2026) ; DEB-Q2, DEB-Q64 : « recommandations ok » (21/11/2026) ;
 > DEB-Q65, DEB-Q66 : « recommandations ok », DEB-Q67 à DEB-Q72 rendues sans objet par DEB-Q73 ; DEB-Q73 à DEB-Q78 :
 > « accord » du développeur (21/11/2026) ; DEB-Q79 à DEB-Q82 : « recommandations ok » (21/11/2026) ; DEB-Q83 : accès confirmé par le développeur, DEB-Q84 à DEB-Q88 :
-> « recommandations ok » après la sonde (21/11/2026). Décisions : §8. Document d'origine **hors
+> « recommandations ok » après la sonde (21/11/2026) ; DEB-Q89, DEB-Q90 : « recommandations ok » (21/11/2026). Décisions : §8. Document d'origine **hors
 > dépôt** (DEB-D2) : cahier des charges « Document de cadrage » (novembre 2026), tenu par le développeur ; le modèle de
 > fiche (FEB) est versionné, nettoyé de ses métadonnées (DEB-Q9, DEB-Q33).
 
 ## 1. Objet et périmètre
 
 Une application web de démonstration aide un agent à rédiger, par dialogue avec une IA, la fiche d'expression de
-besoin d'une demande d'évolution du système d'information ; la décision du chef de service est simulée ; la fiche
+besoin d'une demande adressée au service informatique (assistance utilisateur, exploitation des serveurs, réseau,
+applications, développement applicatif : DEB-Q89, qui élargit l'objet initial, les seules évolutions du SI) ; la décision du chef de service est simulée ; la fiche
 validée est produite au format Word, au modèle FEB. Données fictives uniquement ; aucune décision réelle.
 
 | Dans le périmètre | Hors périmètre (évolutions ultérieures) |
@@ -48,7 +49,7 @@ sauvegardé.
 | Comprendre le texte libre, reformuler | Liste des rubriques, obligatoires ou facultatives |
 | Formuler la question suivante | **Rubrique à questionner ensuite** (ordre fixe : première rubrique obligatoire vide) |
 | Proposer une valeur de rubrique, avec sa justification | Fusion des propositions : rubrique manuelle jamais écrasée, proposition mise en attente |
-| Signaler une demande hors périmètre (incident, assistance, équipement, habilitation) | Complétude, cycle des statuts, numéro `EB-AAAA-NNNN` attribué à la soumission |
+| Repérer le service, la tâche ou la prestation attendue du service informatique ; signaler une demande qui n'en relève pas (DEB-Q89) | Complétude, cycle des statuts, numéro `EB-AAAA-NNNN` attribué à la soumission |
 | Alimenter « Points restant à clarifier » et le résumé | Contenu du .docx, à partir de la fiche |
 
 Réponse de l'IA : **JSON structuré** `{ message, propositions: [{ rubrique, valeur, justification }], horsPerimetre }`,
@@ -173,7 +174,8 @@ AG Grid inutile). Réponse de l'IA affichée entière, avec indicateur d'attente
 | F3 | Page Liste à l'accueil (DEB-Q59 à DEB-Q63) | `Appliquer-Lot F3` vert ; `npm test` vert ; dans le navigateur, statut de la liste conforme après chaque transition : création (Brouillon), soumission (Soumise, numéro), compléments (À compléter), reprise (Brouillon), validation (Validée, « Télécharger »), refus (Refusée) |
 | L1 | Cycle de vie, serveur (DEB-Q73 à DEB-Q78) : `Transitions` du Domaine, table SQLite et migration du schéma 1 au schéma 2, dépôt, service, champ `cycle` de `GET api/fiches/{id}` | `Appliquer-Lot L1` vert (tests, couverture 100 / 100) et commité ; base du poste migrée au schéma 2 au premier lancement (`Localhost`) ; parcours création → soumission → compléments → reprise → nouvelle soumission → validation : six transitions dans `GET api/fiches/{id}`, dans l'ordre, acteurs conformes ; un refus ajoute « Refus » |
 | L2 | Cycle de vie, front : panneau « Cycle de vie » de la page Dialogue (vue pure, coquille sans `innerHTML`) ; consultation relue après chaque transition (DEB-Q79 à DEB-Q82) | `npm test` vert ; dans le navigateur, le panneau montre le parcours de L1 et se met à jour après chaque action |
-| A1 | Adaptateur IA réel et prompt système (DEB-Q2 : accès à Albert API vérifié à l'ouverture du lot, sinon API Mistral) | scénario e-commerce joué avec l'IA réelle, sans invention ; une demande d'assistance (« pc ne démarre plus », « copieur en panne ») signalée hors périmètre, sans proposition (DEB-Q64) |
+| A1 | Adaptateur IA réel et prompt système (DEB-Q2 : accès à Albert API vérifié à l'ouverture du lot, sinon API Mistral) | scénario e-commerce joué avec l'IA réelle, sans invention ; une demande d'assistance (« pc ne démarre plus », « copieur en panne ») signalée hors périmètre, sans proposition (DEB-Q64) ; **révisé par DEB-Q89** : voir A2 |
+| A2 | Périmètre du service informatique (DEB-Q89) : consignes de l'IA réelle (service, tâche ou prestation repérés ; hors périmètre = demande non informatique), IA scénarisée sans liste de mots, libellé du front | `Appliquer-Lot A2` vert et commité ; au navigateur, avec l'IA réelle : scénario e-commerce sans invention ; « pc ne démarre plus », « copieur en panne » et « prêt d'un ordinateur portable » deviennent des fiches, prestation nommée dans la première réponse, sans invention ; « réserver une salle de réunion » signalé hors périmètre, sans proposition ni question. Ce critère tient lieu de celui d'A1 |
 | R1 | Fiche de recette : nominal et retour pour complément | critère de fin du démonstrateur (§1) : **point de terminaison de la V1** |
 
 L'IA scénarisée précède l'IA réelle : la démonstration reste jouable sans réseau le jour du séminaire. Dépendance :
@@ -277,5 +279,8 @@ sont lancés à la main (`npm test`) et leur sortie jointe au compte rendu.
 | DEB-Q86 | (21/11/2026, « recommandations ok ») `IA:Fournisseur` (`Albert` ou `Scenarise`), `IA:Point`, `IA:Modele` dans `appsettings.{Localhost,Staging,Production}.json` (Albert, `openweight-medium`), rien dans `appsettings.json` ; clé dans la variable `ALBERT_API_KEY` (variable utilisateur Windows), jamais dans un fichier ; aucune bascule implicite : valeur absente, inconnue ou incomplète → arrêt au démarrage, message sans la clé (`CompositionIA`). Démonstration hors réseau : `IA:Fournisseur = Scenarise` (ou variable `IA__Fournisseur`) |
 | DEB-Q87 | (21/11/2026, « recommandations ok ») Réseau : connexions par le proxy du système, identifiants Windows remis au seul proxy ; délai de 60 s par appel ; nouvels essais du client OpenAI désactivés ; sur un 429, un seul nouvel essai pour une limite par minute, après `Retry-After` (2 s à défaut, 10 s au plus : `LimiteDebit`, pur ; `GestionnaireLimiteDebit`, coquille) ; limite par jour et tout autre échec → exception, 503 `panne.technique` (DEB-Q22) |
 | DEB-Q88 | (21/11/2026, « recommandations ok ») Tests sans réseau : prompt pur (`PromptFiche` : consignes fixes en tête pour le cache, puis historique et dernier message portant l'état de la fiche, la rubrique questionnée et la suivante, même ordre que l'IA scénarisée), table de vérité ; adaptateur éprouvé de bout en bout (agent MAF, client OpenAI, maillon du 429) sur un faux fournisseur HTTP ; l'IA réelle n'est jugée qu'au critère d'A1, sur le poste ; couverture 100 / 100 |
+
+| DEB-Q89 | (21/11/2026, « recommandations ok » ; précisée par le développeur : « l'IA doit détecter dans la demande un service, une tâche, une prestation qui peuvent être rendus par un service informatique ») Objet élargi à toute demande adressée au service informatique : assistance utilisateur, exploitation des serveurs, réseau, applications, développement applicatif. Révise DEB-Q41 (l'IA scénarisée ne classe plus rien hors périmètre, liste de mots retirée), DEB-Q64 et le critère d'A1 (une panne ou une demande de matériel devient une fiche) ; DEB-Q23 inchangée (mécanisme). IA réelle : au premier message, la prestation repérée est nommée dans le message, sans devenir une valeur de rubrique ; la rubrique « Application ou service concerné » reçoit aussi l'élément en cause (poste de travail, matériel, serveur, réseau) ; hors périmètre = demande qu'aucun service informatique ne peut rendre. Contrat, Domaine, base, .docx inchangés ; libellé du front « Demande hors du périmètre du service informatique. » ; lot A2. l'écart signalé le 21/11/2026 sous le nom provisoire DEB-A3 (réponse hors périmètre qui pose une question) est sans objet ; ce numéro reste libre |
+| DEB-Q90 | (21/11/2026, « recommandations ok ») Catégorie de la demande (assistance, exploitation, réseau, applications, développement) comme champ distinct, et rubriques obligatoires selon la catégorie : évolutions V2 ; en V1, les dix rubriques obligatoires valent pour toute demande |
 
 Questions ouvertes : aucune.
