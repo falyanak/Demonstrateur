@@ -10,5 +10,12 @@
     <IsPackable>false</IsPackable>
     <!-- Version relue par GET api/sante (version informative de l'assembly). -->
     <Version>0.1.0</Version>
+    <!-- SDK exigé au build (DEB-Q47) : égal à la version du global.json de la RACINE du dépôt (SdkTests le vérifie). -->
+    <SdkAttendu>10.0.403</SdkAttendu>
   </PropertyGroup>
+  <!-- Garde (DEB-A2, DEB-Q58) : dotnet cherche global.json depuis le dossier courant ; lancé hors du dépôt, il prendrait
+       le SDK le plus récent installé. Le build s'arrête alors avant toute compilation. -->
+  <Target Name="VerifierSdk" BeforeTargets="BeforeBuild" Condition="'$(NETCoreSdkVersion)' != '$(SdkAttendu)'">
+    <Error Code="DEB0001" Text="SDK $(NETCoreSdkVersion) utilisé, $(SdkAttendu) attendu (DEB-Q47) : lancer dotnet depuis le dépôt, dont la racine porte global.json." />
+  </Target>
 </Project>

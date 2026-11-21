@@ -388,3 +388,19 @@
   `appsettings.Localhost.json` retouché à la main hors lot (`C:\DEV\demonstrateur-data`, casse changée) ; le garde-fou
   de HY2 a mordu. Arbre remis à HEAD (`git checkout`), contenu relivré sous le nom F2c (règles §3). `global.json` copié
   à la main dans le dossier du profil Windows : sans effet sur `C:\Dev` (recherche depuis le dossier courant), retiré.
+
+## 21/11/2026 — F2c commité ; HY3 : global.json à la racine du dépôt (DEB-A2, DEB-Q58)
+
+- F2c : `git checkout -- .` (arbre remis à HEAD), puis `Appliquer-Lot F2c` : « configuration portée par le lot, valide »,
+  4 fichiers écrits, aucune vérification (lot hors solution) ; commit `50ccdb4`, 4 fichiers dont `harnais.config.psd1`.
+  Constat : `Appliquer-Lot` valide les chemins d'après la configuration portée par le lot ; le découpage F2c puis HY3
+  n'était pas nécessaire (sans dommage). Objectif de F2c atteint.
+- HY3 : `global.json` déplacé à la racine du dépôt (octets inchangés : 10.0.403, `rollForward: disable`), ancien retiré
+  par `SUPPRESSIONS.txt` ; `.slnx` relié à `../global.json` ; `Directory.Build.props` : `SdkAttendu` et cible
+  `VerifierSdk` (`BeforeTargets="BeforeBuild"`, erreur `DEB0001` si `NETCoreSdkVersion` diffère) ; `SolutionTests.Racine`
+  rendu `internal`, partagé avec `SdkTests` (3 tests : `global.json` à la racine et bloquant, aucun dans la solution,
+  version égale à la garde). Total estimé 538 (Architecture 23).
+- Vérifié chez l'assistant : réplique Python des trois tests sur les fichiers du lot (verte), puis sur trois copies
+  mutées, chacune en échec : `SdkAttendu` 10.0.404, `global.json` laissé dans la solution, `rollForward` `latestFeature` ;
+  XML et JSON bien formés ; octets (CRLF, BOM du seul fichier qui en portait). Non vérifié : compilation C#, tests .NET,
+  évaluation de la garde par MSBuild (le poste tranche : `dotnet --version` à la racine, build forcé en échec).

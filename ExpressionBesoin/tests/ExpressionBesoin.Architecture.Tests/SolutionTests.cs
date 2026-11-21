@@ -3,7 +3,8 @@ namespace ExpressionBesoin.Architecture.Tests;
 /// <summary>Règles appliquées aux vrais fichiers de la solution : un projet de src, une règle ; chaque projet conforme.</summary>
 public sealed class SolutionTests
 {
-    private static readonly string Racine = TrouverRacine();
+    /// <summary>Dossier de la solution (celui du .slnx), partagé avec <see cref="SdkTests"/>.</summary>
+    internal static readonly string Racine = TrouverRacine();
 
     [Fact]
     public void Chaque_projet_de_src_a_une_regle_et_chaque_regle_un_projet()

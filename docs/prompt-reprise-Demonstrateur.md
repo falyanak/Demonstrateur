@@ -1,6 +1,6 @@
 # Prompt de reprise — Demonstrateur
 
-> Mis à jour le 21/11/2026 par le lot F2c. Règles génériques : harnais central, `regles\regles-de-travail.md` (v5) ;
+> Mis à jour le 21/11/2026 par le lot HY3. Règles génériques : harnais central, `regles\regles-de-travail.md` (v5) ;
 > modèle de projet : `regles\harnais-modele-generique.md` (v2) ; front : `regles\gabarit-frontend-vite-aspnet.md` ;
 > outillage : `C:\Dev\Harnais\docs\specification-harnais-central.md` (fait foi).
 > Historique détaillé : `docs/historique-Demonstrateur.md` (non envoyé par défaut). Documents hors dépôt dont dépend ce
@@ -8,20 +8,17 @@
 > `Expression_de_besoin_demonstrateur_IA_SICCRF.docx` (document de cadrage, novembre 2026). Le modèle `FEB.docx` est
 > versionné depuis I2, nettoyé de ses métadonnées (DEB-Q9, DEB-Q33).
 
-## ▶ ÉTAT AU 21/11/2026 (F2 et HY2 clos ; anomalie DEB-A2 : lot F2c livré, puis HY3) — À LIRE D'ABORD
+## ▶ ÉTAT AU 21/11/2026 (F2c commité ; lot HY3 livré : correction de DEB-A2) — À LIRE D'ABORD
 
-**Où on en est** : chantiers P, B, I clos ; F1, F2, HY1, HY2 clos (HEAD `9b21bdb`, publié et sauvegardé ; 535 tests
-.NET, Vitest 165, parcours du navigateur prouvé). **DEB-A2** : lancées depuis la racine du dépôt, les commandes du
-harnais compilent avec le SDK 11.0.100, car `global.json` (10.0.403, DEB-Q47) est dans `ExpressionBesoin/`, hors du
-chemin où `dotnet` le cherche (dossier courant et parents ; mesuré : 11.0.100 à la racine, 10.0.403 dans
-`ExpressionBesoin`). Correction immédiate (DEB-Q58), en deux lots : **F2c** (documents ; `global.json` ajouté aux
-`Lot.Racines`, que `Appliquer-Lot` lit avant d'écrire) livré, à appliquer ; puis **HY3** (`global.json` à la racine,
-garde du SDK dans `Directory.Build.props`, tests d'architecture), bâti après la sortie de F2c.
-**Critère de fin de F2c** : `Appliquer-Lot F2c` vert et commité.
-**Critère de fin de HY3** : `Appliquer-Lot HY3` vert et commité ; `dotnet --version` rend 10.0.403 à la racine du
-dépôt ; la garde échoue sur une version forcée (commande fournie avec HY3) ; `Compter-Tests` compte les tests attendus
-à l'ouverture suivante, site arrêté.
-**Prochain pas** (plan ordonné) : F2c, HY3, puis F3 (page Liste).
+**Où on en est** : chantiers P, B, I clos ; F1, F2, HY1, HY2 clos ; F2c commité (`50ccdb4`). **DEB-A2** : lancées depuis
+la racine du dépôt, les commandes du harnais compilaient avec le SDK 11.0.100, car `global.json` (10.0.403, DEB-Q47)
+était dans `ExpressionBesoin/`, hors du chemin où `dotnet` le cherche (dossier courant et parents). **HY3** (DEB-Q58)
+livré, à appliquer : `global.json` à la racine du dépôt (l'ancien supprimé), `.slnx` relié, garde `VerifierSdk` au build
+(erreur `DEB0001` si le SDK n'est pas `SdkAttendu`), `SdkTests` (3 tests d'architecture).
+**Critère de fin de HY3** : `Appliquer-Lot HY3` vert et commité (538 tests estimés) ; `dotnet --version` rend 10.0.403
+à la racine du dépôt ; la garde échoue sur une version forcée (`-p:SdkAttendu=0.0.0`) ; `Compter-Tests` compte 538 à
+l'ouverture suivante, site arrêté.
+**Prochain pas** (plan ordonné) : HY3, puis F3 (page Liste).
 **Point de terminaison de la V1** (DEB-D4) : lot R1, critère du plan §1 ; périmètre gelé jusque-là.
 **Ouverture de la session suivante** (site arrêté : il verrouille les DLL de `bin\Debug`) :
 
@@ -29,7 +26,7 @@ dépôt ; la garde échoue sur une version forcée (commande fournie avec HY3) ;
     # attendu : « SESSION PRÉPARÉE : 8 pièce(s) dans C:\Dev\Sessions\Demonstrateur\<horodatage> » ; joindre toutes les
     # pièces et donner leur compte.
 
-**Décisions récentes** : DEB-Q58 (21/11/2026). **Anomalies ouvertes** : DEB-A2 (correction : F2c, HY3).
+**Décisions récentes** : DEB-Q58 (21/11/2026). **Anomalies ouvertes** : DEB-A2 (correction : HY3, à appliquer).
 **Questions ouvertes** : DEB-Q2 (fournisseur d'IA). **Hygiène** : aucune en cours (DEB-HY2 close par HY2).
 
 ## §0. Protocole (propre au projet)
@@ -40,13 +37,13 @@ dépôt ; la garde échoue sur une version forcée (commande fournie avec HY3) ;
 | Configuration | `harnais.config.psd1` (dépôt « Demonstrateur », type `Projet` depuis P0, `HarnaisMinimal` 1.9.0) |
 | Projets de tests | `ExpressionBesoin/tests/ExpressionBesoin.{Domain,Application,Infrastructure,Web,Architecture}.Tests` (tous dans `Lot.TestsUnitaires` ; Application depuis B2, Infrastructure depuis I1) |
 | Couverture | `ExpressionBesoin/coverage-baseline.json` (100 / 100 depuis `a73cb7e`), `ExpressionBesoin/coverage-dette.txt` (vide) ; projets mesurés : Domain.Tests, Application.Tests, Infrastructure.Tests, Web.Tests ; assemblies attendues : Domain, Application, Infrastructure, Web (Infrastructure depuis I1) |
-| Outils | SDK 10.0.403, bloqué par `global.json` (`rollForward: disable`, DEB-Q47 ; non tenu depuis la racine du dépôt : DEB-A2, corrigée par HY3) ; .NET 11 installé, non utilisé ; `.config/dotnet-tools.json` : dotnet-coverage 18.12.0, ReportGenerator 5.6.0 (HY1) |
+| Outils | SDK 10.0.403, bloqué par `global.json` (`rollForward: disable`, DEB-Q47), à la RACINE du dépôt depuis HY3 (DEB-A2) ; garde `VerifierSdk` (`Directory.Build.props`, `SdkAttendu`) ; .NET 11 installé, non utilisé ; `.config/dotnet-tools.json` : dotnet-coverage 18.12.0, ReportGenerator 5.6.0 (HY1) |
 | Paquets | `nuget.config` du projet : nuget.org seul (DEB-Q11) ; versions centralisées dans `Directory.Packages.props` |
 | Tests du front | `ExpressionBesoin/src/ExpressionBesoin.Web/ClientApp/tests` (Vitest 5) ; contrat partagé `tests/contrats/fiche-reference.json` |
 | Front | Node.js 26.13.1 LTS et son npm (DEB-D7) ; `node_modules` versionné (DEB-D6), Windows x64 ; `npm ci` seulement s'il manque ; versions exactes (`.npmrc`) |
 | Données | fictives, jamais réelles ; jeux d'essai hors dépôt ; base SQLite hors dépôt, clé `Fiches:Base` fixée par environnement (DEB-Q54, DEB-Q55) : poste `C:\Dev\Demonstrateur-data\fiches.db` (`appsettings.Localhost.json`) ; serveurs `appsettings.Staging.json`, `appsettings.Production.json` (`D:\Donnees\Demonstrateur-data[-staging]`, à confirmer) ; variable `Fiches__Base` prioritaire ; rien dans `appsettings.json` |
 | Dépôt distant | `https://github.com/falyanak/Demonstrateur.git`, **public**, branche `main` ; publication par le développeur seul (`Publier-Branche -Confirmer`, Git Credential Manager) |
-| Identifiants | `DEB-D…`, `DEB-A…`, `DEB-Q…`, `DEB-HY…` ; pris : DEB-D1 à DEB-D7, DEB-Q1 à DEB-Q58, DEB-A1 (close par F2), DEB-A2 (ouverte, HY3), DEB-HY1 (close par HY1), DEB-HY2 (close par HY2) ; mutations M1 à M10, MF1 à MF15 (front) |
+| Identifiants | `DEB-D…`, `DEB-A…`, `DEB-Q…`, `DEB-HY…` ; pris : DEB-D1 à DEB-D7, DEB-Q1 à DEB-Q58, DEB-A1 (close par F2), DEB-A2 (lot HY3), DEB-HY1 (close par HY1), DEB-HY2 (close par HY2) ; mutations M1 à M10, MF1 à MF15 (front) |
 
 Ligne enchaînée du projet (zip portant `DEPOT.txt` = « Demonstrateur ») :
 
@@ -70,19 +67,19 @@ page de liste des fiches et de leur statut. Plan, périmètre et critère de fin
 | B — métier (Domain, Application) | B1, B1b, B2, B2b | clos le 20/11/2026 : B1 (`3ee722c`), B1b (`17f3a8d`), B2 (`9007adf`), B2b |
 | I — infrastructure | I1 (SQLite), I2 (.docx) | clos le 21/11/2026 : I1 (`f42de12`), I1b ; I2 relivré en I2a (`e28a964`), I2b |
 | F — front | F1 (socle, API), F2 (Dialogue), F3 (Liste) | F1 clos le 21/11/2026 : F1 (`bfaaf97`), F1b (`fe31e69`), F1c (`3e45551`) ; F2 clos le 21/11/2026 : F2 (`ba3aafd`), F2c ; F3 à faire ; `TestsFront` attendu d'OT2 |
-| Hygiène | HY1, HY1b (DEB-HY1 : NuGet, outils dotnet, SDK) ; HY2 (DEB-HY2 : dossier de données par environnement) ; HY3 (DEB-A2 : SDK depuis la racine) | HY1 clos le 21/11/2026 : HY1 (`d307a91`), HY1b ; HY2 clos le 21/11/2026 : HY2 (`9b21bdb`) ; HY3 à faire, après F2c |
+| Hygiène | HY1, HY1b (DEB-HY1 : NuGet, outils dotnet, SDK) ; HY2 (DEB-HY2 : dossier de données par environnement) ; HY3 (DEB-A2 : SDK depuis la racine) | HY1 clos le 21/11/2026 : HY1 (`d307a91`), HY1b ; HY2 clos le 21/11/2026 : HY2 (`9b21bdb`) ; HY3 livré, à appliquer |
 | A — IA réelle | A1 | à faire ; fournisseur à trancher (DEB-Q2) |
 | R — recette | R1 | à faire |
 
-| Projet de tests | P0, poste (20/11/2026) | B1, poste (20/11/2026) | B2, poste (20/11/2026) | I1, poste (20/11/2026) | I2a, poste (21/11/2026) | F1, poste (21/11/2026) | HY1, poste (21/11/2026) | F2, poste (21/11/2026) | HY2, poste (21/11/2026) |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| ExpressionBesoin.Domain.Tests | 25 | 189 | 189 | 189 | 207 | 207 | 207 | 207 | 207 |
-| ExpressionBesoin.Application.Tests | — | — | 65 | 65 | 66 | 66 | 66 | 66 | 66 |
-| ExpressionBesoin.Infrastructure.Tests | — | — | — | 48 | 109 | 135 | 135 | 135 | 135 |
-| ExpressionBesoin.Web.Tests | 30 | 30 | 30 | 30 | 30 | 97 | 97 | 103 | 107 |
-| ExpressionBesoin.Architecture.Tests | 20 | 20 | 20 | 20 | 20 | 20 | 20 | 20 | 20 |
-| **Total** | **75** (Release et Debug, 0 échec) | **239** (Release et Debug, 0 échec) | **304** (Debug, 0 échec) | **352** (Release et Debug, 0 échec) | **432** (Release et Debug, 0 échec) | **525** (Debug, 0 échec) ; Vitest **58** | **525** (Debug, xUnit 4, 0 échec) | **531** (Debug, `Compter-Tests`, 0 échec) ; Vitest **165** (poste, 21/11/2026) | **535** (Debug, `Compter-Tests`, 0 échec ; +4 Web, `ConfigurationEnvironnementsTests`) |
-| Couverture | Domain, Web : lignes 64/64, branches 16/16 = 100 % | Domain, Web : lignes 410/410, branches 156/156 = 100 % | Domain, Application, Web : lignes 580/580, branches 202/202 = 100 % | Domain, Application, Infrastructure, Web : lignes 918/918, branches 266/266 = 100 % | Domain, Application, Infrastructure, Web : lignes 1181/1181, branches 356/356 = 100 % | conforme au cliquet 100 / 100 (`Appliquer-Lot F1` vert ; comptes non transmis) ; front 74/74 lignes, 57/57 branches (chez l'assistant) | conforme au cliquet 100 / 100 (`Appliquer-Lot HY1` vert ; comptes non transmis) | conforme au cliquet 100 / 100 (`Appliquer-Lot F2` vert ; comptes non transmis) ; front 153/153 lignes, 123/123 branches (chez l'assistant) | conforme au cliquet 100 / 100 (`Appliquer-Lot HY2` vert ; comptes non transmis) |
+| Projet de tests | P0, poste (20/11/2026) | B1, poste (20/11/2026) | B2, poste (20/11/2026) | I1, poste (20/11/2026) | I2a, poste (21/11/2026) | F1, poste (21/11/2026) | HY1, poste (21/11/2026) | F2, poste (21/11/2026) | HY2, poste (21/11/2026) | HY3, ESTIMÉ |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| ExpressionBesoin.Domain.Tests | 25 | 189 | 189 | 189 | 207 | 207 | 207 | 207 | 207 | 207 |
+| ExpressionBesoin.Application.Tests | — | — | 65 | 65 | 66 | 66 | 66 | 66 | 66 | 66 |
+| ExpressionBesoin.Infrastructure.Tests | — | — | — | 48 | 109 | 135 | 135 | 135 | 135 | 135 |
+| ExpressionBesoin.Web.Tests | 30 | 30 | 30 | 30 | 30 | 97 | 97 | 103 | 107 | 107 |
+| ExpressionBesoin.Architecture.Tests | 20 | 20 | 20 | 20 | 20 | 20 | 20 | 20 | 20 | 23 |
+| **Total** | **75** (Release et Debug, 0 échec) | **239** (Release et Debug, 0 échec) | **304** (Debug, 0 échec) | **352** (Release et Debug, 0 échec) | **432** (Release et Debug, 0 échec) | **525** (Debug, 0 échec) ; Vitest **58** | **525** (Debug, xUnit 4, 0 échec) | **531** (Debug, `Compter-Tests`, 0 échec) ; Vitest **165** (poste, 21/11/2026) | **535** (Debug, `Compter-Tests`, 0 échec ; +4 Web, `ConfigurationEnvironnementsTests`) | **538** (estimé : +3 Architecture, `SdkTests`) |
+| Couverture | Domain, Web : lignes 64/64, branches 16/16 = 100 % | Domain, Web : lignes 410/410, branches 156/156 = 100 % | Domain, Application, Web : lignes 580/580, branches 202/202 = 100 % | Domain, Application, Infrastructure, Web : lignes 918/918, branches 266/266 = 100 % | Domain, Application, Infrastructure, Web : lignes 1181/1181, branches 356/356 = 100 % | conforme au cliquet 100 / 100 (`Appliquer-Lot F1` vert ; comptes non transmis) ; front 74/74 lignes, 57/57 branches (chez l'assistant) | conforme au cliquet 100 / 100 (`Appliquer-Lot HY1` vert ; comptes non transmis) | conforme au cliquet 100 / 100 (`Appliquer-Lot F2` vert ; comptes non transmis) ; front 153/153 lignes, 123/123 branches (chez l'assistant) | conforme au cliquet 100 / 100 (`Appliquer-Lot HY2` vert ; comptes non transmis) | à mesurer (`Appliquer-Lot HY3`) ; aucun code couvrable ajouté |
 
 Comptes .NET mesurés de HY1 à HY2 : compilés par le SDK 11.0.100 (DEB-A2), cible `net10.0` inchangée.
 
@@ -90,7 +87,7 @@ Comptes .NET mesurés de HY1 à HY2 : compilés par le SDK 11.0.100 (DEB-A2), ci
 
 1. Fournisseur d'IA (DEB-Q2) : à trancher avant A1 ; l'IA scénarisée suffit jusque-là. Recommandation : Albert API
    (DINUM) si le ministère y a accès, sinon API Mistral. Technologie : DEB-D5.
-2. DEB-A2 (SDK 11.0.100 utilisé depuis la racine du dépôt) : correction par F2c puis HY3 (DEB-Q58).
+2. DEB-A2 (SDK 11.0.100 utilisé depuis la racine du dépôt) : HY3 livré, à appliquer (DEB-Q58).
 6. Chemins des serveurs (DEB-Q55) : `D:\Donnees\Demonstrateur-data\fiches.db` (Production) et
    `D:\Donnees\Demonstrateur-data-staging\fiches.db` (Staging), à confirmer avec l'exploitation avant toute
    publication (évolution V2, DEB-Q56) ; un changement = retouche des deux fichiers et de `ConfigurationEnvironnementsTests`.
@@ -139,11 +136,11 @@ l'exécutable, jamais par `dotnet test`.
 ## §4. Cartographie (HEAD fait foi)
 
 ```
-harnais.config.psd1  README.md  .gitignore  .gitattributes
+harnais.config.psd1  README.md  .gitignore  .gitattributes  global.json (SDK 10.0.403, à la racine depuis HY3)
 docs/            prompt-reprise-Demonstrateur.md  historique-Demonstrateur.md
 specifications/  plan-demonstrateur.md
 ExpressionBesoin/
-  ExpressionBesoin.slnx  global.json  nuget.config  Directory.Build.props  Directory.Packages.props
+  ExpressionBesoin.slnx  nuget.config  Directory.Build.props (garde VerifierSdk, HY3)  Directory.Packages.props
   .config/dotnet-tools.json  coverage-baseline.json  coverage-dette.txt
   src/ExpressionBesoin.Domain/          Resultat.cs (Refus, Resultat<T>, Resultat) ; ListeImmuable.cs (égalité structurelle) ;
                                         Fiches/ Catalogue, FicheBesoin (types), Fiche, Completude, Dialogue, Cycle,
@@ -185,7 +182,7 @@ ExpressionBesoin/
                                               PointsFiches, ParcoursFiche (Tests) ; Vite/ ViteTags, LecteurManifeste,
                                               ViteScriptsTagHelper (Tests) (F1)
   tests/ExpressionBesoin.Infrastructure.Tests/IA/  ScenarioDialogueTests.cs (F1)
-  tests/ExpressionBesoin.Architecture.Tests/  AnalyseCsproj.cs (pur), ReglesSolution.cs,
+  tests/ExpressionBesoin.Architecture.Tests/  AnalyseCsproj.cs (pur), ReglesSolution.cs, SdkTests.cs (HY3),
                                               AnalyseCsprojTests.cs, SolutionTests.cs
 ```
 
@@ -206,7 +203,7 @@ ExpressionBesoin/
 ## §6. Reliquat, hygiène, leçons
 
 Anomalie ouverte : **DEB-A2** (21/11/2026) : `global.json` dans `ExpressionBesoin/`, hors du chemin de recherche de
-`dotnet` lancé depuis la racine ; SDK 11.0.100 utilisé ; correction HY3 (DEB-Q58). DEB-A1 close par F2 : historique. **Évolutions V2** (hors V1, DEB-D4 ; ouvertes seulement par décision du développeur) :
+`dotnet` lancé depuis la racine ; SDK 11.0.100 utilisé ; correction HY3, livrée (DEB-Q58). DEB-A1 close par F2 : historique. **Évolutions V2** (hors V1, DEB-D4 ; ouvertes seulement par décision du développeur) :
 courriel au chef de service, habilitations, instruction XA / SICCRF, rapprochement de demandes, tableau de bord,
 synthèse CODIR / COPIL, export PDF, version optimiste des fiches (DEB-Q26) ; toute idée née pendant la V1 s'ajoute ici.
 
@@ -215,6 +212,6 @@ synthèse CODIR / COPIL, export PDF, version optimiste des fiches (DEB-Q26) ; to
 Acquis : plan v1.14 ; socle P0, Domaine B1, Application B2, Infrastructure I1 et I2, front F1 et F2, hygiène HY1 et HY2
 validés sur le poste (535 tests .NET sous xUnit 4, couverture 100 %, Vitest 165, parcours de la page Dialogue joué :
 validation, compléments, refus ; .docx ouvert dans Word ; base `C:\Dev\Demonstrateur-data\fiches.db`, `api/sante`
-« ok » en version `0.1.0+9b21bdb`). Audit honnête : chez l'assistant, ni SDK .NET ni NuGet ; F2c ne touche que des
-documents et une racine de lot. Plan ordonné : F2c (à appliquer), HY3 (DEB-A2), F3, A1, R1 (point de terminaison de la
+« ok » en version `0.1.0+9b21bdb`). Audit honnête : chez l'assistant, ni SDK .NET ni NuGet ; HY3 non compilé chez l'assistant :
+`SdkTests` rejoué par une réplique Python sur les fichiers du lot, qui échoue sur des copies mutées. Plan ordonné : HY3 (à appliquer ; DEB-A2), F3, A1, R1 (point de terminaison de la
 V1, DEB-D4). Pièces à envoyer : toutes celles d'`Ouvrir-Session` (8), avec leur compte, site arrêté.

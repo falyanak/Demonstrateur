@@ -2,7 +2,7 @@
   <Folder Name="/Elements de solution/">
     <File Path="Directory.Build.props" />
     <File Path="Directory.Packages.props" />
-    <File Path="global.json" />
+    <File Path="../global.json" />
     <File Path="nuget.config" />
     <File Path="tests/Directory.Build.props" />
   </Folder>
