@@ -573,3 +573,26 @@
 - Vérifié chez l'assistant : syntaxe C# (tree-sitter) ; attendus des consignes recalculés depuis les fragments du code
   (réplique Python) ; octets (CRLF sans BOM) ; taille du prompt < 30 720 octets. Non vérifié : compilation, tests,
   couverture, `tsc` et `vite build` (un libellé changé dans une coquille), réponses de l'IA réelle.
+
+## 21/11/2026 — A2 appliqué ; anomalie DEB-A3 ; A3 livré (questionnement de l'IA réelle)
+
+- `Appliquer-Lot A2` : 9 fichiers écrits et relus à l'octet près, compilation Release, 635 tests .NET, 0 échec
+  (Infrastructure 184 : égal à l'estimation) ; commit `4afcbfe` par la ligne enchaînée.
+- Navigateur, IA réelle, fiche EB-2026-0012 (« mon smartphone est en panne », exportée par `GET api/fiches/{id}`) :
+  devenue une fiche (DEB-Q89), prestation nommée au premier message (« Je comprends une demande d'assistance
+  utilisateur : panne de smartphone. », mais sans question), valeurs tirées des mots de l'agent, soumise et validée.
+  Écart : après « pouvoir appeler mes collègues », l'IA a reposé la question des bénéfices en la reformulant.
+- DEB-A3 : le dernier message à l'IA annonçait « Dernière question posée sur : X », X déduit comme la première rubrique
+  obligatoire vide et sans proposition ; juste pour l'IA scénarisée (elle propose toujours pour la rubrique
+  questionnée), faux dès que l'IA réelle n'a rien proposé pour la rubrique questionnée (ici, vraisemblablement, le
+  processus métier) : la « suivante » désignait alors une rubrique à laquelle l'agent venait de répondre. L'export ne
+  donne que l'état final : cause établie par le code et compatible avec l'historique, non observée tour par tour.
+  « Maintenant » (accord du développeur).
+- A3 : `PromptFiche.AQuestionner` (pur : obligatoires vides et sans proposition, ordre de questionnement) remplace
+  `Questionnement` ; le dernier message porte « Rubriques à questionner, dans l'ordre : … » ; règles 3 (prestation
+  nommée, puis question), 4 (réponse brève proposée telle quelle, précision manquante dans `pointsAClarifier`), 6
+  (première rubrique de la liste non encore répondue ; jamais de question reposée), 10 (liste vide). Tests :
+  `PromptFicheTests` (non-régression DEB-A3 sur le cas observé ; `AQuestionner`). Comptes ESTIMÉS : Infrastructure
+  184 → 185, total 636.
+- Vérifié chez l'assistant : syntaxe C# (tree-sitter) ; attendus recalculés par réplique Python ; octets ; prompt
+  < 30 720 octets. Non vérifié : compilation, tests, réponses de l'IA réelle.

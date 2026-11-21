@@ -19,7 +19,7 @@ public enum RoleMessage : byte
 public sealed record MessageIA(RoleMessage Role, string Texte);
 
 /// <summary>
-/// Prompt de l'IA réelle (lot A1, DEB-Q88 ; périmètre du service informatique, lot A2, DEB-Q89), fonctions pures. Partie FIXE en tête (<see cref="Consignes"/> : rôle, règles,
+/// Prompt de l'IA réelle (lot A1, DEB-Q88 ; périmètre, lot A2, DEB-Q89 ; questionnement, lot A3, DEB-A3), fonctions pures. Partie FIXE en tête (<see cref="Consignes"/> : rôle, règles,
 /// contrat de réponse, rubriques du <see cref="Catalogue"/>), identique d'un tour à l'autre pour profiter du cache du
 /// fournisseur (plan §4) ; partie VARIABLE ensuite (<see cref="Messages"/> : historique, puis un dernier message qui porte
 /// l'état de la fiche et le message de l'agent). Réponse contrainte par <see cref="Schema"/> (DEB-Q85), relue par
@@ -56,8 +56,9 @@ public static class PromptFiche
             .Append(new MessageIA(RoleMessage.Agent, Tour(contexte))));
 
     /// <summary>
-    /// Dernier message : état de la fiche, rubriques obligatoires manquantes, rubrique questionnée et suivante (même
-    /// ordre que l'IA scénarisée : <see cref="ScenarioDialogue.Suivante"/>), puis le message de l'agent.
+    /// Dernier message : état de la fiche, rubriques obligatoires manquantes, mention du premier message, rubriques encore
+    /// à questionner dans l'ordre (<see cref="AQuestionner"/>), puis le message de l'agent. Aucune « dernière question »
+    /// n'est déduite (DEB-A3) : l'IA la lit dans l'historique.
     /// </summary>
     internal static string Tour(ContexteTour contexte)
     {
@@ -71,7 +72,16 @@ public static class PromptFiche
         texte.Append("Rubriques obligatoires manquantes : ")
             .Append(contexte.Manquantes.Count == 0 ? Aucune : string.Join(", ", contexte.Manquantes))
             .Append('\n');
-        texte.Append(Questionnement(contexte)).Append("\n\nMessage de l'agent :\n").Append(contexte.Message);
+        if (contexte.Historique.Count == 0)
+        {
+            texte.Append("Premier message de l'agent : sa demande initiale.\n");
+        }
+
+        var aQuestionner = AQuestionner(contexte);
+        texte.Append("Rubriques à questionner, dans l'ordre : ")
+            .Append(aQuestionner.Count == 0 ? Aucune : string.Join(", ", aQuestionner))
+            .Append("\n\nMessage de l'agent :\n")
+            .Append(contexte.Message);
         return texte.ToString();
     }
 
@@ -89,24 +99,15 @@ public static class PromptFiche
     }
 
     /// <summary>
-    /// Premier tour : la demande initiale, rubrique à questionner ensuite = prochaine rubrique. Tours suivants : la
-    /// dernière question portait sur la prochaine rubrique (le message y répond en général), la suivante vient après.
+    /// Rubriques obligatoires encore à questionner, dans l'ordre de questionnement (DEB-Q14, résumé en dernier) : vides et
+    /// sans proposition en attente. DEB-A3 : remplace la « dernière question » déduite de la prochaine rubrique, fausse
+    /// dès que l'IA n'a rien proposé pour la rubrique qu'elle avait questionnée.
     /// </summary>
-    internal static string Questionnement(ContexteTour contexte)
-    {
-        if (contexte.ProchaineRubrique is not { } cible)
-        {
-            return "Rubrique à questionner ensuite : " + Aucune;
-        }
-
-        if (contexte.Historique.Count == 0)
-        {
-            return "Premier message de l'agent : sa demande initiale.\nRubrique à questionner ensuite : " + cible;
-        }
-
-        return "Dernière question posée sur : " + cible + "\nRubrique à questionner ensuite : "
-            + (ScenarioDialogue.Suivante(contexte, cible) ?? Aucune);
-    }
+    internal static ListeImmuable<string> AQuestionner(ContexteTour contexte) =>
+        ListeImmuable<string>.De(Catalogue.OrdreQuestionnement
+            .Select(rubrique => Catalogue.Definition(rubrique).Code)
+            .Where(code => contexte.Rubriques.Any(etat =>
+                etat.Code == code && etat.Valeur is null && etat.PropositionEnAttente is null)));
 
     private static string ConstruireConsignes()
     {
@@ -125,14 +126,19 @@ public static class PromptFiche
             + "2. Chaque proposition porte une justification qui cite ou résume les mots de l'agent.\n"
             + "3. Au premier message, repère dans la demande le service, la tâche ou la prestation attendue du service "
             + "informatique et nomme-la dans ton message en une courte phrase (par exemple : « Je comprends une demande "
-            + "d'assistance utilisateur : prêt d'un ordinateur portable. »), sans en faire une valeur de rubrique.\n"
-            + "4. Propose une valeur pour chaque rubrique que le dernier message de l'agent renseigne clairement, en "
-            + "particulier la rubrique sur laquelle portait la dernière question. Ne propose rien pour une rubrique dont "
-            + "la valeur retenue dit déjà la même chose.\n"
+            + "d'assistance utilisateur : prêt d'un ordinateur portable. »), sans en faire une valeur de rubrique, puis "
+            + "pose la question de la règle 6.\n"
+            + "4. Le dernier message de l'agent répond en général à ta dernière question (voir l'historique) : propose sa "
+            + "réponse pour la rubrique sur laquelle elle portait, au plus près de ses mots, même brève. Si elle est "
+            + "imprécise, propose-la telle quelle et ajoute la précision manquante, sous forme de question, dans "
+            + "pointsAClarifier. Propose aussi toute autre rubrique que le message renseigne clairement. Ne propose rien "
+            + "pour une rubrique dont la valeur retenue dit déjà la même chose.\n"
             + "5. Au premier message, propose pour la rubrique intitule un intitulé court (huit mots au plus) tiré de la "
             + "demande de l'agent, si elle est vide. La rubrique application reçoit l'application, le service ou "
             + "l'élément concerné cité par l'agent (poste de travail, matériel, serveur, réseau, nom d'application).\n"
-            + "6. Pose une seule question, courte, sur la rubrique à questionner ensuite. Quand c'est resume, ne pose "
+            + "6. Pose une seule question, courte, sur la première rubrique de la liste « Rubriques à questionner » à "
+            + "laquelle l'agent n'a pas déjà répondu et que tu ne proposes pas dans cette réponse. Ne repose jamais une "
+            + "question à laquelle l'agent a déjà répondu, même en la reformulant. Quand il ne reste que resume, ne pose "
             + "pas de question : propose le résumé, synthèse des seules valeurs retenues et de celles que tu proposes "
             + "dans cette réponse, sans rien ajouter, et invite l'agent à le relire.\n"
             + "7. La solution envisagée n'est pas le besoin : si l'agent décrit une solution, propose-la dans "
@@ -144,7 +150,7 @@ public static class PromptFiche
             + "proposition, avec un message qui indique que la demande ne relève pas du service informatique, sans poser "
             + "de question. Une panne, un incident, une demande de matériel, d'accès ou d'habilitation relèvent du "
             + "service informatique : horsPerimetre = false.\n"
-            + "10. Quand il n'y a plus de rubrique à questionner, invite l'agent à relire la fiche, à accepter ou "
+            + "10. Quand la liste « Rubriques à questionner » est vide (aucune), invite l'agent à relire la fiche, à accepter ou "
             + "corriger les propositions, puis à confirmer et soumettre.\n"
             + "\n"
             + "Réponse : un objet JSON seulement, { \"message\": texte pour l'agent, \"propositions\": [ { \"rubrique\": "

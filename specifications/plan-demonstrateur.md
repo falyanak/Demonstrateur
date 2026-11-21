@@ -1,6 +1,6 @@
 # Plan du démonstrateur « Expression de besoin » (version simplifiée)
 
-> Version 1.20 du 21/11/2026 (lot A2 ; 1.19 au lot A1, 1.18 au lot L2, 1.17 au lot L1, 1.16 au lot F3b, 1.15 au lot F3, 1.14 au lot F2c, 1.13 au lot HY2, 1.12 au lot F2, 1.11 au lot HY1b, 1.10 au lot HY1, 1.9 au lot F1, 1.8 au lot I2b, 1.7 au lot I2, 1.6 au lot I1, 1.5 au lot B2, 1.4 au lot B1b, 1.3 au lot B1, 1.2 au lot P0c, 1.1 au
+> Version 1.21 du 21/11/2026 (lot A3 ; 1.20 au lot A2, 1.19 au lot A1, 1.18 au lot L2, 1.17 au lot L1, 1.16 au lot F3b, 1.15 au lot F3, 1.14 au lot F2c, 1.13 au lot HY2, 1.12 au lot F2, 1.11 au lot HY1b, 1.10 au lot HY1, 1.9 au lot F1, 1.8 au lot I2b, 1.7 au lot I2, 1.6 au lot I1, 1.5 au lot B2, 1.4 au lot B1b, 1.3 au lot B1, 1.2 au lot P0c, 1.1 au
 > lot P0, 1.0 au lot P0a). Arbitrages DEB-Q1 à DEB-Q8, DEB-Q11 à DEB-Q32 : « recommandations ok » (20/11/2026) ; DEB-Q9 :
 > « ok » (20/11/2026) ; DEB-Q33 à DEB-Q37 : « recommandations ok » (21/11/2026) ;
 > DEB-Q38 à DEB-Q44 : « recommandations ok » (21/11/2026) ; DEB-Q45, DEB-Q46 : « recommandations ok »
@@ -176,6 +176,7 @@ AG Grid inutile). Réponse de l'IA affichée entière, avec indicateur d'attente
 | L2 | Cycle de vie, front : panneau « Cycle de vie » de la page Dialogue (vue pure, coquille sans `innerHTML`) ; consultation relue après chaque transition (DEB-Q79 à DEB-Q82) | `npm test` vert ; dans le navigateur, le panneau montre le parcours de L1 et se met à jour après chaque action |
 | A1 | Adaptateur IA réel et prompt système (DEB-Q2 : accès à Albert API vérifié à l'ouverture du lot, sinon API Mistral) | scénario e-commerce joué avec l'IA réelle, sans invention ; une demande d'assistance (« pc ne démarre plus », « copieur en panne ») signalée hors périmètre, sans proposition (DEB-Q64) ; **révisé par DEB-Q89** : voir A2 |
 | A2 | Périmètre du service informatique (DEB-Q89) : consignes de l'IA réelle (service, tâche ou prestation repérés ; hors périmètre = demande non informatique), IA scénarisée sans liste de mots, libellé du front | `Appliquer-Lot A2` vert et commité ; au navigateur, avec l'IA réelle : scénario e-commerce sans invention ; « pc ne démarre plus », « copieur en panne » et « prêt d'un ordinateur portable » deviennent des fiches, prestation nommée dans la première réponse, sans invention ; « réserver une salle de réunion » signalé hors périmètre, sans proposition ni question. Ce critère tient lieu de celui d'A1 |
+| A3 | Correctif de l'anomalie DEB-A3 (question reposée en boucle) : le dernier message à l'IA porte la liste ordonnée des rubriques encore à questionner, sans « dernière question » déduite ; règles 3, 4, 6, 10 des consignes (réponse brève reprise telle quelle, jamais de question reposée) | `Appliquer-Lot A3` vert et commité ; critère d'A2 rejoué au navigateur, sans question reposée |
 | R1 | Fiche de recette : nominal et retour pour complément | critère de fin du démonstrateur (§1) : **point de terminaison de la V1** |
 
 L'IA scénarisée précède l'IA réelle : la démonstration reste jouable sans réseau le jour du séminaire. Dépendance :

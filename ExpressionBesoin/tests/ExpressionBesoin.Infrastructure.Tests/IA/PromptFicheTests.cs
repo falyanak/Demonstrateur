@@ -44,7 +44,7 @@ public sealed class PromptFicheTests
             + "- intitule : vide\n"
             + "Rubriques obligatoires manquantes : application, intitule\n"
             + "Premier message de l'agent : sa demande initiale.\n"
-            + "Rubrique à questionner ensuite : application\n"
+            + "Rubriques à questionner, dans l'ordre : application, intitule\n"
             + "\n"
             + "Message de l'agent :\n"
             + "Contrôle des plates-formes e-commerce et prélèvements à distance",
@@ -52,7 +52,7 @@ public sealed class PromptFicheTests
     }
 
     [Fact]
-    public void Tour_suivant_rubrique_questionnee_et_suivante_libre()
+    public void Tour_suivant_rubriques_a_questionner_vides_et_sans_proposition()
     {
         var contexte = Contexte(
             "Les contrôleurs saisissent tout à la main.",
@@ -75,19 +75,48 @@ public sealed class PromptFicheTests
             + "- difficultes : retenue « Saisie double » ; proposition en attente « Saisies en double »\n"
             + "- resultatRecherche : vide\n"
             + "Rubriques obligatoires manquantes : intitule, situationActuelle, resultatRecherche\n"
-            + "Dernière question posée sur : situationActuelle\n"
-            + "Rubrique à questionner ensuite : resultatRecherche\n"
+            + "Rubriques à questionner, dans l'ordre : situationActuelle, resultatRecherche\n"
             + "\n"
             + "Message de l'agent :\n"
             + "Les contrôleurs saisissent tout à la main.",
             PromptFiche.Tour(contexte));
     }
 
+    /// <summary>
+    /// DEB-A3 (dialogue du 21/11/2026) : l'IA avait questionné les bénéfices sans rien proposer pour le processus métier ;
+    /// le contexte désignait alors le processus comme « dernière question » et les bénéfices comme suivante, et l'IA a
+    /// reposé la question des bénéfices. Désormais, aucune dernière question n'est déduite : la liste ordonnée seule.
+    /// </summary>
     [Fact]
-    public void Tour_suivant_sans_rubrique_libre_apres_la_questionnee() =>
-        Assert.Equal(
-            "Dernière question posée sur : situationActuelle\nRubrique à questionner ensuite : aucune",
-            PromptFiche.Questionnement(Contexte("Oui.", "situationActuelle", [EtatDe("situationActuelle")], ["situationActuelle"], DeuxEchanges)));
+    public void Aucune_derniere_question_deduite_liste_ordonnee_seule()
+    {
+        var contexte = Contexte(
+            "pouvoir appeler mes collègues",
+            "processusMetier",
+            [EtatDe("utilisateursConcernes", "Moi seul."), EtatDe("processusMetier"), EtatDe("beneficesAttendus"), EtatDe("resume")],
+            ["processusMetier", "beneficesAttendus", "resume"],
+            DeuxEchanges);
+
+        var tour = PromptFiche.Tour(contexte);
+
+        Assert.Equal(new[] { "processusMetier", "beneficesAttendus", "resume" }, PromptFiche.AQuestionner(contexte).ToArray());
+        Assert.Contains("Rubriques à questionner, dans l'ordre : processusMetier, beneficesAttendus, resume\n\nMessage de l'agent :\n", tour);
+        Assert.DoesNotContain("Dernière question", tour);
+        Assert.DoesNotContain("Premier message", tour);
+    }
+
+    [Fact]
+    public void A_questionner_ordre_de_questionnement_obligatoires_libres_du_contexte()
+    {
+        var contexte = Contexte(
+            "x",
+            "beneficesAttendus",
+            [EtatDe("resume"), EtatDe("exempleRepresentatif"), EtatDe("application", proposition: "SORA"), EtatDe("beneficesAttendus")],
+            [],
+            DeuxEchanges);
+
+        Assert.Equal(new[] { "beneficesAttendus", "resume" }, PromptFiche.AQuestionner(contexte).ToArray());
+    }
 
     [Fact]
     public void Plus_de_rubrique_a_questionner()
@@ -98,7 +127,7 @@ public sealed class PromptFicheTests
             "État de la fiche :\n"
             + "- application : retenue « SORA »\n"
             + "Rubriques obligatoires manquantes : aucune\n"
-            + "Rubrique à questionner ensuite : aucune\n"
+            + "Rubriques à questionner, dans l'ordre : aucune\n"
             + "\n"
             + "Message de l'agent :\n"
             + "C'est tout.",
@@ -145,7 +174,11 @@ public sealed class PromptFicheTests
         Assert.Contains(
             "Une panne, un incident, une demande de matériel, d'accès ou d'habilitation relèvent du service informatique : horsPerimetre = false.",
             consignes);
-        Assert.Contains("Quand c'est resume, ne pose pas de question : propose le résumé", consignes);
+        Assert.Contains("Quand il ne reste que resume, ne pose pas de question : propose le résumé", consignes);
+        Assert.Contains("sans en faire une valeur de rubrique, puis pose la question de la règle 6.", consignes);
+        Assert.Contains("propose-la telle quelle et ajoute la précision manquante, sous forme de question, dans pointsAClarifier.", consignes);
+        Assert.Contains("Ne repose jamais une question à laquelle l'agent a déjà répondu, même en la reformulant.", consignes);
+        Assert.Contains("Quand la liste « Rubriques à questionner » est vide (aucune), invite l'agent", consignes);
         Assert.Contains(
             "Réponse : un objet JSON seulement, { \"message\": texte pour l'agent, \"propositions\": [ { \"rubrique\": code, \"valeur\": texte, \"justification\": texte } ], \"horsPerimetre\": booléen }.",
             consignes);
