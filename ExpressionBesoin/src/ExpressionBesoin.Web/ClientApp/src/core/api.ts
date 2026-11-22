@@ -2,12 +2,14 @@ import {
   ContratInvalide,
   lireAgents,
   lireConsultation,
+  lireDictee,
   lireErreur,
   lireFiche,
   lireResumes,
   lireTour,
   type AgentVue,
   type ConsultationVue,
+  type DicteeVue,
   type ErreurVue,
   type FicheVue,
   type ResumeVue,
@@ -67,6 +69,8 @@ export interface ClientApi {
   soumettre(id: string, confirme: boolean): Promise<Issue<FicheVue>>;
   decider(id: string, decision: TypeDecision, commentaire: string): Promise<Issue<FicheVue>>;
   reprendre(id: string): Promise<Issue<FicheVue>>;
+  /** Dictée (lot S1) : WAV canonique → texte ; refus `dictee.*` (422), panne 503. */
+  dicter(audio: Uint8Array<ArrayBuffer>): Promise<Issue<DicteeVue>>;
   /** Adresse du .docx (lien de téléchargement, aucun appel). */
   urlDocument(id: string): string;
 }
@@ -95,6 +99,7 @@ export function creerClient(recuperer: Recuperer, resoudre: (chemin: string) => 
     soumettre: (id, confirme) => appeler(`${fiche(id)}/soumettre`, envoyer({ confirme }), lire),
     decider: (id, decision, commentaire) => appeler(`${fiche(id)}/decision`, envoyer({ decision, commentaire }), lire),
     reprendre: (id) => appeler(`${fiche(id)}/reprendre`, { method: "POST", headers: json }, lire),
+    dicter: (audio) => appeler("api/dictee", { method: "POST", headers: { ...json, "Content-Type": "audio/wav" }, body: audio }, lireDictee),
     urlDocument: (id) => resoudre(`${fiche(id)}/document`),
   };
 }

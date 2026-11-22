@@ -1,5 +1,6 @@
 import type { Issue } from "../../core/api.ts";
 import type { ConsultationVue, ErreurVue, FicheVue, TourVue, TransitionVue, TypeDecision } from "../../core/contrats.ts";
+import { CIBLE_MESSAGE, insererTexte } from "./dictee.ts";
 
 // État de la page Dialogue (DEB-Q49) : réducteur PUR, état × événement → état. Aucune règle métier (DEB-Q50) : la fiche
 // vient toujours du serveur ; la page ne garde que ce que l'agent est en train de saisir et l'attente d'une réponse.
@@ -11,6 +12,16 @@ export interface LigneDialogue {
   readonly horsPerimetre: boolean;
   readonly ecartees: number;
 }
+
+/**
+ * Dictée en cours (lot S1) : une à la fois ; `cible` = CIBLE_MESSAGE ou code de rubrique, `position` = curseur de la zone
+ * au départ (le texte dicté y sera inséré).
+ */
+export type EtatDictee =
+  | { readonly phase: "inactive" }
+  | { readonly phase: "enregistrement" | "transcription"; readonly cible: string; readonly position: number };
+
+export const DICTEE_INACTIVE: EtatDictee = { phase: "inactive" };
 
 export interface EtatDialogue {
   readonly fiche: FicheVue | null;
@@ -26,6 +37,7 @@ export interface EtatDialogue {
   /** Une requête à la fois : vrai entre le départ d'un appel et sa réponse. */
   readonly attente: boolean;
   readonly erreur: ErreurVue | null;
+  readonly dictee: EtatDictee;
 }
 
 export type Evenement =
@@ -41,7 +53,12 @@ export type Evenement =
   | { readonly type: "brouillon"; readonly code: string; readonly texte: string }
   | { readonly type: "confirmation"; readonly coche: boolean }
   | { readonly type: "decision"; readonly decision: TypeDecision }
-  | { readonly type: "commentaire"; readonly texte: string };
+  | { readonly type: "commentaire"; readonly texte: string }
+  /** Dictée (lot S1) : départ (micro demandé), envoi au serveur, texte reçu, échec (micro, refus ou panne). */
+  | { readonly type: "dicteeDebut"; readonly cible: string; readonly position: number }
+  | { readonly type: "dicteeEnvoi" }
+  | { readonly type: "dicteeTexte"; readonly texte: string }
+  | { readonly type: "dicteeEchec"; readonly erreur: ErreurVue };
 
 export const ETAT_INITIAL: EtatDialogue = {
   fiche: null,
@@ -54,6 +71,7 @@ export const ETAT_INITIAL: EtatDialogue = {
   commentaire: "",
   attente: false,
   erreur: null,
+  dictee: DICTEE_INACTIVE,
 };
 
 /** Départ d'un appel : `null` si un appel est déjà en cours (la page n'en lance pas un second). Pure. */
@@ -93,6 +111,16 @@ function recevoir(etat: EtatDialogue, fiche: FicheVue, enregistree?: string): Et
   };
 }
 
+/**
+ * Texte dicté inséré dans sa cible : la zone de message, ou le brouillon de la rubrique (à défaut sa valeur retenue).
+ * Pure.
+ */
+export function insererDictee(etat: EtatDialogue, cible: string, position: number, texte: string): EtatDialogue {
+  if (cible === CIBLE_MESSAGE) return { ...etat, message: insererTexte(etat.message, texte, position) };
+  const base = etat.brouillons[cible] ?? etat.fiche?.rubriques.find((rubrique) => rubrique.code === cible)?.valeur ?? "";
+  return { ...etat, brouillons: { ...etat.brouillons, [cible]: insererTexte(base, texte, position) } };
+}
+
 /** Réducteur de la page. Pure. */
 export function reduire(etat: EtatDialogue, evenement: Evenement): EtatDialogue {
   switch (evenement.type) {
@@ -127,5 +155,17 @@ export function reduire(etat: EtatDialogue, evenement: Evenement): EtatDialogue 
       return { ...etat, decision: evenement.decision };
     case "commentaire":
       return { ...etat, commentaire: evenement.texte };
+    case "dicteeDebut":
+      return etat.dictee.phase === "inactive"
+        ? { ...etat, dictee: { phase: "enregistrement", cible: evenement.cible, position: evenement.position }, erreur: null }
+        : etat;
+    case "dicteeEnvoi":
+      return etat.dictee.phase === "enregistrement" ? { ...etat, dictee: { ...etat.dictee, phase: "transcription" } } : etat;
+    case "dicteeTexte":
+      return etat.dictee.phase === "transcription"
+        ? { ...insererDictee(etat, etat.dictee.cible, etat.dictee.position, evenement.texte), dictee: DICTEE_INACTIVE }
+        : etat;
+    case "dicteeEchec":
+      return { ...etat, dictee: DICTEE_INACTIVE, erreur: evenement.erreur };
   }
 }

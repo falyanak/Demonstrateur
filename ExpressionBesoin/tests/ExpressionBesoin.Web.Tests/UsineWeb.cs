@@ -1,3 +1,4 @@
+using ExpressionBesoin.Application.Dictee;
 using ExpressionBesoin.Application.Fiches;
 using ExpressionBesoin.Web.Hebergement;
 using Microsoft.AspNetCore.Hosting;
@@ -54,6 +55,7 @@ public class UsineWeb : WebApplicationFactory<Program>
                 [$"{CompositionIA.CleProfils}:{ProfilEssai}:{CompositionIA.Point}"] = "https://albert.test/v1",
                 [$"{CompositionIA.CleProfils}:{ProfilEssai}:{CompositionIA.Modele}"] = "modele-essai",
                 [$"{CompositionIA.CleProfils}:{ProfilEssai}:{CompositionIA.VariableCle}"] = VariableCleEssai,
+                [$"{CompositionIA.CleProfils}:{ProfilEssai}:{CompositionIA.ModeleTranscription}"] = "whisper-essai",
                 [VariableCleEssai] = CleIA,
             }));
         builder.ConfigureTestServices(services =>
@@ -107,6 +109,28 @@ public sealed class UsinePanne : UsineWeb
     {
         public ValueTask<string> Repondre(ContexteTour contexte, CancellationToken annulation) =>
             throw new HttpRequestException("Fournisseur d'IA injoignable (essai).");
+    }
+}
+
+/// <summary>
+/// Dictée offerte, modèle simulé (lot S1) : la réponse dépend du nombre d'octets d'échantillons reçus, pour jouer chaque
+/// issue de la route sans réseau : 2 → blanc (silence), 6 → panne, sinon <see cref="Texte"/>.
+/// </summary>
+public sealed class UsineDictee : UsineWeb
+{
+    public const string Texte = "Le copieur du bureau 1A ne démarre plus.";
+
+    protected override void Remplacer(IServiceCollection services) => services.AddSingleton(new ServiceDictee(new TranscripteurEssai()));
+
+    private sealed class TranscripteurEssai : ITranscripteur
+    {
+        public ValueTask<string> Transcrire(ReadOnlyMemory<byte> wav, CancellationToken annulation) =>
+            (wav.Length - DecisionsDictee.EnTete) switch
+            {
+                2 => ValueTask.FromResult("  "),
+                6 => throw new HttpRequestException("Whisper injoignable (essai)."),
+                _ => ValueTask.FromResult(Texte),
+            };
     }
 }
 

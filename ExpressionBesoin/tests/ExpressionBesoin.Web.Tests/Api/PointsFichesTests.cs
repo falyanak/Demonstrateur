@@ -155,13 +155,28 @@ public sealed class PointsFichesTests(UsineWeb usine) : IClassFixture<UsineWeb>
     }
 
     [Fact]
-    public async Task Page_dialogue_rendue_pour_un_identifiant_de_fiche()
+    public async Task Page_dialogue_rendue_pour_un_identifiant_de_fiche_sans_dictee_avec_l_ia_scenarisee()
     {
         using var client = usine.CreateClient();
         var id = new Guid("6f1c2b3a-0000-4000-8000-0000000000c1");
         var html = await client.GetStringAsync($"/Home/Dialogue/{id}", Annulation);
-        Assert.Contains("<div id=\"app\" data-page=\"dialogue\" data-fiche=\"6f1c2b3a-0000-4000-8000-0000000000c1\">", html);
+        Assert.Contains(
+            "<div id=\"app\" data-page=\"dialogue\" data-fiche=\"6f1c2b3a-0000-4000-8000-0000000000c1\" data-dictee=\"non\">",
+            html);
         Assert.DoesNotContain("<vite-scripts", html);
+    }
+
+    /// <summary>IA scénarisée : aucun modèle de transcription, la route refuse (lot S1, DEB-Q132).</summary>
+    [Fact]
+    public async Task Dictee_indisponible_avec_l_ia_scenarisee_422()
+    {
+        using var client = usine.CreateClient();
+        using var contenu = new ByteArrayContent(Convert.FromHexString(PointsDicteeTests.ReferenceHex));
+        using var reponse = await client.PostAsync("/api/dictee", contenu, Annulation);
+        var corps = await reponse.Content.ReadAsStringAsync(Annulation);
+
+        Assert.Equal(HttpStatusCode.UnprocessableEntity, reponse.StatusCode);
+        Assert.StartsWith("{\"code\":\"dictee.indisponible\",", corps);
     }
 
     [Theory]

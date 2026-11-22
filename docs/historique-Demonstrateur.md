@@ -832,3 +832,31 @@
   ni « Panne » ni « Réponse vide » (DEB-A6 toujours en observation). Objectif atteint, on arrête : chantier A clos.
 - Restent : DEB-Q128 à confirmer ; essai du profil Claude à l'arrivée de la clé (DEB-Q129).
 - A6b : documents seuls (prompt, historique).
+
+## 22/11/2026 — Bilan avant R1 ; dictée : sonde, DEB-Q130 à DEB-Q134 ; lot S1
+
+- Session ouverte sur `93bac51a9704` (A6b commité) : 8 pièces reçues, tailles et SHA-256 conformes à `PIECES.txt`,
+  archive à 180 entrées comme l'annonce `MASQUAGE.txt` (0 fichier masqué) ; état conforme, 0 commit à publier,
+  sauvegarde à HEAD (dossier marqué « provisoire ») ; 799 tests MESURÉS par `Compter-Tests`, 0 échec.
+- Bilan : chantiers techniques clos, V1 non atteinte (R1 à jouer) ; publication et sauvegarde déjà faites.
+- Demande du développeur : dictée (« speech to text ») pour simplifier la saisie, en s'inspirant de FlowPortal
+  (`ui/voice.js` : `MediaRecorder`, webm/opus) et de CSAgent (`AudioTools.cs` : ffmpeg, WAV mono 16 kHz,
+  `POST /audio/transcriptions`, `openai/whisper-large-v3`). DEB-Q130 à DEB-Q133 posées, « recommandations ok ».
+- Sonde hors dépôt `Sonder-Dictee.ps1` (lecture seule ; voix « Microsoft Hortense Desktop », WAV 16 kHz mono 16 bits) :
+  11 modèles, 1 de transcription (`whisper-large-v3`, alias `openai/whisper-large-v3`, `openweight-audio`) ; texte
+  court 7,4 s → 311 ms, mots retrouvés 16/18 ; texte long 43,9 s → 481 ms, 116/121. Les 7 écarts sont des graphies
+  équivalentes (« plateformes », « 400 », « 12 ») : DEB-Q134 posée (89 % sous le seuil de 90 % de DEB-Q130).
+- Lot S1 (chantier S, saisie vocale) : Application `Dictee/` (`ITranscripteur`, `DecisionsDictee` pures : WAV
+  canonique, 4 000 044 octets au plus, refus `dictee.*` ; `ServiceDictee`) ; Infrastructure `TranscripteurWhisper`
+  (formulaire de CSAgent, maillon 429, sans ffmpeg) et `ReponseTranscription` (pure) ; `OptionsIA.ModeleTranscription`
+  ; Web : `ModeleTranscription` lu par `CompositionIA` (Albert : `whisper-large-v3`), `ServiceDictee` composé et vérifié
+  au démarrage, route `POST api/dictee` (`LireCorps` borné), `DicteeVue`, `data-dictee` de la page Dialogue ; front :
+  `core/wav.ts` (pur : mélange mono, WAV), `core/micro.ts` (coquille, hors couverture par nom), `features/dialogue/
+  dictee.ts` (pur : insertion au curseur, erreurs du micro), réducteur (`dictee`, quatre événements), `boutonDictee`,
+  boutons « 🎙 Dicter » de la page ; contrat `dictee-reference.json` figé à l'octet par xUnit, lu par Vitest.
+- Vérifié chez l'assistant : réplique du front (Node 22 au lieu de 26, `engine-strict` levé) : `tsc -b` (faute
+  volontaire détectée), Vitest 313/313 (249 + 64, 10 fichiers), couverture du front 100 % (290/290 instructions,
+  204/204 branches ; une branche morte de `encoderWav` retirée), `vite build` ; mutations MF31 à MF38, 8 détectées sur
+  8 ; syntaxe C# des 20 fichiers par tree-sitter (faute volontaire détectée) ; table de vérité de l'en-tête et octets
+  WAV attendus recalculés par une réplique Python. Non vérifié : compilation C#, tests xUnit, couverture .NET (branches
+  des `await` notamment), micro au navigateur. Comptes ESTIMÉS : Application 106, Infrastructure 247, Web 184, total 879.

@@ -1,3 +1,4 @@
+using ExpressionBesoin.Application.Dictee;
 using ExpressionBesoin.Application.Fiches;
 using ExpressionBesoin.Domain;
 using Microsoft.AspNetCore.Mvc;
@@ -35,6 +36,15 @@ public static class PointsFiches
         api.MapGet("/agents", async (ServiceFiches service, CancellationToken annulation) =>
             Results.Json((await service.ListerAgents(annulation)).Select(AgentVue.De), ContratJson.Options));
 
+        // Dictée (lot S1) : corps = WAV canonique (audio/wav), lu jusqu'à un octet au-delà du maximum pour que la décision
+        // pure reconnaisse un envoi trop long ; rien n'est stocké.
+        api.MapPost("/dictee", async (HttpRequest requete, ServiceDictee service, CancellationToken annulation) =>
+            Repondre(
+                await service.Transcrire(
+                    await LireCorps(requete.Body, requete.ContentLength, DecisionsDictee.OctetsMax + 1, annulation),
+                    annulation),
+                DicteeVue.De));
+
         var fiches = api.MapGroup("/fiches");
         fiches.MapGet("", async (ServiceFiches service, CancellationToken annulation) =>
             Results.Json((await service.Lister(annulation)).Select(ResumeVue.De), ContratJson.Options));
@@ -68,6 +78,28 @@ public static class PointsFiches
     /// <summary>Succès → projection en JSON ; refus → statut de <see cref="StatutHttp.De"/>.</summary>
     internal static IResult Repondre<T, TVue>(Resultat<T> resultat, Func<T, TVue> projeter, int statut = StatusCodes.Status200OK) =>
         resultat.Match(valeur => Results.Json(projeter(valeur), ContratJson.Options, statusCode: statut), Erreur);
+
+    /// <summary>
+    /// Corps d'une requête, <paramref name="plafond"/> octets au plus : tampon à la taille annoncée quand elle est connue
+    /// et inférieure au plafond (une seule allocation), sinon au plafond ; la suite éventuelle n'est pas lue.
+    /// </summary>
+    internal static async Task<byte[]> LireCorps(Stream corps, long? longueur, int plafond, CancellationToken annulation)
+    {
+        var tampon = new byte[longueur is { } annoncee && annoncee < plafond ? (int)annoncee : plafond];
+        var lus = 0;
+        while (lus < tampon.Length)
+        {
+            var nombre = await corps.ReadAsync(tampon.AsMemory(lus), annulation);
+            if (nombre == 0)
+            {
+                break;
+            }
+
+            lus += nombre;
+        }
+
+        return lus == tampon.Length ? tampon : tampon[..lus];
+    }
 
     internal static IResult Erreur(Refus refus) =>
         Results.Json(new ErreurVue(refus.Code, refus.Message), ContratJson.Options, statusCode: StatutHttp.De(refus.Code));

@@ -69,6 +69,9 @@ export interface ResumeVue {
 
 export interface ErreurVue { readonly code: string; readonly message: string }
 
+/** `POST api/dictee` : texte d'une dictée (lot S1), à insérer dans la zone de l'agent. */
+export interface DicteeVue { readonly texte: string }
+
 type Objet = Readonly<Record<string, unknown>>;
 
 const STATUTS: readonly string[] = ["Brouillon", "Soumise", "Validee", "ACompleter", "Refusee"];
@@ -246,6 +249,11 @@ export function lireResumes(valeur: unknown): ResumeVue[] {
       confirmeeLe: texteOuNul(o, "confirmeeLe", c),
     };
   });
+}
+
+/** Texte d'une dictée (POST api/dictee, lot S1). Pure. */
+export function lireDictee(valeur: unknown): DicteeVue {
+  return { texte: texte(objet(valeur, "dictee"), "texte", "dictee") };
 }
 
 /** Corps d'un refus ou d'une panne (`{ code, message }`) ; `null` si le corps n'a pas cette forme. Pure. */

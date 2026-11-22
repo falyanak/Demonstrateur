@@ -1,4 +1,5 @@
 using System.Globalization;
+using ExpressionBesoin.Application.Dictee;
 using ExpressionBesoin.Application.Fiches;
 using ExpressionBesoin.Infrastructure.IA;
 
@@ -10,7 +11,8 @@ namespace ExpressionBesoin.Web.Hebergement;
 /// catalogue <see cref="CleProfils"/> (<c>appsettings.json</c>). Un profil est l'IA scénarisée
 /// (<see cref="Fournisseur"/> = <see cref="Scenarise"/>, DEB-Q41) ou une API compatible OpenAI : <see cref="Point"/>,
 /// <see cref="Modele"/>, <see cref="VariableCle"/> (NOM de la variable d'environnement qui porte la clé),
-/// <see cref="Temperature"/> et <see cref="JetonsMax"/> facultatifs, non envoyés si absents. Seul le profil courant est
+/// <see cref="Temperature"/> et <see cref="JetonsMax"/> facultatifs, non envoyés si absents ; <see cref="ModeleTranscription"/>
+/// facultatif (dictée, lot S1, DEB-Q132 : absent → dictée indisponible). Seul le profil courant est
 /// vérifié ; aucune bascule implicite : valeur absente, inconnue ou incomplète → arrêt au démarrage, message explicite qui
 /// ne cite jamais la clé.
 /// </summary>
@@ -32,6 +34,8 @@ public static class CompositionIA
 
     public const string JetonsMax = "JetonsMax";
 
+    public const string ModeleTranscription = "ModeleTranscription";
+
     public const string Scenarise = "Scenarise";
 
     /// <summary>
@@ -42,6 +46,15 @@ public static class CompositionIA
         Lire(cle => configuration[cle]) is { } options
             ? (IAssistantIA)AssistantIAAlbert.Creer(options, journal: journal)
             : new AssistantIAScenarise();
+
+    /// <summary>
+    /// Dictée du profil courant (lot S1, DEB-Q132) : transcripteur Whisper sur le point et la clé du profil s'il porte un
+    /// <see cref="ModeleTranscription"/>, sinon aucun (IA scénarisée comprise) : bouton masqué, route refusée.
+    /// </summary>
+    public static ServiceDictee CreerDictee(IConfiguration configuration) =>
+        new(Lire(cle => configuration[cle]) is { ModeleTranscription: { } modele } options
+            ? TranscripteurWhisper.Creer(options, modele)
+            : null);
 
     /// <summary>
     /// Options du profil courant, <c>null</c> pour l'IA scénarisée ; configuration fautive → exception.
@@ -108,7 +121,23 @@ public static class CompositionIA
         {
             Temperature = LireTemperature(configuration(prefixe + Temperature), prefixe),
             JetonsMax = LireJetonsMax(configuration(prefixe + JetonsMax), prefixe),
+            ModeleTranscription = LireModeleTranscription(configuration(prefixe + ModeleTranscription), prefixe),
         };
+    }
+
+    /// <summary>Absent → <c>null</c> (dictée indisponible) ; sinon nom du modèle, sans espaces de bord, jamais blanc.</summary>
+    private static string? LireModeleTranscription(string? lu, string prefixe)
+    {
+        if (lu is null)
+        {
+            return null;
+        }
+
+        return string.IsNullOrWhiteSpace(lu)
+            ? throw new InvalidOperationException(
+                $"Configuration {prefixe}{ModeleTranscription} : nom du modèle de transcription attendu (ex. whisper-large-v3), "
+                + "ou absent (dictée indisponible).")
+            : lu.Trim();
     }
 
     /// <summary>Absente → <c>null</c> (non envoyée) ; sinon nombre de 0 à 2, point décimal (NaN refusé).</summary>

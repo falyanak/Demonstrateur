@@ -1,6 +1,8 @@
+using ExpressionBesoin.Application.Dictee;
 using ExpressionBesoin.Application.Fiches;
 using ExpressionBesoin.Infrastructure.IA;
 using ExpressionBesoin.Web.Hebergement;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace ExpressionBesoin.Web.Tests;
@@ -216,14 +218,46 @@ public sealed class CompositionIATests
             $"Configuration IA:Profils:Albert:JetonsMax : entier positif attendu (reçu « {lu} »), ou absent (non envoyé).",
             Refus(Avec("IA:Profils:Albert:JetonsMax", lu)));
 
+    /// <summary>Modèle de transcription facultatif (lot S1, DEB-Q132) : absent → dictée indisponible.</summary>
+    [Theory]
+    [InlineData(null, null)]
+    [InlineData("whisper-large-v3", "whisper-large-v3")]
+    [InlineData(" whisper-large-v3 ", "whisper-large-v3")]
+    public void Modele_de_transcription_facultatif(string? lu, string? attendu) =>
+        Assert.Equal(attendu, Lire(Avec("IA:Profils:Albert:ModeleTranscription", lu))?.ModeleTranscription);
+
+    [Theory]
+    [InlineData("")]
+    [InlineData("  ")]
+    public void Modele_de_transcription_blanc_arret_explicite(string lu) =>
+        Assert.Equal(
+            "Configuration IA:Profils:Albert:ModeleTranscription : nom du modèle de transcription attendu (ex. whisper-large-v3), "
+            + "ou absent (dictée indisponible).",
+            Refus(Avec("IA:Profils:Albert:ModeleTranscription", lu)));
+
+    /// <summary>Dictée composée selon le profil courant : Albert avec modèle de transcription seulement.</summary>
+    [Theory]
+    [InlineData("Albert", "whisper-large-v3", true)]
+    [InlineData("Albert", null, false)]
+    [InlineData("Scenarise", "whisper-large-v3", false)]
+    public void Dictee_selon_le_profil_courant(string profil, string? modele, bool disponible)
+    {
+        var valeurs = Avec("IA:Profils:Albert:ModeleTranscription", modele);
+        valeurs["IA:Profil"] = profil;
+        var configuration = new ConfigurationBuilder().AddInMemoryCollection(valeurs).Build();
+
+        Assert.Equal(disponible, CompositionIA.CreerDictee(configuration).Disponible);
+    }
+
     [Fact]
     public void Cles_de_configuration() =>
         Assert.Equal(
-            new[] { "IA:Profil", "IA:Profils", "Fournisseur", "Point", "Modele", "VariableCle", "Temperature", "JetonsMax", "Scenarise" },
+            new[] { "IA:Profil", "IA:Profils", "Fournisseur", "Point", "Modele", "VariableCle", "Temperature", "JetonsMax", "ModeleTranscription", "Scenarise" },
             new[]
             {
                 CompositionIA.CleProfil, CompositionIA.CleProfils, CompositionIA.Fournisseur, CompositionIA.Point, CompositionIA.Modele,
-                CompositionIA.VariableCle, CompositionIA.Temperature, CompositionIA.JetonsMax, CompositionIA.Scenarise,
+                CompositionIA.VariableCle, CompositionIA.Temperature, CompositionIA.JetonsMax, CompositionIA.ModeleTranscription,
+                CompositionIA.Scenarise,
             });
 
     [Fact]
@@ -231,6 +265,7 @@ public sealed class CompositionIATests
     {
         using var usine = new UsineWeb();
         Assert.IsType<AssistantIAScenarise>(usine.Services.GetRequiredService<IAssistantIA>());
+        Assert.False(usine.Services.GetRequiredService<ServiceDictee>().Disponible);
     }
 
     [Fact]
@@ -238,6 +273,7 @@ public sealed class CompositionIATests
     {
         using var usine = new UsineAlbert();
         Assert.IsType<AssistantIAAlbert>(usine.Services.GetRequiredService<IAssistantIA>());
+        Assert.True(usine.Services.GetRequiredService<ServiceDictee>().Disponible);
     }
 
     [Fact]

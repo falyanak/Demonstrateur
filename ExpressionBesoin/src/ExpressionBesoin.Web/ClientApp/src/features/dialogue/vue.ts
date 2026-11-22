@@ -1,6 +1,7 @@
 import type { Etape, FicheVue, RubriqueVue, TransitionVue, TypeDecision } from "../../core/contrats.ts";
 import { dateHeure } from "../../core/dates.ts";
 import { badgeStatut, type Badge } from "../../core/statuts.ts";
+import { CIBLE_MESSAGE } from "./dictee.ts";
 import type { EtatDialogue } from "./etat.ts";
 
 // Modèle d'affichage de la page Dialogue (DEB-Q49) : fonctions PURES, sans DOM. Les actions ne dépendent que des champs
@@ -116,6 +117,31 @@ export function actions(etat: EtatDialogue): Actions {
     reprendre: libre && statut === "ACompleter",
     telecharger: statut === "Validee",
   };
+}
+
+/** Bouton « Dicter » d'une zone (lot S1). */
+export interface BoutonDictee {
+  readonly libelle: string;
+  readonly actif: boolean;
+  /** Vrai pendant l'enregistrement ou la transcription de CETTE zone (aria-pressed). */
+  readonly enCours: boolean;
+}
+
+/**
+ * Bouton « Dicter » de la zone `cible` (CIBLE_MESSAGE ou code de rubrique) : une dictée à la fois ; hors dictée, permis
+ * quand la zone est modifiable (dialoguer pour le message, éditer pour une rubrique) ; pendant l'enregistrement de cette
+ * zone, il devient « Arrêter » ; pendant sa transcription, il attend. Pure.
+ */
+export function boutonDictee(etat: EtatDialogue, cible: string): BoutonDictee {
+  const dictee = etat.dictee;
+  if (dictee.phase === "inactive") {
+    const permis = cible === CIBLE_MESSAGE ? actions(etat).dialoguer : actions(etat).editer;
+    return { libelle: "🎙 Dicter", actif: permis, enCours: false };
+  }
+  if (dictee.cible !== cible) return { libelle: "🎙 Dicter", actif: false, enCours: false };
+  return dictee.phase === "enregistrement"
+    ? { libelle: "⏹ Arrêter", actif: true, enCours: true }
+    : { libelle: "Transcription…", actif: false, enCours: true };
 }
 
 /** « Enregistrer » d'une rubrique (DEB-Q51) : édition permise et brouillon différent de la valeur retenue. Pure. */

@@ -64,11 +64,11 @@ public sealed class ConfigurationEnvironnementsTests
         Assert.NotNull(albert);
         Assert.NotNull(claude);
         Assert.Equal(
-            (new Uri("https://albert.api.etalab.gouv.fr/v1"), "gemma-4-31b-it", "cle-albert", (float?)0.1f, (int?)null),
-            (albert.Point, albert.Modele, albert.Cle, albert.Temperature, albert.JetonsMax));
+            (new Uri("https://albert.api.etalab.gouv.fr/v1"), "gemma-4-31b-it", "cle-albert", (float?)0.1f, (int?)null, "whisper-large-v3"),
+            (albert.Point, albert.Modele, albert.Cle, albert.Temperature, albert.JetonsMax, albert.ModeleTranscription));
         Assert.Equal(
-            (new Uri("https://api.anthropic.com/v1"), "claude-sonnet-5-5", "cle-claude", (float?)null, (int?)4096),
-            (claude.Point, claude.Modele, claude.Cle, claude.Temperature, claude.JetonsMax));
+            (new Uri("https://api.anthropic.com/v1"), "claude-sonnet-5-5", "cle-claude", (float?)null, (int?)4096, (string?)null),
+            (claude.Point, claude.Modele, claude.Cle, claude.Temperature, claude.JetonsMax, claude.ModeleTranscription));
         Assert.Null(Profil(configuration, CompositionIA.Scenarise));
     }
 

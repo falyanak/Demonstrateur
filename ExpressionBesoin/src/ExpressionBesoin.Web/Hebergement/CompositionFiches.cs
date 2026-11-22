@@ -1,3 +1,4 @@
+using ExpressionBesoin.Application.Dictee;
 using ExpressionBesoin.Application.Fiches;
 using ExpressionBesoin.Infrastructure.Documents;
 using ExpressionBesoin.Infrastructure.Fiches;
@@ -38,6 +39,8 @@ public static class CompositionFiches
         services.AddSingleton<IAssistantIA>(fournisseur => CompositionIA.Creer(
             fournisseur.GetRequiredService<IConfiguration>(),
             fournisseur.GetRequiredService<ILogger<AssistantIAAlbert>>()));
+        // Dictée (lot S1) : transcripteur du profil courant s'il a un modèle de transcription, sinon indisponible (DEB-Q132).
+        services.AddSingleton(fournisseur => CompositionIA.CreerDictee(fournisseur.GetRequiredService<IConfiguration>()));
         services.AddSingleton(fournisseur => new ServiceFiches(
             fournisseur.GetRequiredService<IDepotFiches>(),
             fournisseur.GetRequiredService<IAssistantIA>(),
@@ -52,7 +55,7 @@ public static class CompositionFiches
 
     /// <summary>
     /// Au démarrage : dossier de la base créé, schéma initialisé, gabarit FEB chargé et vérifié, adaptateur IA choisi
-    /// (configuration de l'IA vérifiée, sans appel réseau).
+    /// (configuration de l'IA vérifiée, sans appel réseau), dictée composée (lot S1).
     /// </summary>
     public static void Initialiser(IServiceProvider services)
     {
@@ -61,6 +64,7 @@ public static class CompositionFiches
         services.GetRequiredService<DepotFichesSqlite>().Initialiser();
         services.GetRequiredService<IGenerateurDocument>();
         services.GetRequiredService<IAssistantIA>();
+        services.GetRequiredService<ServiceDictee>();
     }
 
     /// <summary>Chemin configuré, variables d'environnement développées ; absent ou relatif → arrêt explicite.</summary>

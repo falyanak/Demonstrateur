@@ -26,4 +26,10 @@ public sealed class OptionsIA(Uri point, string modele, string cle)
 
     /// <summary>Plafond de jetons de la réponse ; <c>null</c> → champ absent de la requête (DEB-Q128).</summary>
     public int? JetonsMax { get; init; }
+
+    /// <summary>
+    /// Modèle de transcription de la dictée (lot S1, DEB-Q132), sur le même point et avec la même clé ; <c>null</c> →
+    /// dictée indisponible avec ce profil (Albert : <c>whisper-large-v3</c>, sonde du 22/11/2026).
+    /// </summary>
+    public string? ModeleTranscription { get; init; }
 }

@@ -9,8 +9,8 @@ export default defineConfig({
     coverage: {
       provider: "v8",
       include: ["src/**/*.ts"],
-      // Coquilles DOM des pages seules exclues (DEB-Q49) : leurs décisions vivent dans des modules purs, mesurés.
-      exclude: ["src/main.ts", "src/**/*.d.ts", "src/features/**/Page*.ts"],
+      // Coquilles DOM des pages et du micro (S1) seules exclues (DEB-Q49) : leurs décisions vivent dans des modules purs, mesurés.
+      exclude: ["src/main.ts", "src/**/*.d.ts", "src/features/**/Page*.ts", "src/core/micro.ts"],
       reporter: ["text", "html"],
     },
   },

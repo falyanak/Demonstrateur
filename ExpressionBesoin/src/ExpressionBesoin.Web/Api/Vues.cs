@@ -140,3 +140,9 @@ public sealed record AgentVue(string Identifiant, string Nom, string Bureau, str
 
 /// <summary>Corps d'un refus métier ou d'une panne (DEB-Q42).</summary>
 public sealed record ErreurVue(string Code, string Message);
+
+/// <summary>Texte d'une dictée (<c>POST api/dictee</c>, lot S1) ; figé à l'octet par <c>dictee-reference.json</c>.</summary>
+public sealed record DicteeVue(string Texte)
+{
+    public static DicteeVue De(string texte) => new(texte);
+}

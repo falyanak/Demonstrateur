@@ -1,6 +1,6 @@
 # Plan du démonstrateur « Expression de besoin » (version simplifiée)
 
-> Version 1.31 du 22/11/2026 (lot A6 ; 1.30 au lot A7c ; 1.29 au lot A7b ; 1.28 au lot A7a, A7 relivré ; 1.27 au lot A5d ; 1.26 au lot A5c ; 1.25 au lot A5b ; 1.24 au lot A5 ; 1.23 au lot A4b ; 1.22 au lot A4 ; 1.21 au lot A3, 1.20 au lot A2, 1.19 au lot A1, 1.18 au lot L2, 1.17 au lot L1, 1.16 au lot F3b, 1.15 au lot F3, 1.14 au lot F2c, 1.13 au lot HY2, 1.12 au lot F2, 1.11 au lot HY1b, 1.10 au lot HY1, 1.9 au lot F1, 1.8 au lot I2b, 1.7 au lot I2, 1.6 au lot I1, 1.5 au lot B2, 1.4 au lot B1b, 1.3 au lot B1, 1.2 au lot P0c, 1.1 au
+> Version 1.32 du 22/11/2026 (lot S1 ; 1.31 au lot A6 ; 1.30 au lot A7c ; 1.29 au lot A7b ; 1.28 au lot A7a, A7 relivré ; 1.27 au lot A5d ; 1.26 au lot A5c ; 1.25 au lot A5b ; 1.24 au lot A5 ; 1.23 au lot A4b ; 1.22 au lot A4 ; 1.21 au lot A3, 1.20 au lot A2, 1.19 au lot A1, 1.18 au lot L2, 1.17 au lot L1, 1.16 au lot F3b, 1.15 au lot F3, 1.14 au lot F2c, 1.13 au lot HY2, 1.12 au lot F2, 1.11 au lot HY1b, 1.10 au lot HY1, 1.9 au lot F1, 1.8 au lot I2b, 1.7 au lot I2, 1.6 au lot I1, 1.5 au lot B2, 1.4 au lot B1b, 1.3 au lot B1, 1.2 au lot P0c, 1.1 au
 > lot P0, 1.0 au lot P0a). Arbitrages DEB-Q1 à DEB-Q8, DEB-Q11 à DEB-Q32 : « recommandations ok » (20/11/2026) ; DEB-Q9 :
 > « ok » (20/11/2026) ; DEB-Q33 à DEB-Q37 : « recommandations ok » (21/11/2026) ;
 > DEB-Q38 à DEB-Q44 : « recommandations ok » (21/11/2026) ; DEB-Q45, DEB-Q46 : « recommandations ok »
@@ -9,7 +9,7 @@
 > avant F3 » (21/11/2026) ; DEB-Q59 à DEB-Q63 : « recommandations ok » (21/11/2026) ; DEB-Q2, DEB-Q64 : « recommandations ok » (21/11/2026) ;
 > DEB-Q65, DEB-Q66 : « recommandations ok », DEB-Q67 à DEB-Q72 rendues sans objet par DEB-Q73 ; DEB-Q73 à DEB-Q78 :
 > « accord » du développeur (21/11/2026) ; DEB-Q79 à DEB-Q82 : « recommandations ok » (21/11/2026) ; DEB-Q83 : accès confirmé par le développeur, DEB-Q84 à DEB-Q88 :
-> « recommandations ok » après la sonde (21/11/2026) ; DEB-Q89, DEB-Q90 : « recommandations ok » (21/11/2026) ; DEB-Q91 à DEB-Q94 : « recommandations ok » (21/11/2026) ; DEB-Q95 à DEB-Q104 : mesures et « recommandations ok », DEB-D8 : demande du développeur (21/11/2026) ; DEB-Q116 : « option 1 », DEB-Q117 à DEB-Q120 : « recommandations ok » (22/11/2026) ; DEB-Q121, DEB-Q122 : « recommandations ok » (22/11/2026) ; DEB-Q123, DEB-Q124 : « recommandations ok », DEB-Q125 : « ok » (22/11/2026) ; DEB-Q105 à DEB-Q108, DEB-Q126, DEB-Q127 : « recommandations ok », DEB-Q129 : réponse du développeur (22/11/2026). Décisions : §8. Document d'origine **hors
+> « recommandations ok » après la sonde (21/11/2026) ; DEB-Q89, DEB-Q90 : « recommandations ok » (21/11/2026) ; DEB-Q91 à DEB-Q94 : « recommandations ok » (21/11/2026) ; DEB-Q95 à DEB-Q104 : mesures et « recommandations ok », DEB-D8 : demande du développeur (21/11/2026) ; DEB-Q116 : « option 1 », DEB-Q117 à DEB-Q120 : « recommandations ok » (22/11/2026) ; DEB-Q121, DEB-Q122 : « recommandations ok » (22/11/2026) ; DEB-Q123, DEB-Q124 : « recommandations ok », DEB-Q125 : « ok » (22/11/2026) ; DEB-Q105 à DEB-Q108, DEB-Q126, DEB-Q127 : « recommandations ok », DEB-Q129 : réponse du développeur (22/11/2026) ; DEB-Q130 à DEB-Q133 : « recommandations ok » (22/11/2026). Décisions : §8. Document d'origine **hors
 > dépôt** (DEB-D2) : cahier des charges « Document de cadrage » (novembre 2026), tenu par le développeur ; le modèle de
 > fiche (FEB) est versionné, nettoyé de ses métadonnées (DEB-Q9, DEB-Q33).
 
@@ -28,6 +28,7 @@ validée est produite au format Word, au modèle FEB. Données fictives uniqueme
 | Bouton qui **simule la décision du chef de service** (valider, demander des compléments, refuser) | Rapprochement de demandes, tableau de bord, synthèse CODIR / COPIL |
 | **Génération et téléchargement du .docx** au modèle FEB après validation | Export PDF |
 | Page **Liste** des fiches avec leur statut | |
+| **Dictée** au micro (Whisper d'Albert) dans la zone de message et les rubriques (DEB-Q130) | Dictée sur un serveur (HTTPS exigé par le micro) |
 
 **Point de terminaison de la version 1 (V1 simplifiée, DEB-D4)** : la V1 s'arrête au lot R1, quand le critère
 ci-dessous est prouvé sur le poste ; l'assistant le dit alors en clair (« objectif atteint, on arrête »). Son
@@ -38,7 +39,8 @@ propre avec son propre critère de fin. Un lot correctif de la V1 ne corrige que
 **Critère de fin du démonstrateur (V1)** : sur le poste, le scénario du cahier des charges (§7, partie agent et chef de
 service) est joué de bout en bout : la demande vague « contrôle des plates-formes e-commerce et prélèvements à
 distance » devient une fiche complète sans information inventée ; l'agent corrige une rubrique, confirme et soumet ; la
-validation est simulée ; le .docx s'ouvre dans Word au modèle FEB ; la liste affiche « Validée ». Variante jouée
+validation est simulée ; le .docx s'ouvre dans Word au modèle FEB ; la liste affiche « Validée » ; un message au moins
+est dicté (DEB-Q130). Variante jouée
 aussi : retour pour complément, puis nouvelle soumission. Tests verts, couverture conforme ; dernier commit publié et
 sauvegardé.
 
@@ -51,6 +53,7 @@ sauvegardé.
 | Proposer une valeur de rubrique, avec sa justification | Fusion des propositions : rubrique manuelle jamais écrasée, proposition mise en attente |
 | Repérer le service, la tâche ou la prestation attendue du service informatique ; signaler une demande qui n'en relève pas (DEB-Q89) | Complétude, cycle des statuts, numéro `EB-AAAA-NNNN` attribué à la soumission |
 | Alimenter « Points restant à clarifier » et le résumé | Contenu du .docx, à partir de la fiche |
+| Transcrire la parole dictée (Whisper, S1) | Format du WAV, taille, insertion du texte au curseur (DEB-Q131, DEB-Q133) |
 
 Réponse de l'IA : **JSON structuré** `{ message, propositions: [{ rubrique, valeur, justification }], questions:
 [{ rubrique, question }], horsPerimetre }` (`questions` depuis A7, DEB-Q117), lu par une fonction pure
@@ -101,13 +104,15 @@ ExpressionBesoin/src/
                                    route du §5), DecisionsFiches (pures) ; ports IDepotFiches (fiche + historique du
                                    dialogue, écrits ensemble), IAssistantIA (contexte du tour -> texte brut, relu par
                                    ReponseIA.Lire), IGenerateurDocument, IReferentielOrganisation ; TimeProvider, fuseau
-                                   et générateur d'identifiants injectés
+                                   et générateur d'identifiants injectés ; Dictee/ (S1) : ITranscripteur,
+                                   DecisionsDictee (pures), ServiceDictee
   ExpressionBesoin.Infrastructure  SQLite (fiche en JSON + colonnes de liste ; table Transitions, schéma 2, L1) ; .docx sur le gabarit FEB embarqué
                                    (zip + XML, sans SDK OpenXML, DEB-Q34 ; placement par libellé, DEB-Q35) ;
                                    AssistantIAAlbert (A1 : agent MAF sur Albert API, PromptFiche et LimiteDebit purs) ;
-                                   AssistantIAScenarise (démonstration et tests hors réseau), choisi par le profil IA:Profil (A6)
+                                   AssistantIAScenarise (démonstration et tests hors réseau), choisi par le profil IA:Profil (A6) ;
+                                   TranscripteurWhisper, ReponseTranscription (S1)
   ExpressionBesoin.Web             API minimale, deux vues Razor ; ClientApp Vite + TypeScript (features/dialogue,
-                                   features/liste)
+                                   features/liste) ; core/wav (pur), core/micro (coquille), features/dialogue/dictee (S1)
 ```
 
 Performance :
@@ -133,9 +138,11 @@ Performance :
 | `POST` | `api/fiches/{id}/decision` | simulation du chef de service `{ decision, commentaire }` |
 | `POST` | `api/fiches/{id}/reprendre` | reprise d'une fiche à compléter (`ACompleter → Brouillon`, DEB-Q16) ; ajoutée au lot F1, le cas d'usage existait |
 | `GET` | `api/fiches/{id}/document` | .docx ; 409 si la fiche n'est pas validée |
+| `POST` | `api/dictee` | dictée (S1) : WAV canonique mono 16 kHz 16 bits → `{ texte }`, rien n'est stocké (DEB-Q131) |
 
 Refus de l'Application (B2), en plus de ceux du Domaine : `fiche.introuvable`, `agent.inconnu`, `rubrique.inconnue`
-(DEB-Q27), `message.vide`, `document.nonValidee` (409) ; du Web (F1) : `decision.inconnue`. Statuts (DEB-Q42) :
+(DEB-Q27), `message.vide`, `document.nonValidee` (409), `dictee.{indisponible,tropLongue,formatInvalide,vide,silence}`
+(S1) ; du Web (F1) : `decision.inconnue`. Statuts (DEB-Q42) :
 `*.introuvable` → 404, `document.nonValidee` → 409, tout autre refus → 422, panne d'un port → 503 `panne.technique` ;
 corps d'erreur `{ code, message }`. Contrat JSON des réponses (DEB-Q43) : `ExpressionBesoin.Web/Api/Vues.cs`.
 
@@ -186,7 +193,8 @@ AG Grid inutile). Réponse de l'IA affichée entière, avec indicateur d'attente
 | A5b | Correctif de DEB-A5 (2e tour : réponse vide d'Albert, affichée « JSON invalide ») : corps de requête nettoyé comme CSAgent (DEB-Q113), diagnostic au journal (DEB-Q114), réponse vide redemandée une fois puis panne 503 lisible (DEB-Q112) | `Appliquer-Lot A5b` vert et commité ; au navigateur, avec gemma, le 2e tour de « PC ne s'allume plus » répond ; sinon la ligne « Réponse vide de l'IA (DEB-A5) » du journal du site donne la requête réelle |
 | A6 | Fournisseur de l'IA par profils nommés (DEB-D8, DEB-Q105 à DEB-Q107, DEB-Q126 à DEB-Q128) : `IA:Profil` (par environnement) désigne un profil du catalogue `IA:Profils` de `appsettings.json` (point, modèle, variable de la clé, température et plafond de jetons facultatifs) ; profils Albert, Claude (couche compatible OpenAI d'Anthropic), Scénarisé | `Appliquer-Lot A6` vert, couverture 100 / 100, commité ; même scénario joué au navigateur sur les profils `Albert` et `Scenarise` par le seul changement de `IA:Profil` (DEB-Q129) ; le profil Claude est essayé plus tard, sans conditionner R1 |
 | A7 | Question contextualisée (DEB-Q116 à DEB-Q120), après la sonde hors dépôt `Sonder-Question.ps1` (consignes `consignes-A7.txt`) : champ `questions` du schéma, questions candidates sur les trois premières rubriques à questionner non proposées, garde-fous purs, repli sur la question type, libellé de la rubrique en tête de la question ; contrat de l'API, front, base, .docx inchangés | sonde au seuil de DEB-Q120 ; `Appliquer-Lot A7` vert (couverture 100 / 100) et commité ; au navigateur, avec gemma, « PC ne s'allume plus » et le scénario e-commerce : questions contextualisées, aucune ne redemande une information donnée, aucun fait inventé |
-| R1 | Fiche de recette : nominal et retour pour complément | critère de fin du démonstrateur (§1) : **point de terminaison de la V1** |
+| S1 | Dictée (DEB-Q130 à DEB-Q133, après la sonde hors dépôt `Sonder-Dictee.ps1`, DEB-Q134) : WAV canonique produit par le navigateur, route `api/dictee`, transcripteur Whisper du profil (`ModeleTranscription`), boutons « 🎙 Dicter » du message et des rubriques | `Appliquer-Lot S1` vert, couverture 100 / 100, commité ; `npm test` vert ; au navigateur, profil `Albert` : un message et une rubrique dictés, texte inséré au curseur, relu, puis envoyé ou enregistré ; profil `Scenarise` : aucun bouton |
+| R1 | Fiche de recette : nominal et retour pour complément, un message dicté | critère de fin du démonstrateur (§1) : **point de terminaison de la V1** |
 
 L'IA scénarisée précède l'IA réelle : la démonstration reste jouable sans réseau le jour du séminaire. Dépendance :
 l'étape `TestsFront` d'`Appliquer-Lot` arrive avec le lot OT2 du harnais central ; sans lui, les tests Vitest de F1 à F3
@@ -342,4 +350,10 @@ sont lancés à la main (`npm test`) et leur sortie jointe au compte rendu.
 | DEB-Q128 | (22/11/2026, POSÉE par A6 ; recommandation : garder) Plafond de jetons `JetonsMax` facultatif par profil, non envoyé si absent : la documentation d'Anthropic ne donne pas de valeur par défaut ; 4096 pour Claude, absent pour Albert (aucun changement de sa requête) ; appliqué par A6 |
 | DEB-Q129 | (22/11/2026, réponse du développeur : « pour l'instant on poursuit avec gemma, mon accès à claude viendra plus tard ») Critère d'A6 joué sur les profils `Albert` et `Scenarise` ; profil `Claude` livré au catalogue, essayé à l'arrivée de la clé par le seul changement d'`IA:Profil` ; cet essai ne conditionne ni la clôture d'A6 ni R1 |
 
-Questions ouvertes : DEB-Q128 (appliquée par A6, à confirmer), DEB-Q109 à DEB-Q111 (V2).
+| DEB-Q130 | (22/11/2026, « recommandations ok » ; demande du développeur, exception au gel DEB-D4 comme DEB-D8) Dictée en V1 : chantier **S** (saisie vocale), lot S1 avant R1 ; R1 comprend un message dicté. Condition : sonde hors dépôt `Sonder-Dictee.ps1` (voix Windows, WAV 16 kHz) à 90 % de mots retrouvés au moins sur chaque texte et moins de 5 s pour le texte court ; sinon dictée en V2 |
+| DEB-Q131 | (22/11/2026, « recommandations ok ») Chaîne de la dictée, inspirée de FlowPortal et CSAgent, SANS ffmpeg : le navigateur enregistre (`MediaRecorder`), décode et rééchantillonne à 16 kHz (Web Audio), mélange en mono et encode le WAV canonique (fonctions pures, Vitest) ; `POST api/dictee` (WAV seul, 4 000 044 octets au plus, soit 125 s) ; port `ITranscripteur`, adaptateur `TranscripteurWhisper` : `POST {Point}/audio/transcriptions`, formulaire `file`, `model`, `language` (`fr`), `response_format` (`json`) ; délai et 429 de DEB-Q87 ; panne 503 ; rien n'est stocké, ni l'audio ni le texte ; aucun paquet ajouté |
+| DEB-Q132 | (22/11/2026, « recommandations ok ») `ModeleTranscription` facultatif par profil de l'IA, même point et même clé (Albert : `whisper-large-v3`) ; absent (Claude, Scénarisé) → dictée indisponible : `data-dictee="non"`, aucun bouton, route refusée `dictee.indisponible` ; aucune transcription simulée |
+| DEB-Q133 | (22/11/2026, « recommandations ok ») Bouton « 🎙 Dicter » à côté de la zone de message et de chaque rubrique ; une dictée à la fois, arrêtée par un second clic ou au bout de 120 s ; texte inséré à la position du curseur, jamais envoyé ni enregistré de lui-même (acte explicite, comme DEB-Q51) ; la transcription est une saisie comme une autre |
+| DEB-Q134 | (22/11/2026, POSÉE ; recommandation : seuil de DEB-Q130 jugé atteint) Sonde : un seul modèle de transcription (`whisper-large-v3`) ; 7,4 s d'audio en 311 ms, 43,9 s en 481 ms ; mots retrouvés 16/18 (89 %) et 116/121 (96 %). Les 7 écarts sont des graphies équivalentes (« plateformes », « 400 », « 12 ») que le compteur de la sonde ne rapproche pas (trait d'union, nombres), aucun mot faux ; refusée → S1 n'est pas appliqué, dictée en V2 |
+
+Questions ouvertes : DEB-Q134 (conditionne l'application de S1), DEB-Q128 (appliquée par A6, à confirmer), DEB-Q109 à DEB-Q111 (V2).

@@ -1,8 +1,9 @@
-@model Guid
+@model ExpressionBesoin.Web.Controllers.ModeleDialogue
 @{
     ViewData["Title"] = "Dialogue";
 }
-@* Page Dialogue (F2, DEB-Q48) : montée par features/dialogue/PageDialogue.ts, qui consulte la fiche par l'API. *@
-<div id="app" data-page="dialogue" data-fiche="@Model">
+@* Page Dialogue (F2, DEB-Q48) : montée par features/dialogue/PageDialogue.ts, qui consulte la fiche par l'API ;
+   data-dictee : boutons « Dicter » affichés ou non (lot S1, DEB-Q132). *@
+<div id="app" data-page="dialogue" data-fiche="@Model.Fiche" data-dictee="@(Model.Dictee ? "oui" : "non")">
     <noscript>La page Dialogue nécessite JavaScript.</noscript>
 </div>

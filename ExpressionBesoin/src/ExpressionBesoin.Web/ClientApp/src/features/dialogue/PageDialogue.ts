@@ -2,13 +2,17 @@ import type { ContextePage, Page } from "../../core/aiguillage.ts";
 import { erreurException, type Issue } from "../../core/api.ts";
 import type { ConsultationVue, FicheVue, TypeDecision } from "../../core/contrats.ts";
 import { FUSEAU } from "../../core/dates.ts";
+import { enregistrer, microDisponible, type Enregistrement } from "../../core/micro.ts";
+import { CIBLE_MESSAGE, erreurMicro, SECONDES_MAX } from "./dictee.ts";
 import { apresTransition, commencer, ETAT_INITIAL, reduire, type EtatDialogue, type Evenement } from "./etat.ts";
-import { actions, badgeStatut, blocs, CYCLE_VIDE, DECISIONS, lignesCycle, noteEcartees, peutEnregistrer, progression, titreFiche, type Badge } from "./vue.ts";
+import { actions, badgeStatut, blocs, boutonDictee, CYCLE_VIDE, DECISIONS, lignesCycle, noteEcartees, peutEnregistrer, progression, titreFiche, type Badge } from "./vue.ts";
 
 // Page Dialogue (F2, DEB-Q48 à DEB-Q53) : COQUILLE sans décision. L'état vient du réducteur (etat.ts), l'affichage du
 // modèle (vue.ts) ; ici, seulement le DOM (textContent, jamais innerHTML) et les appels de l'API.
 // Une saisie (frappe) ne reconstruit pas la page : elle met l'état à jour et rafraîchit les commandes, le focus reste.
 // Panneau « Cycle de vie » (L2) : lignes de vue.ts ; consultation relue après chaque transition (DEB-Q80).
+// Dictée (S1) : boutons « Dicter » si la vue l'offre (data-dictee) et si le navigateur a un micro ; le texte reçu passe
+// par le réducteur (insertion au curseur), jamais envoyé ni enregistré de lui-même (DEB-Q133).
 
 type Attributs = Readonly<Record<string, string>>;
 
@@ -35,6 +39,8 @@ export const page: Page = {
   async monter(racine: HTMLElement, { client }: ContextePage): Promise<void> {
     const id = racine.dataset["fiche"] ?? "";
     let etat: EtatDialogue = ETAT_INITIAL;
+    const dicteeOfferte = racine.dataset["dictee"] === "oui" && microDisponible();
+    let enregistrement: Enregistrement | null = null;
     // Commandes à rafraîchir sans reconstruire la page : élément → condition d'activation.
     let commandes: { readonly element: HTMLButtonElement | HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement; readonly actif: (e: EtatDialogue) => boolean }[] = [];
 
@@ -76,6 +82,55 @@ export const page: Page = {
       });
     }
 
+    // Dictée : départ (le micro est demandé), puis arrêt par un second clic ou au bout de SECONDES_MAX.
+    async function basculerDictee(cible: string, zone: HTMLTextAreaElement): Promise<void> {
+      if (etat.dictee.phase === "enregistrement") {
+        await terminerDictee();
+        return;
+      }
+      if (etat.dictee.phase !== "inactive") return;
+      appliquer({ type: "dicteeDebut", cible, position: zone.selectionStart }, true);
+      try {
+        enregistrement = await enregistrer(SECONDES_MAX, () => void terminerDictee());
+      } catch (exception) {
+        appliquer({ type: "dicteeEchec", erreur: erreurMicro(exception) }, true);
+      }
+    }
+
+    async function terminerDictee(): Promise<void> {
+      const courant = enregistrement;
+      if (courant === null || etat.dictee.phase !== "enregistrement") return;
+      enregistrement = null;
+      appliquer({ type: "dicteeEnvoi" }, true);
+      let audio: Uint8Array<ArrayBuffer>;
+      try {
+        audio = await courant.arreter();
+      } catch (exception) {
+        appliquer({ type: "dicteeEchec", erreur: erreurMicro(exception) }, true);
+        return;
+      }
+      let evenement: Evenement;
+      try {
+        const issue = await client.dicter(audio);
+        evenement = issue.ok ? { type: "dicteeTexte", texte: issue.valeur.texte } : { type: "dicteeEchec", erreur: issue.erreur };
+      } catch (exception) {
+        evenement = { type: "dicteeEchec", erreur: erreurException(exception) };
+      }
+      appliquer(evenement, true);
+    }
+
+    function dicter(cible: string, zone: HTMLTextAreaElement): HTMLButtonElement[] {
+      if (!dicteeOfferte) return [];
+      const vue = boutonDictee(etat, cible);
+      const b = commande(
+        bouton(vue.libelle, `btn-sm text-nowrap ${vue.enCours ? "btn-danger" : "btn-outline-secondary"}`, () => void basculerDictee(cible, zone)),
+        (e) => boutonDictee(e, cible).actif,
+      );
+      b.setAttribute("aria-pressed", String(vue.enCours));
+      b.title = "Dicter au micro (deux minutes au plus) : le texte s'insère au curseur, à relire avant d'envoyer.";
+      return [b];
+    }
+
     function rafraichir(): void {
       for (const { element, actif } of commandes) element.disabled = !actif(etat);
     }
@@ -103,7 +158,7 @@ export const page: Page = {
       zone.value = etat.message;
       zone.addEventListener("input", () => appliquer({ type: "message", texte: zone.value }, false));
       const envoyer = commande(el("button", "btn btn-primary", "Envoyer", { type: "submit" }), (e) => actions(e).dialoguer);
-      const formulaire = el("form", "d-flex gap-2 align-items-end", undefined, {}, [zone, envoyer]);
+      const formulaire = el("form", "d-flex gap-2 align-items-end", undefined, {}, [zone, ...dicter(CIBLE_MESSAGE, zone), envoyer]);
       const soumettreMessage = () => {
         const texte = etat.message;
         void executer(() => client.envoyerMessage(id, texte), (tour) => ({ type: "tour", envoye: texte, tour }));
@@ -153,7 +208,7 @@ export const page: Page = {
             (e) => peutEnregistrer(e, rubrique.code),
           );
           zone.addEventListener("input", () => appliquer({ type: "brouillon", code: rubrique.code, texte: zone.value }, false));
-          const champ = el("div", `mb-2${rubrique.questionnee ? " rubrique-questionnee" : ""}`, undefined, {}, [entete, el("div", "d-flex gap-2 align-items-start mt-1", undefined, {}, [zone, enregistrer])]);
+          const champ = el("div", `mb-2${rubrique.questionnee ? " rubrique-questionnee" : ""}`, undefined, {}, [entete, el("div", "d-flex gap-2 align-items-start mt-1", undefined, {}, [zone, ...dicter(rubrique.code, zone), enregistrer])]);
           if (rubrique.proposition !== null) {
             champ.append(
               el("div", "proposition border-start border-warning border-3 ps-2 mt-1 small", undefined, {}, [
