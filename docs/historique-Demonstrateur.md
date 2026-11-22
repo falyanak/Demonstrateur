@@ -714,3 +714,21 @@
   compréhension » : questions types fixes, sans égard au contexte (panne de PC : résultat recherché, critères de
   réussite, bénéfices attendus évidents ou déjà dits). DEB-Q116 posée (recommandation : question contextualisée).
 - A5c : clôture de session (documents seuls) ; plan v1.26.
+
+## 22/11/2026 — Session : pièces contrôlées ; méta-prompt ; A5d
+
+- Pièces d'`Ouvrir-Session` : 8 sur 8, tailles et SHA-256 conformes à `PIECES.txt`, archive de 180 entrées, commit
+  `01bba27`. `Compter-Tests` : Domain 281, Application 67, Infrastructure 222, Web 133, Architecture 23, total 726,
+  0 échec (comptes estimés d'A5b confirmés).
+- Demande du développeur : un méta-prompt qui reprenne les informations à recueillir pour la FEB par un dialogue
+  intelligent. Lue comme l'option 1 de DEB-Q116, confirmée. Point de conception : l'IA répond AVANT la fusion, elle ne
+  peut pas savoir quelle rubrique sera questionnée (une question sur une rubrique qu'elle propose referait DEB-A4) :
+  questions candidates sur les trois premières rubriques à questionner (DEB-Q117). Le repérage de la rubrique
+  questionnée par la fin du message ne tient plus avec un texte libre : libellé en tête (DEB-Q118).
+- DEB-Q116 « option 1 », DEB-Q117 à DEB-Q120 « recommandations ok ».
+- Livrés hors dépôt avec A5d : `consignes-A7.txt` (méta-prompt : nature de la demande, guide des rubriques selon la
+  nature, règles 1 à 11 reprises, règles 12 à 17 des questions, schéma avec `questions`) et `Sonder-Question.ps1`
+  (quatre parcours scriptés, fusion, rubrique choisie après la fusion, garde-fous, CSV à juger).
+- Vérifié chez l'assistant : garde-fou et retrait des questions sur une réplique Python, cas fautifs compris ;
+  équilibre des délimiteurs du script ; octets (UTF-8 avec BOM, CRLF) ; prompt ≤ 30 720 octets. Non vérifié :
+  analyse syntaxique PowerShell (aucun PowerShell disponible dans cette session), appel réel à Albert.
