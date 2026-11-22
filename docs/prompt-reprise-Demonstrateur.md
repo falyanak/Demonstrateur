@@ -1,6 +1,6 @@
 # Prompt de reprise — Demonstrateur
 
-> Mis à jour le 22/11/2026 par le lot A6 (profils de l'IA ; DEB-Q105 à DEB-Q108, DEB-Q126 à DEB-Q129). Règles génériques : harnais central, `regles\regles-de-travail.md` (v5) ;
+> Mis à jour le 22/11/2026 par le lot A6b (clôture d'A6 et du chantier A). Règles génériques : harnais central, `regles\regles-de-travail.md` (v5) ;
 > modèle de projet : `regles\harnais-modele-generique.md` (v2) ; front : `regles\gabarit-frontend-vite-aspnet.md` ;
 > outillage : `C:\Dev\Harnais\docs\specification-harnais-central.md` (fait foi).
 > Historique détaillé : `docs/historique-Demonstrateur.md` (non envoyé par défaut). Documents hors dépôt dont dépend ce
@@ -8,13 +8,13 @@
 > `Expression_de_besoin_demonstrateur_IA_SICCRF.docx` (document de cadrage, novembre 2026). Le modèle `FEB.docx` est
 > versionné depuis I2, nettoyé de ses métadonnées (DEB-Q9, DEB-Q33).
 
-## ▶ ÉTAT AU 22/11/2026 (A6 livré, NON VÉRIFIÉ) — À LIRE D'ABORD
+## ▶ ÉTAT AU 22/11/2026 (chantier A clos) — À LIRE D'ABORD
 
-**Où on en est** : chantiers P, B, I, F, L clos ; HY1 à HY3 clos. Chantier A : A1 à A5b, A7 validés (A7b `79f5eb8` :
-**770 MESURÉS**, couverture 2307/2307, 871/871). **A6 livré** sur `fc15530` (profils `IA:Profil` / `IA:Profils`,
-DEB-Q105, DEB-Q126) : comptes ESTIMÉS Infrastructure 228, Web 161, **total 799** ; compilation non vérifiée.
-**Prochaine action** : `Appliquer-Lot A6` + couverture (ligne enchaînée §0) ; puis critère d'A6 au navigateur, profils
-`Albert` et `Scenarise` (DEB-Q129 ; Claude plus tard, sans bloquer R1) ; puis publier, sauvegarder, R1.
+**Où on en est** : chantiers P, B, I, F, L, A clos ; HY1 à HY3 clos. A6 validé (`3b81591`) : **799 MESURÉS**, 0 échec ;
+couverture lignes 2354/2354, branches 899/899 ; même parcours joué au navigateur sur les profils `Albert` et `Scenarise`
+par `IA__Profil` seul (DEB-Q129). Profil `Claude` livré, essayé à l'arrivée de la clé, sans conditionner R1.
+**Prochaine action** : publier et sauvegarder le dernier commit, puis R1 (scénario e-commerce et retour pour complément,
+DEB-Q123 ; site lancé avec son journal, DEB-Q124).
 **Ouverture de la session suivante** (site arrêté : il verrouille les DLL de `bin\Debug`) :
 
     Set-Location C:\Dev\Demonstrateur; . C:\Dev\Harnais\outillage\Charger-Harnais.ps1; Ouvrir-Session -BrancheAttendue main
@@ -67,18 +67,18 @@ page de liste des fiches et de leur statut. Plan, périmètre et critère de fin
 | F — front | F1 (socle, API), F2 (Dialogue), F3 (Liste) | F1 clos le 21/11/2026 : F1 (`bfaaf97`), F1b (`fe31e69`), F1c (`3e45551`) ; F2 clos le 21/11/2026 : F2 (`ba3aafd`), F2c (`50ccdb4`) ; F3 clos le 21/11/2026 : F3 (`ce06fe6`), F3b ; `TestsFront` attendu d'OT2 |
 | Hygiène | HY1, HY1b (DEB-HY1 : NuGet, outils dotnet, SDK) ; HY2 (DEB-HY2 : dossier de données par environnement) ; HY3 (DEB-A2 : SDK depuis la racine) | HY1 clos le 21/11/2026 : HY1 (`d307a91`), HY1b ; HY2 clos le 21/11/2026 : HY2 (`9b21bdb`) ; HY3 clos le 21/11/2026 : HY3 (`fcdb37a`) |
 | L — cycle de vie | L1 (serveur), L2 (front) | ouvert le 21/11/2026 (DEB-Q65) ; clos le 21/11/2026 : L1 (`b275507`), L1b ; L2 (`ec192e6`), L2b |
-| A — IA réelle | A1 à A7 | ouvert le 21/11/2026 : Albert API (DEB-Q83) ; A1 (`27ec900`), A2 (`4afcbfe`), A3 (`e84710c`), A4 (`345a707`), A4b, A5 (`bf75669`), A5b (`c30a13b`), A5c, A5d, A7 (échec de compilation), A7a (`868f549`), A7b (`79f5eb8`), A7c : A7 clos le 22/11/2026 ; A6 livré (profils), à vérifier ; critère : plan §7 |
+| A — IA réelle | A1 à A7 | ouvert le 21/11/2026 : Albert API (DEB-Q83) ; A1 (`27ec900`), A2 (`4afcbfe`), A3 (`e84710c`), A4 (`345a707`), A4b, A5 (`bf75669`), A5b (`c30a13b`), A5c, A5d, A7 (échec de compilation), A7a (`868f549`), A7b (`79f5eb8`), A7c : A7 clos le 22/11/2026 ; A6 (`3b81591`), A6b : chantier A clos le 22/11/2026 ; critère : plan §7 |
 | R — recette | R1 | à faire |
 
-Comptes mesurés, lot par lot : historique. Dernière mesure (A7b, poste, 22/11/2026, Release, `Appliquer-Lot`, 0 échec) :
-Domain 319, Application 68, Infrastructure 227, Web 133, Architecture 23, **total 770** ; Vitest **249**, 8 fichiers
-(L2, inchangé depuis) ; couverture A7b : lignes 2307/2307, branches 871/871 ; cliquet 100 / 100.
+Comptes mesurés, lot par lot : historique. Dernière mesure (A6, poste, 22/11/2026, Release, `Appliquer-Lot`, 0 échec) :
+Domain 319, Application 68, Infrastructure 228, Web 161, Architecture 23, **total 799** ; Vitest **249**, 8 fichiers
+(L2, inchangé depuis) ; couverture A6 : lignes 2354/2354, branches 899/899 ; cliquet 100 / 100.
 SDK 10.0.403 depuis HY3 (DEB-A2).
 
 ## §2. Points ouverts
 
-1. A6 (plan §7) : `Appliquer-Lot A6`, couverture, critère au navigateur sur `Albert` et `Scenarise` ; un écart = lot
-   correctif. Profil Claude essayé quand la clé et l'accord arrivent (DEB-Q107, DEB-Q129) : ne conditionne pas R1.
+1. R1 (plan §7), après publication et sauvegarde. Profil Claude essayé quand la clé et l'accord arrivent (DEB-Q107,
+   DEB-Q129) : ne conditionne pas R1 ; DEB-Q128 (plafond de jetons) à confirmer.
 2. Publication et sauvegarde du dernier commit : exigées par le critère de fin de la V1 (R1).
 6. Chemins des serveurs (DEB-Q55) : `D:\Donnees\Demonstrateur-data\fiches.db` (Production) et
    `D:\Donnees\Demonstrateur-data-staging\fiches.db` (Staging), à confirmer avec l'exploitation avant toute
@@ -222,8 +222,7 @@ s'ajoute ici.
 ## §7. Prochaine session
 
 Acquis : plan v1.31 ; socle, Domaine, Application, Infrastructure, front F1 à F3, HY1 à HY3, cycle de vie L1, L2, IA
-réelle A1 à A5b, A7 validés sur le poste (770 mesurés, couverture 100 / 100) ; A6 livré, à vérifier.
+réelle A1 à A7 validés sur le poste (chantier A clos : 799 mesurés, couverture 100 / 100).
 Audit honnête : chez l'assistant, ni SDK .NET ni NuGet (tree-sitter, répliques Python) ; `Appliquer-Lot` tranche ; la
-qualité de l'IA ne se juge qu'au navigateur. Plan ordonné : vérifier A6, publier, sauvegarder, R1. Pièces :
-celles d'`Ouvrir-Session` (8), avec leur compte ; sortie d'`Appliquer-Lot A6` et de `Lancer-Couverture` ; constats du
-navigateur sur les deux profils.
+qualité de l'IA ne se juge qu'au navigateur. Plan ordonné : publier, sauvegarder, R1. Pièces :
+celles d'`Ouvrir-Session` (8), avec leur compte ; sorties de `Publier-Branche` et de `Sauvegarder-Depots`.

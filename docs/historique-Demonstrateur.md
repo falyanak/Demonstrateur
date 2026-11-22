@@ -820,3 +820,15 @@
   un attendu faussé est détecté). Comptes ESTIMÉS : Infrastructure 228, Web 161, total 799. Non vérifié : compilation,
   tests, couverture (aucun SDK .NET chez l'assistant), nom JSON du plafond (`max_completion_tokens` attendu, `max_tokens`
   toléré par le test).
+
+## 22/11/2026 — A6 validé ; critère d'A6 atteint ; chantier A clos ; A6b (clôture)
+
+- `Appliquer-Lot A6; if ($?) { Lancer-Couverture; if ($?) { … commit } }` : 15 fichiers, compilation Release, 799 tests
+  MESURÉS (Domain 319, Application 68, Infrastructure 228, Web 161, Architecture 23), 0 échec ; couverture lignes
+  2354/2354, branches 899/899 = 100 %, « COUVERTURE CONFORME » ; commit `3b81591`. Comptes ESTIMÉS confirmés.
+- Critère d'A6 au navigateur, même parcours (création, dialogue, 10 propositions acceptées, soumission, décision) sur
+  deux profils choisis par `IA__Profil` seul : `Albert` (`site-A6-albert.log` : 7 tours, 3,1 à 7,5 s) et `Scenarise`
+  (`site-A6-scenarise.log` : 10 tours, moins de 40 ms) ; statuts 200 et 201 seulement, aucune ligne d'avertissement,
+  ni « Panne » ni « Réponse vide » (DEB-A6 toujours en observation). Objectif atteint, on arrête : chantier A clos.
+- Restent : DEB-Q128 à confirmer ; essai du profil Claude à l'arrivée de la clé (DEB-Q129).
+- A6b : documents seuls (prompt, historique).
