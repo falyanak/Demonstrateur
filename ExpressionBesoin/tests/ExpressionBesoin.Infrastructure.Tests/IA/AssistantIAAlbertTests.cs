@@ -37,7 +37,8 @@ public sealed class AssistantIAAlbertTests
             }),
             ListeImmuable<EtatRubrique>.De(new[] { new EtatRubrique("application", "Application ou service concerné", true, null, null) }),
             ListeImmuable<string>.De(new[] { "application" }),
-            "application");
+            "application",
+            ListeImmuable<string>.De(new[] { "application" }));
 
     private AssistantIAAlbert Assistant(FauxFournisseurIA faux) =>
         AssistantIAAlbert.Creer(
@@ -89,7 +90,7 @@ public sealed class AssistantIAAlbertTests
         var schema = format.GetProperty("json_schema");
         Assert.Equal(("reponse_fiche", true), (schema.GetProperty("name").GetString(), schema.GetProperty("strict").GetBoolean()));
         Assert.Equal(
-            new[] { "message", "propositions", "horsPerimetre" },
+            new[] { "message", "propositions", "questions", "horsPerimetre" },
             schema.GetProperty("schema").GetProperty("properties").EnumerateObject().Select(propriete => propriete.Name).ToArray());
         Assert.False(racine.TryGetProperty("tools", out _));
         Assert.Empty(_attentes);

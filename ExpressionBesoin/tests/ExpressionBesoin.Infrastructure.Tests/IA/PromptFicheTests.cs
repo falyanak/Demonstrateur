@@ -1,3 +1,5 @@
+using System.Security.Cryptography;
+using System.Text;
 using ExpressionBesoin.Application.Fiches;
 using ExpressionBesoin.Domain;
 using ExpressionBesoin.Domain.Fiches;
@@ -6,8 +8,10 @@ using ExpressionBesoin.Infrastructure.IA;
 namespace ExpressionBesoin.Infrastructure.Tests.IA;
 
 /// <summary>
-/// Prompt de l'IA réelle (DEB-Q88 ; questionnement DEB-A3, DEB-A4, question déterministe DEB-Q100) : attendus écrits à la main, recalculés par une réplique indépendante (Python) avant
-/// livraison ; jamais recopiés de la sortie.
+/// Prompt de l'IA réelle (DEB-Q88 ; questionnement DEB-A3, DEB-A4, question déterministe DEB-Q100 ; question
+/// contextualisée, lot A7, DEB-Q116 à DEB-Q122) : attendus écrits à la main ou tirés des fichiers de la sonde d'A7
+/// (consignes-A7.txt, Sonder-Question.ps1) par une réplique indépendante (Python) avant livraison ; jamais recopiés de la
+/// sortie.
 /// </summary>
 public sealed class PromptFicheTests
 {
@@ -16,11 +20,23 @@ public sealed class PromptFicheTests
     private static EtatRubrique EtatDe(string code, string? valeur = null, string? proposition = null) =>
         new(code, Catalogue.Toutes.Single(definition => definition.Code == code).Libelle, true, valeur, proposition);
 
-    private static ContexteTour Contexte(string message, string? prochaine, EtatRubrique[] rubriques, string[] manquantes, params Echange[] historique) =>
-        new(message, ListeImmuable<Echange>.De(historique), ListeImmuable<EtatRubrique>.De(rubriques), ListeImmuable<string>.De(manquantes), prochaine);
+    private static ContexteTour Contexte(
+        string message,
+        string? prochaine,
+        EtatRubrique[] rubriques,
+        string[] manquantes,
+        string[] aQuestionner,
+        params Echange[] historique) =>
+        new(
+            message,
+            ListeImmuable<Echange>.De(historique),
+            ListeImmuable<EtatRubrique>.De(rubriques),
+            ListeImmuable<string>.De(manquantes),
+            prochaine,
+            ListeImmuable<string>.De(aQuestionner));
 
     private const string RelanceApplication =
-        "Je comprends une demande d'évolution.\n\nQuelle application ou quel équipement est concerné ?";
+        "Je comprends une demande d'évolution.\n\nApplication ou service concerné : Quelle application ou quel équipement est concerné ?";
 
     private static readonly Echange[] DeuxEchanges =
     [
@@ -37,15 +53,16 @@ public sealed class PromptFicheTests
         Assert.Equal(attendu, PromptFiche.Etat(EtatDe("difficultes", valeur, proposition)));
 
     [Fact]
-    public void Premier_tour_demande_initiale_sans_rubrique_questionnee()
+    public void Premier_tour_demande_initiale_rubriques_a_questionner_sans_rubrique_questionnee()
     {
-        var contexte = Contexte(Demande, "application", [EtatDe("application"), EtatDe("intitule")], ["application", "intitule"]);
+        var contexte = Contexte(Demande, "application", [EtatDe("application"), EtatDe("intitule")], ["application", "intitule"], ["application", "intitule"]);
 
         Assert.Equal(
             "État de la fiche :\n"
             + "- application : vide\n"
             + "- intitule : vide\n"
             + "Rubriques obligatoires manquantes : application, intitule\n"
+            + "Rubriques à questionner : application, intitule\n"
             + "Premier message de l'agent : sa demande initiale.\n"
             + "\n"
             + "Message de l'agent :\n"
@@ -71,6 +88,7 @@ public sealed class PromptFicheTests
                 EtatDe("resultatRecherche"),
             ],
             ["intitule", "situationActuelle", "resultatRecherche"],
+            ["situationActuelle", "resultatRecherche"],
             DeuxEchanges);
 
         Assert.Equal(
@@ -81,6 +99,7 @@ public sealed class PromptFicheTests
             + "- difficultes : retenue « Saisie double » ; proposition en attente « Saisies en double »\n"
             + "- resultatRecherche : vide\n"
             + "Rubriques obligatoires manquantes : intitule, situationActuelle, resultatRecherche\n"
+            + "Rubriques à questionner : situationActuelle, resultatRecherche\n"
             + "Rubrique questionnée : application\n"
             + "\n"
             + "Message de l'agent :\n"
@@ -89,14 +108,17 @@ public sealed class PromptFicheTests
     }
 
     [Theory]
+    [InlineData("Noté.\n\nSituation actuelle : Depuis quand votre PC ne s'allume-t-il plus ?", "application", "situationActuelle")]
+    [InlineData("Noté.\n\nCritères de réussite : À quoi verrez-vous que c'est réglé ?", "application", "criteresReussite")]
     [InlineData("Noté.\n\nQue se passe-t-il aujourd'hui, concrètement ?", "application", "situationActuelle")]
     [InlineData("Noté.\n\nToutes les rubriques obligatoires sont renseignées : envoyez « résumé » pour que je le propose.", null, "resume")]
     [InlineData("Quelle application est concernée ?", "difficultes", "difficultes")]
     [InlineData("Relisez la fiche, acceptez ou corrigez les propositions, puis confirmez et soumettez.", null, null)]
     public void Rubrique_questionnee_relance_reconnue_sinon_prochaine_rubrique(string dernierMessageIA, string? prochaine, string? attendue)
     {
-        // Ligne 3 : message antérieur à A5 (question de l'IA), la prochaine rubrique du contexte le remplace.
-        var contexte = Contexte("x", prochaine, [], [], new Echange(AuteurEchange.Agent, Demande, Essais.T0), new Echange(AuteurEchange.IA, dernierMessageIA, Essais.T0));
+        // Lignes 1 et 2 : libellé en tête (A7, candidate de l'IA ou question type) ; ligne 3 : question type seule
+        // (A5) ; ligne 5 : message antérieur à A5 (question de l'IA), la prochaine rubrique du contexte le remplace.
+        var contexte = Contexte("x", prochaine, [], [], [], new Echange(AuteurEchange.Agent, Demande, Essais.T0), new Echange(AuteurEchange.IA, dernierMessageIA, Essais.T0));
 
         Assert.Equal(attendue, PromptFiche.Questionnee(contexte));
     }
@@ -109,9 +131,10 @@ public sealed class PromptFicheTests
             "difficultes",
             [],
             [],
+            [],
             new Echange(AuteurEchange.IA, RelanceApplication, Essais.T0),
             new Echange(AuteurEchange.Agent, "SORA", Essais.T0),
-            new Echange(AuteurEchange.IA, "Noté.\n\nQue se passe-t-il aujourd'hui, concrètement ?", Essais.T0),
+            new Echange(AuteurEchange.IA, "Noté.\n\nSituation actuelle : Comment saisissez-vous les contrôles aujourd'hui ?", Essais.T0),
             new Echange(AuteurEchange.Agent, "Tout à la main", Essais.T0));
 
         Assert.Equal("situationActuelle", PromptFiche.Questionnee(contexte));
@@ -120,10 +143,10 @@ public sealed class PromptFicheTests
     [Fact]
     public void Rubrique_questionnee_historique_sans_message_de_l_IA_prochaine_rubrique()
     {
-        var contexte = Contexte("x", "intitule", [], [], new Echange(AuteurEchange.Agent, Demande, Essais.T0));
+        var contexte = Contexte("x", "intitule", [], [], ["intitule"], new Echange(AuteurEchange.Agent, Demande, Essais.T0));
 
         Assert.Equal("intitule", PromptFiche.Questionnee(contexte));
-        Assert.Contains("Rubrique questionnée : intitule\n\nMessage de l'agent :\nx", PromptFiche.Tour(contexte));
+        Assert.Contains("Rubriques à questionner : intitule\nRubrique questionnée : intitule\n\nMessage de l'agent :\nx", PromptFiche.Tour(contexte));
     }
 
     [Fact]
@@ -134,6 +157,7 @@ public sealed class PromptFicheTests
             null,
             [EtatDe("application", "SORA")],
             [],
+            [],
             new Echange(AuteurEchange.Agent, Demande, Essais.T0),
             new Echange(AuteurEchange.IA, "Noté.\n\nRelisez la fiche, acceptez ou corrigez les propositions, puis confirmez et soumettez.", Essais.T0));
 
@@ -141,6 +165,7 @@ public sealed class PromptFicheTests
             "État de la fiche :\n"
             + "- application : retenue « SORA »\n"
             + "Rubriques obligatoires manquantes : aucune\n"
+            + "Rubriques à questionner : aucune\n"
             + "Rubrique questionnée : aucune\n"
             + "\n"
             + "Message de l'agent :\n"
@@ -151,7 +176,13 @@ public sealed class PromptFicheTests
     [Fact]
     public void Messages_historique_dans_l_ordre_puis_le_tour()
     {
-        var contexte = Contexte("Les contrôleurs saisissent tout à la main.", "situationActuelle", [EtatDe("situationActuelle")], ["situationActuelle"], DeuxEchanges);
+        var contexte = Contexte(
+            "Les contrôleurs saisissent tout à la main.",
+            "situationActuelle",
+            [EtatDe("situationActuelle")],
+            ["situationActuelle"],
+            ["situationActuelle"],
+            DeuxEchanges);
 
         Assert.Equal(
             ListeImmuable<MessageIA>.De(new[]
@@ -166,90 +197,76 @@ public sealed class PromptFicheTests
     [Fact]
     public void Premier_tour_un_seul_message()
     {
-        var contexte = Contexte(Demande, "application", [EtatDe("application")], ["application"]);
+        var contexte = Contexte(Demande, "application", [EtatDe("application")], ["application"], ["application"]);
         Assert.Equal(ListeImmuable<MessageIA>.De(new[] { new MessageIA(RoleMessage.Agent, PromptFiche.Tour(contexte)) }), PromptFiche.Messages(contexte));
     }
 
+    /// <summary>
+    /// Les consignes sont, à l'octet près, le méta-prompt sondé (consignes-A7.txt, fins de ligne en « \n », blancs de
+    /// bord retirés, seuil de DEB-Q120 atteint, DEB-Q121), dont la règle 6 reçoit la phrase de DEB-Q122. Empreinte
+    /// calculée par la réplique Python sur ce texte, jamais sur la sortie du code.
+    /// </summary>
     [Fact]
-    public void Consignes_role_regles_contrat_puis_rubriques_du_catalogue()
+    public void Consignes_meta_prompt_sonde_plus_DEB_Q122_a_l_octet()
+    {
+        var octets = Encoding.UTF8.GetBytes(PromptFiche.Consignes);
+
+        Assert.Equal(9667, octets.Length);
+        Assert.Equal("FEC0FACB4CCAB1357DB67002F49FB0C903CC38D7210E6B21B257438440582C90", Convert.ToHexString(SHA256.HashData(octets)));
+    }
+
+    [Fact]
+    public void Consignes_role_nature_regles_contrat_puis_rubriques_du_catalogue()
     {
         var consignes = PromptFiche.Consignes;
 
         Assert.StartsWith(
             "Tu aides un agent de l'administration à rédiger la fiche d'expression de besoin (FEB) d'une demande adressée au service informatique.",
             consignes);
-        Assert.Contains("l'application pose elle-même les questions, après ta réponse.\n", consignes);
-        Assert.Contains("1. N'invente jamais rien.", consignes);
-        Assert.Contains("S'il ne l'a pas dit, ne propose rien.\n", consignes);
+        Assert.Contains("pose, après ton message, la question que tu as rédigée pour elle, ou à défaut sa question type.\n", consignes);
+        Assert.Contains("Nature de la demande : au premier message, repère sa nature parmi : panne ou incident", consignes);
+        Assert.Contains("ne la propose jamais comme valeur. Aux tours suivants, déduis-la de l'historique.\n", consignes);
+        Assert.Contains("Règles des propositions :\n1. N'invente jamais rien.", consignes);
+        Assert.Contains("réponds alors horsPerimetre = true, sans aucune proposition ni question", consignes);
+        Assert.Contains("Règles des questions :\n12. Le message du tour donne les « Rubriques à questionner », dans l'ordre.", consignes);
+        Assert.Contains("Jamais de question pour une rubrique que tu proposes, ni pour resume, ni pour pointsAClarifier.\n", consignes);
+        Assert.Contains("13. Une question tient en une seule phrase, terminée par « ? », sans autre « ? », de vingt-cinq mots au plus.\n", consignes);
         Assert.Contains(
-            "assistance utilisateur (poste de travail, matériel, logiciels, comptes, accès et habilitations), exploitation des serveurs, réseau et télécommunications, applications existantes (maintenance, évolution), développement applicatif.",
+            "\"questions\": [ { \"rubrique\": code, \"question\": texte } ], \"horsPerimetre\": booléen }.\n",
             consignes);
-        Assert.Contains("repère dans la demande le service, la tâche ou la prestation attendue du service informatique", consignes);
-        Assert.Contains("sans en faire une valeur de rubrique, puis applique la règle 5.\n", consignes);
-        Assert.Contains("sur la « Rubrique questionnée » : propose sa réponse pour cette rubrique, au plus près de ses mots, même brève.", consignes);
-        Assert.Contains("propose-la telle quelle et ajoute la précision manquante, sous forme de question, dans pointsAClarifier.", consignes);
-        Assert.Contains("seulement si la demande ne porte sur aucun service, aucune tâche ni aucune prestation", consignes);
-        Assert.Contains("réponds alors horsPerimetre = true, sans aucune proposition", consignes);
         Assert.Contains(
-            "Une panne, un incident, une demande de matériel, d'accès ou d'habilitation relèvent du service informatique : horsPerimetre = false.",
-            consignes);
-        Assert.Contains("10. Quand la « Rubrique questionnée » est resume, l'agent demande le résumé : propose-le", consignes);
-        Assert.Contains(
-            "Réponse : un objet JSON seulement, { \"message\": texte pour l'agent, \"propositions\": [ { \"rubrique\": code, \"valeur\": texte, \"justification\": texte } ], \"horsPerimetre\": booléen }.",
+            "- criteresReussite : Critères de réussite (obligatoire) — ce qui montrera que la demande est satisfaite. Panne : ce que l'agent devra retrouver pour reprendre son travail (démarrage, applications, fichiers, accès).",
             consignes);
         Assert.EndsWith(
-            "Rubriques de la fiche (code : libellé — rôle), dans l'ordre du modèle :\n"
-            + "- application : Application ou service concerné (obligatoire) — l'application, le service ou l'élément en cause (nom d'application, poste de travail, matériel, serveur, réseau).\n"
-            + "- intitule : Intitulé court (obligatoire) — le titre de la demande, huit mots au plus, tiré des mots de l'agent.\n"
-            + "- resume : Résumé (obligatoire) — la synthèse des seules valeurs retenues et proposées, proposée quand l'agent la demande (règle 10).\n"
-            + "- situationActuelle : Situation actuelle (obligatoire) — ce qui se passe aujourd'hui ; pour une panne ou un incident, le symptôme constaté.\n"
-            + "- difficultes : Difficultés rencontrées (obligatoire) — les conséquences sur le travail de l'agent ou de son service, pas le symptôme.\n"
-            + "- exempleRepresentatif : Exemple représentatif — un cas précis donné par l'agent.\n"
-            + "- resultatRecherche : Résultat recherché (obligatoire) — ce que l'agent attend du service informatique ; pour une panne, la remise en état ou un remplacement.\n"
-            + "- criteresReussite : Critères de réussite (obligatoire) — ce qui montrera que la demande est satisfaite.\n"
-            + "- solutionEnvisagee : Solution envisagée — une solution que l'agent a en tête, qui n'est pas le besoin (règle 7).\n"
-            + "- utilisateursConcernes : Utilisateurs ou services concernés (obligatoire) — les personnes ou services touchés.\n"
-            + "- processusMetier : Processus métier (obligatoire) — l'activité de travail touchée.\n"
-            + "- liens : Liens avec d'autres outils ou demandes — les autres outils ou demandes liés.\n"
-            + "- beneficesAttendus : Bénéfices attendus (obligatoire) — ce que la réponse apportera au travail de l'agent ou du service.\n"
-            + "- echeance : Échéance et justification — la date souhaitée et sa raison.\n"
-            + "- contraintes : Contraintes identifiées — les contraintes connues (règles, technique, calendrier).\n"
-            + "- documentsReferences : Documents ou références — les documents ou références cités par l'agent.\n"
-            + "- pointsAClarifier : Points restant à clarifier — les questions restées ouvertes, rédigées par toi (règles 4 et 8).\n"
+            "- pointsAClarifier : Points restant à clarifier — les questions restées ouvertes, rédigées par toi (règles 4 et 8).\n"
             + "Les rubriques obligatoires sont questionnées dans cet ordre, resume en dernier.",
             consignes);
         Assert.DoesNotContain("\r", consignes);
+
+        var regles = Enumerable.Range(1, 17).Select(numero => consignes.IndexOf("\n" + numero + ". ", StringComparison.Ordinal)).ToArray();
+        Assert.All(regles, position => Assert.True(position > 0));
+        Assert.Equal(regles.Order().ToArray(), regles);
     }
 
     /// <summary>
-    /// DEB-Q100 (lot A5) : l'IA ne pose plus de question ; les consignes ne lui en demandent aucune et ne lui donnent
-    /// plus de question type (elle est dans le <see cref="Catalogue"/>, DEB-Q101). Les acquis de DEB-A4 restent : panne
-    /// reprise au premier message, exemple sans fait inventé.
+    /// DEB-Q122 : le message de l'IA n'annonce jamais la suite (sonde A7 : « Je vous propose maintenant de définir une
+    /// date limite » quand l'application relançait sur le résumé). DEB-Q103 reste : aucune question dans le message.
     /// </summary>
     [Fact]
-    public void Consignes_aucune_question_demandee_a_l_IA()
+    public void Consignes_message_sans_question_ni_annonce_de_la_suite()
     {
         var consignes = PromptFiche.Consignes;
 
         Assert.Contains(
-            "6. Ne pose aucune question dans ton message, même reformulée : l'application ajoute après lui la question suivante.",
+            "6. Ton message ne contient aucune question, même reformulée : il accuse réception et dit ce que tu proposes, en mots simples, "
+            + "en deux phrases au plus. Il n'annonce jamais la suite (ni la rubrique suivante, ni la question à venir) : l'application la "
+            + "choisit après ta réponse. Les questions vont seulement dans « questions » (règles 12 à 17).\n",
             consignes);
-        Assert.Contains("11. Si l'agent dit ne pas comprendre la question, explique-la plus simplement d'après le rôle de la rubrique (liste ci-dessous), sans poser de question ;", consignes);
         Assert.Contains("un exemple éventuel ne contient aucun fait que l'agent n'a pas donné (ni date, ni cause, ni chiffre).\n", consignes);
-        Assert.Contains("pour une panne ou un incident, le symptôme décrit va dans situationActuelle.\n", consignes);
-        Assert.DoesNotContain("Question type", consignes);
-        Assert.DoesNotContain("pose une question", consignes);
-        Assert.DoesNotContain("Pose une seule question", consignes);
-        Assert.DoesNotContain("demande le besoin", consignes);
-        Assert.DoesNotContain("Rubriques à questionner", consignes);
         foreach (var definition in Catalogue.Toutes.Where(definition => definition.QuestionType is not null))
         {
             Assert.DoesNotContain(definition.QuestionType!, consignes);
         }
-
-        Assert.True(
-            consignes.IndexOf("10. Quand la", StringComparison.Ordinal) < consignes.IndexOf("11. Si l'agent", StringComparison.Ordinal),
-            "règle 11 après la règle 10");
     }
 
     [Fact]
@@ -273,18 +290,26 @@ public sealed class PromptFicheTests
         Assert.Equal("rubrique", exception.ParamName);
     }
 
+    /// <summary>Schéma de la sonde A7 (Sonder-Question.ps1), codes du catalogue énumérés pour les deux tableaux.</summary>
     [Fact]
     public void Schema_de_la_reponse_codes_du_catalogue_enumeres()
     {
         const string attendu =
-            "{\"type\":\"object\",\"additionalProperties\":false,\"required\":[\"message\",\"propositions\",\"horsPerimetre\"],"
-            + "\"properties\":{\"message\":{\"type\":\"string\"},\"propositions\":{\"type\":\"array\",\"items\":{\"type\":\"object\","
-            + "\"additionalProperties\":false,\"required\":[\"rubrique\",\"valeur\",\"justification\"],\"properties\":{\"rubrique\":"
-            + "{\"type\":\"string\",\"enum\":[\"application\",\"intitule\",\"resume\",\"situationActuelle\",\"difficultes\","
-            + "\"exempleRepresentatif\",\"resultatRecherche\",\"criteresReussite\",\"solutionEnvisagee\",\"utilisateursConcernes\","
-            + "\"processusMetier\",\"liens\",\"beneficesAttendus\",\"echeance\",\"contraintes\",\"documentsReferences\","
-            + "\"pointsAClarifier\"]},\"valeur\":{\"type\":\"string\"},\"justification\":{\"type\":\"string\"}}}},"
-            + "\"horsPerimetre\":{\"type\":\"boolean\"}}}";
+            "{\"type\":\"object\",\"additionalProperties\":false,\"required\":[\"message\",\"propositions\","
+            + "\"questions\",\"horsPerimetre\"],\"properties\":{\"message\":{\"type\":\"string\"},"
+            + "\"propositions\":{\"type\":\"array\",\"items\":{\"type\":\"object\",\"additionalProperties\":false,"
+            + "\"required\":[\"rubrique\",\"valeur\",\"justification\"],\"properties\":{\"rubrique\":{\"type\":\"string\","
+            + "\"enum\":[\"application\",\"intitule\",\"resume\",\"situationActuelle\",\"difficultes\","
+            + "\"exempleRepresentatif\",\"resultatRecherche\",\"criteresReussite\",\"solutionEnvisagee\","
+            + "\"utilisateursConcernes\",\"processusMetier\",\"liens\",\"beneficesAttendus\",\"echeance\",\"contraintes\","
+            + "\"documentsReferences\",\"pointsAClarifier\"]},\"valeur\":{\"type\":\"string\"},"
+            + "\"justification\":{\"type\":\"string\"}}}},\"questions\":{\"type\":\"array\",\"items\":{\"type\":\"object\","
+            + "\"additionalProperties\":false,\"required\":[\"rubrique\",\"question\"],"
+            + "\"properties\":{\"rubrique\":{\"type\":\"string\",\"enum\":[\"application\",\"intitule\",\"resume\","
+            + "\"situationActuelle\",\"difficultes\",\"exempleRepresentatif\",\"resultatRecherche\",\"criteresReussite\","
+            + "\"solutionEnvisagee\",\"utilisateursConcernes\",\"processusMetier\",\"liens\",\"beneficesAttendus\","
+            + "\"echeance\",\"contraintes\",\"documentsReferences\",\"pointsAClarifier\"]},"
+            + "\"question\":{\"type\":\"string\"}}}},\"horsPerimetre\":{\"type\":\"boolean\"}}}";
 
         Assert.Equal(attendu, PromptFiche.SchemaJson);
         Assert.Equal(attendu, PromptFiche.Schema.GetRawText());

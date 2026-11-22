@@ -732,3 +732,39 @@
 - Vérifié chez l'assistant : garde-fou et retrait des questions sur une réplique Python, cas fautifs compris ;
   équilibre des délimiteurs du script ; octets (UTF-8 avec BOM, CRLF) ; prompt ≤ 30 720 octets. Non vérifié :
   analyse syntaxique PowerShell (aucun PowerShell disponible dans cette session), appel réel à Albert.
+
+## 22/11/2026 — Sonde A7 jugée ; DEB-Q121, DEB-Q122 ; lot A7
+
+- Pièces d'`Ouvrir-Session` : 8 sur 8, tailles et SHA-256 conformes à `PIECES.txt`, archive de 180 entrées, commit
+  `63b414f` ; `Compter-Tests` : 726, 0 échec. Sorties de la sonde reçues : `sonde-A7.csv` (jugé), `sonde-A7-brut.txt`.
+- Dépouillement (réplique Python des garde-fous, éprouvée sur des cas fautifs) : 30 tours, 26 à questionner, 26
+  candidates présentes et acceptées (100 %) ; 4 tours au résumé ; 5,3 s par tour en moyenne, 8,7 s au plus. Pertinence
+  jugée 18/26 ; les 8 lignes « Invention = o » étaient exactement les 8 lignes « Pertinente = n », sans fait inventé
+  dans les propositions ni les messages relus : DEB-Q121 (« o » = question inadaptée), seuil atteint. Les 8 écarts
+  portent sur des rubriques sans objet pour une panne : DEB-Q93, correction en V2 (DEB-Q90, DEB-Q110).
+- Constats de la sonde : message qui annonce la suite (« définir une date limite » quand l'application relance sur le
+  résumé) → DEB-Q122 ; candidate rédigée pour `resume` (contraire à la règle 12) et pour `echeance` (absente de la
+  liste) : jamais posées, tests ajoutés.
+- Lot A7 : `ReponseIA` lit `questions` (`QuestionCandidate` ; absent ou mal formé jamais un refus, élément fautif
+  ignoré, première question d'une rubrique gardée) ; `Dialogue.AQuestionner`, `QuestionValide` (DEB-Q119),
+  `Question` (libellé, « : », candidate ou question type, DEB-Q118), `Relance` et `Composer` reçoivent les candidates,
+  `RubriqueQuestionnee` reconnaît le libellé en tête de la dernière ligne (question type seule toujours reconnue) ;
+  `ContexteTour.AQuestionner` ; `PromptFiche` : consignes = `consignes-A7.txt` plus la phrase de DEB-Q122 (règle 6),
+  guide des rubriques selon la nature, ligne « Rubriques à questionner », schéma avec `questions` (celui de la sonde).
+  IA scénarisée inchangée (aucune candidate : question type, libellé en tête). Contrat de l'API, front, base, .docx
+  inchangés.
+- Vérifié chez l'assistant : consignes rejouées depuis les littéraux C# égales au texte sondé plus DEB-Q122 (le même
+  contrôle échoue sur la version d'A5) ; empreinte SHA-256 et longueur (9 667 octets) calculées sur ce texte ; schéma
+  du test égal à celui de `Sonder-Question.ps1` ; assertions des consignes rejouées sur le texte ; table de vérité des
+  garde-fous recalculée par réplique, six mutations détectées ; équilibre des délimiteurs ; octets (CRLF, sans BOM) ;
+  prompt de reprise ≤ 30 720 octets. Comptes ESTIMÉS : 768 (Domain 319, Application 68, Infrastructure 225, Web 133,
+  Architecture 23). Non vérifié : compilation C#, exécution des tests et couverture (aucun SDK .NET ici) ; réponse
+  réelle d'Albert avec le schéma.
+- `Appliquer-Lot A7` : 16 fichiers écrits, compilation Release en échec, pas de commit (ligne enchaînée) :
+  `Dialogue.cs(60,43)` CS0315, `ListeImmuable<Rubrique>` : `ListeImmuable<T>` exige `T : IEquatable<T>`, qu'une
+  énumération n'implémente pas. Les projets suivants n'ont pas été compilés. Lot A7a (après remise de l'arbre à HEAD,
+  fichiers d'A7 seuls) : A7 complet, `Dialogue.AQuestionner` rend un `ImmutableArray<Rubrique>` (comme
+  `Catalogue.OrdreQuestionnement`) ; `Assert.Empty` sur ce tableau remplacé par `IsEmpty` (surcharge incertaine).
+  Relecture sémantique des autres fichiers (contraintes génériques, surcharges, nullabilité), toujours sans compilateur :
+  les paquets .NET sont inaccessibles depuis l'environnement de l'assistant. Leçon du projet : un type générique de
+  l'application porte ses contraintes ; les relire avant de l'instancier sur un nouveau type.

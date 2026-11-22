@@ -146,6 +146,13 @@ public sealed class DecisionsFichesTests
             },
             tour.Contexte.Manquantes.ToArray());
         Assert.Equal("application", tour.Contexte.ProchaineRubrique);
+        Assert.Equal(
+            new[]
+            {
+                "application", "intitule", "situationActuelle", "difficultes", "resultatRecherche", "criteresReussite",
+                "utilisateursConcernes", "processusMetier", "beneficesAttendus",
+            },
+            tour.Contexte.AQuestionner.ToArray());
     }
 
     [Fact]
@@ -172,6 +179,13 @@ public sealed class DecisionsFichesTests
             },
             contexte.Manquantes.ToArray());
         Assert.Equal("situationActuelle", contexte.ProchaineRubrique);
+        Assert.Equal(
+            new[]
+            {
+                "situationActuelle", "difficultes", "resultatRecherche", "criteresReussite", "utilisateursConcernes",
+                "processusMetier", "beneficesAttendus",
+            },
+            contexte.AQuestionner.ToArray());
     }
 
     [Fact]
@@ -181,6 +195,7 @@ public sealed class DecisionsFichesTests
 
         Assert.Empty(contexte.Manquantes);
         Assert.Null(contexte.ProchaineRubrique);
+        Assert.Empty(contexte.AQuestionner);
     }
 
     // --- Conclusion d'un tour ---
@@ -254,7 +269,36 @@ public sealed class DecisionsFichesTests
         var issue = Valeur(DecisionsFiches.ConclureTour(Prepare(), reponse, Debut, Fin));
 
         const string attendu =
-            "Je comprends une demande d'assistance utilisateur.\n\nComment intituleriez-vous votre demande en quelques mots ?";
+            "Je comprends une demande d'assistance utilisateur.\n\nIntitulé court : Comment intituleriez-vous votre demande en quelques mots ?";
+        Assert.Equal(attendu, issue.Tour.Message);
+        Assert.Equal(attendu, issue.Echanges[1].Texte);
+    }
+
+    /// <summary>
+    /// Lot A7 (DEB-Q117, DEB-Q118) : l'IA propose l'application et rédige des questions pour l'application et l'intitulé ;
+    /// après la fusion, l'application choisit l'intitulé et pose la candidate de l'IA pour lui, précédée du libellé.
+    /// C'est ce message qui est enregistré.
+    /// </summary>
+    [Fact]
+    public void ConclureTour_question_candidate_de_la_rubrique_choisie_apres_la_fusion()
+    {
+        const string reponse = """
+            {
+              "message": "Je comprends une demande d'assistance utilisateur : PC qui ne s'allume plus.",
+              "propositions": [ { "rubrique": "application", "valeur": "PC", "justification": "« mon PC »" } ],
+              "questions": [
+                { "rubrique": "application", "question": "Quel équipement est concerné ?" },
+                { "rubrique": "intitule", "question": "Comment résumeriez-vous la panne de votre PC en quelques mots ?" }
+              ],
+              "horsPerimetre": false
+            }
+            """;
+
+        var issue = Valeur(DecisionsFiches.ConclureTour(Prepare(), reponse, Debut, Fin));
+
+        const string attendu =
+            "Je comprends une demande d'assistance utilisateur : PC qui ne s'allume plus.\n\n"
+            + "Intitulé court : Comment résumeriez-vous la panne de votre PC en quelques mots ?";
         Assert.Equal(attendu, issue.Tour.Message);
         Assert.Equal(attendu, issue.Echanges[1].Texte);
     }

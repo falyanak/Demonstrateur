@@ -43,15 +43,17 @@ public sealed record EtatRubrique(string Code, string Libelle, bool Obligatoire,
 
 /// <summary>
 /// Partie VARIABLE d'un tour de dialogue (plan §4) : message de l'agent, historique, état de la fiche, rubriques
-/// obligatoires manquantes, prochaine rubrique à questionner (<c>null</c> s'il n'y en a plus). La partie fixe du prompt
-/// (consignes, modèle de fiche) appartient à l'adaptateur (A1).
+/// obligatoires manquantes, prochaine rubrique à questionner (<c>null</c> s'il n'y en a plus), codes des rubriques à
+/// questionner dans l'ordre, sans le résumé (<see cref="Dialogue.AQuestionner"/>, lot A7, DEB-Q117). La partie fixe du
+/// prompt (consignes, modèle de fiche) appartient à l'adaptateur (A1).
 /// </summary>
 public sealed record ContexteTour(
     string Message,
     ListeImmuable<Echange> Historique,
     ListeImmuable<EtatRubrique> Rubriques,
     ListeImmuable<string> Manquantes,
-    string? ProchaineRubrique);
+    string? ProchaineRubrique,
+    ListeImmuable<string> AQuestionner);
 
 /// <summary>
 /// Fiche, historique de son dialogue (DEB-Q21) et transitions de son cycle de vie (DEB-Q77), pour l'affichage et la

@@ -23,13 +23,22 @@ public enum MotifEcart : byte
 public sealed record PropositionEcartee(int Position, string Code, MotifEcart Motif);
 
 /// <summary>
-/// Réponse de l'IA (plan §2) : <c>{ message, propositions: [{ rubrique, valeur, justification }], horsPerimetre }</c>.
+/// Question candidate rédigée par l'IA pour une rubrique à questionner (lot A7, DEB-Q117) ; l'application ne la pose
+/// que si la rubrique est celle qu'elle choisit après la fusion et si la question passe les garde-fous
+/// (<see cref="Dialogue.QuestionValide"/>, DEB-Q119), sinon elle pose la question type.
+/// </summary>
+public sealed record QuestionCandidate(Rubrique Rubrique, string Question);
+
+/// <summary>
+/// Réponse de l'IA (plan §2) : <c>{ message, propositions: [{ rubrique, valeur, justification }], questions:
+/// [{ rubrique, question }], horsPerimetre }</c> (<c>questions</c> depuis le lot A7, DEB-Q117).
 /// </summary>
 public sealed record ReponseIA(
     string Message,
     ListeImmuable<PropositionRubrique> Propositions,
     ListeImmuable<PropositionEcartee> Ecartees,
-    bool HorsPerimetre)
+    bool HorsPerimetre,
+    ListeImmuable<QuestionCandidate> Questions)
 {
     /// <summary>
     /// Lecture du texte rendu par l'IA. Une seule clôture <c>```json</c> (ou <c>```</c>) autour du JSON est tolérée.
@@ -37,6 +46,9 @@ public sealed record ReponseIA(
     /// booléen, <c>propositions</c> non tableau) → refus, la fiche reste inchangée. Une proposition fautive (rubrique
     /// inconnue, valeur ou justification absente, doublon) est écartée et signalée ; la première d'une rubrique est
     /// gardée. Valeurs nettoyées de leurs espaces ; <c>propositions</c> et <c>horsPerimetre</c> absents → vide, faux.
+    /// <c>questions</c> (A7) n'est jamais un motif de refus : la question type la remplace (DEB-Q119). Absent, nul ou non
+    /// tableau → aucune question ; un élément qui n'est pas un objet, sans rubrique connue ou sans texte est ignoré ; la
+    /// première question d'une rubrique est gardée.
     /// </summary>
     public static Resultat<ReponseIA> Lire(string texte)
     {
@@ -137,7 +149,32 @@ public sealed record ReponseIA(
             }
         }
 
-        return Resultat.Succes(new ReponseIA(message, retenues, ecartees, horsPerimetre));
+        return Resultat.Succes(new ReponseIA(message, retenues, ecartees, horsPerimetre, LireQuestions(racine)));
+    }
+
+    private static ListeImmuable<QuestionCandidate> LireQuestions(JsonElement racine)
+    {
+        var questions = ListeImmuable<QuestionCandidate>.Vide;
+        if (!racine.TryGetProperty("questions", out var tableau) || tableau.ValueKind != JsonValueKind.Array)
+        {
+            return questions;
+        }
+
+        var vues = new bool[Catalogue.Toutes.Length];
+        foreach (var element in tableau.EnumerateArray())
+        {
+            if (element.ValueKind == JsonValueKind.Object
+                && Texte(element, "rubrique") is { } code
+                && Catalogue.EssayerTrouver(code, out var rubrique)
+                && Texte(element, "question") is { } question
+                && !vues[(int)rubrique])
+            {
+                vues[(int)rubrique] = true;
+                questions = questions.Ajouter(new QuestionCandidate(rubrique, question));
+            }
+        }
+
+        return questions;
     }
 
     private static (PropositionRubrique? Retenue, PropositionEcartee? Ecartee) LireProposition(

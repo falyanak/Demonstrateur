@@ -1,6 +1,6 @@
 # Plan du démonstrateur « Expression de besoin » (version simplifiée)
 
-> Version 1.27 du 22/11/2026 (lot A5d ; 1.26 au lot A5c ; 1.25 au lot A5b ; 1.24 au lot A5 ; 1.23 au lot A4b ; 1.22 au lot A4 ; 1.21 au lot A3, 1.20 au lot A2, 1.19 au lot A1, 1.18 au lot L2, 1.17 au lot L1, 1.16 au lot F3b, 1.15 au lot F3, 1.14 au lot F2c, 1.13 au lot HY2, 1.12 au lot F2, 1.11 au lot HY1b, 1.10 au lot HY1, 1.9 au lot F1, 1.8 au lot I2b, 1.7 au lot I2, 1.6 au lot I1, 1.5 au lot B2, 1.4 au lot B1b, 1.3 au lot B1, 1.2 au lot P0c, 1.1 au
+> Version 1.28 du 22/11/2026 (lot A7a, A7 relivré ; 1.27 au lot A5d ; 1.26 au lot A5c ; 1.25 au lot A5b ; 1.24 au lot A5 ; 1.23 au lot A4b ; 1.22 au lot A4 ; 1.21 au lot A3, 1.20 au lot A2, 1.19 au lot A1, 1.18 au lot L2, 1.17 au lot L1, 1.16 au lot F3b, 1.15 au lot F3, 1.14 au lot F2c, 1.13 au lot HY2, 1.12 au lot F2, 1.11 au lot HY1b, 1.10 au lot HY1, 1.9 au lot F1, 1.8 au lot I2b, 1.7 au lot I2, 1.6 au lot I1, 1.5 au lot B2, 1.4 au lot B1b, 1.3 au lot B1, 1.2 au lot P0c, 1.1 au
 > lot P0, 1.0 au lot P0a). Arbitrages DEB-Q1 à DEB-Q8, DEB-Q11 à DEB-Q32 : « recommandations ok » (20/11/2026) ; DEB-Q9 :
 > « ok » (20/11/2026) ; DEB-Q33 à DEB-Q37 : « recommandations ok » (21/11/2026) ;
 > DEB-Q38 à DEB-Q44 : « recommandations ok » (21/11/2026) ; DEB-Q45, DEB-Q46 : « recommandations ok »
@@ -9,7 +9,7 @@
 > avant F3 » (21/11/2026) ; DEB-Q59 à DEB-Q63 : « recommandations ok » (21/11/2026) ; DEB-Q2, DEB-Q64 : « recommandations ok » (21/11/2026) ;
 > DEB-Q65, DEB-Q66 : « recommandations ok », DEB-Q67 à DEB-Q72 rendues sans objet par DEB-Q73 ; DEB-Q73 à DEB-Q78 :
 > « accord » du développeur (21/11/2026) ; DEB-Q79 à DEB-Q82 : « recommandations ok » (21/11/2026) ; DEB-Q83 : accès confirmé par le développeur, DEB-Q84 à DEB-Q88 :
-> « recommandations ok » après la sonde (21/11/2026) ; DEB-Q89, DEB-Q90 : « recommandations ok » (21/11/2026) ; DEB-Q91 à DEB-Q94 : « recommandations ok » (21/11/2026) ; DEB-Q95 à DEB-Q104 : mesures et « recommandations ok », DEB-D8 : demande du développeur (21/11/2026) ; DEB-Q116 : « option 1 », DEB-Q117 à DEB-Q120 : « recommandations ok » (22/11/2026). Décisions : §8. Document d'origine **hors
+> « recommandations ok » après la sonde (21/11/2026) ; DEB-Q89, DEB-Q90 : « recommandations ok » (21/11/2026) ; DEB-Q91 à DEB-Q94 : « recommandations ok » (21/11/2026) ; DEB-Q95 à DEB-Q104 : mesures et « recommandations ok », DEB-D8 : demande du développeur (21/11/2026) ; DEB-Q116 : « option 1 », DEB-Q117 à DEB-Q120 : « recommandations ok » (22/11/2026) ; DEB-Q121, DEB-Q122 : « recommandations ok » (22/11/2026). Décisions : §8. Document d'origine **hors
 > dépôt** (DEB-D2) : cahier des charges « Document de cadrage » (novembre 2026), tenu par le développeur ; le modèle de
 > fiche (FEB) est versionné, nettoyé de ses métadonnées (DEB-Q9, DEB-Q33).
 
@@ -52,9 +52,11 @@ sauvegardé.
 | Repérer le service, la tâche ou la prestation attendue du service informatique ; signaler une demande qui n'en relève pas (DEB-Q89) | Complétude, cycle des statuts, numéro `EB-AAAA-NNNN` attribué à la soumission |
 | Alimenter « Points restant à clarifier » et le résumé | Contenu du .docx, à partir de la fiche |
 
-Réponse de l'IA : **JSON structuré** `{ message, propositions: [{ rubrique, valeur, justification }], horsPerimetre }`,
-lu par une fonction pure (`ReponseIA.Lire`) : rubrique inconnue → proposition écartée et signalée ; JSON invalide →
-refus explicite, la fiche reste inchangée. Ce contrat est figé par des tests sur des réponses d'exemple ; ses règles de
+Réponse de l'IA : **JSON structuré** `{ message, propositions: [{ rubrique, valeur, justification }], questions:
+[{ rubrique, question }], horsPerimetre }` (`questions` depuis A7, DEB-Q117), lu par une fonction pure
+(`ReponseIA.Lire`) : rubrique inconnue → proposition écartée et signalée ; JSON invalide → refus explicite, la fiche
+reste inchangée ; `questions` absent ou mal formé n'est jamais un refus (élément fautif ignoré, première question d'une
+rubrique gardée) : la question type la remplace (DEB-Q119). Ce contrat est figé par des tests sur des réponses d'exemple ; ses règles de
 tolérance sont fixées par DEB-Q19. Codes de rubrique (camelCase, `situationActuelle`…) : `Catalogue.cs` du Domaine.
 
 ## 3. Modèle de la fiche (d'après le modèle FEB)
@@ -90,7 +92,9 @@ ExpressionBesoin/src/
                                    Fiche.AppliquerPropositions, ModifierChamp, AccepterProposition, RejeterProposition,
                                    Completude.Manquantes, Dialogue.ProchaineRubrique, Cycle.Soumettre, Cycle.Decider,
                                    Cycle.Reprendre (une fonction par transition, horloge en paramètre),
-                                   Numerotation.Suivant(annee, dernier), ReponseIA.Lire ; ContenuDocument.Construire
+                                   Numerotation.Suivant(annee, dernier), ReponseIA.Lire ; Dialogue.AQuestionner,
+                                   QuestionValide, Question (A7 : question candidate ou question type, libellé en tête) ;
+                                   ContenuDocument.Construire
                                    (I2 : textes du .docx, dates dans le fuseau, dernière décision) ; Transitions.Entre,
                                    Transitions.EtapeDe (L1 : cycle de vie)
   ExpressionBesoin.Application     cas d'usage lire -> décider -> écrire (B2) : ServiceFiches (coquille, une méthode par
@@ -322,5 +326,7 @@ sont lancés à la main (`npm test`) et leur sortie jointe au compte rendu.
 | DEB-Q118 | (22/11/2026, « recommandations ok ») La question posée est précédée du libellé de sa rubrique (« Critères de réussite : … ? ») ; `Dialogue.RubriqueQuestionnee` reconnaît ce préfixe, l'ancien repérage par la question type reste pour les historiques antérieurs ; aucun changement de la base |
 | DEB-Q119 | (22/11/2026, « recommandations ok ») Garde-fous purs d'une question candidate : une seule phrase, une seule ligne, terminée par « ? », aucun autre « ? », 200 caractères au plus ; sinon question type |
 | DEB-Q120 | (22/11/2026, « recommandations ok ») Sonde avant A7 (gemma, parcours PC qui ne s'allume plus, e-commerce, prêt d'un portable, compte bloqué) : seuil 80 % de questions acceptées par les garde-fous et aucun fait inventé (jugé par le développeur) ; en dessous, questions types gardées et option 1 abandonnée par une nouvelle décision |
+| DEB-Q121 | (22/11/2026, « recommandations ok ») Sonde A7 jugée (gemma, quatre parcours, 30 tours) : 26 questions candidates sur 26 acceptées par les garde-fous ; le « o » de la colonne Invention marquait une question redondante ou inadaptée à la nature de la demande, pas un fait inventé : aucune invention, seuil de DEB-Q120 atteint, option 1 confirmée, lot A7. Pertinence jugée 18/26 : les 8 écarts portent sur des rubriques sans objet pour une panne (critères, bénéfices, utilisateurs, processus), DEB-Q93 ; correction par catégorie en V2 (DEB-Q90, DEB-Q110) |
+| DEB-Q122 | (22/11/2026, « recommandations ok ») Le message de l'IA n'annonce jamais la suite (sonde : « je vous propose maintenant de définir une date limite » quand l'application relançait sur le résumé) : phrase ajoutée à la règle 6 des consignes d'A7, sans garde-fou mécanique (tournures trop variées) ; vérifié au navigateur |
 
 Questions ouvertes : DEB-Q108 (A5), DEB-Q105 à DEB-Q107 (A6), DEB-Q109 à DEB-Q111 (V2).

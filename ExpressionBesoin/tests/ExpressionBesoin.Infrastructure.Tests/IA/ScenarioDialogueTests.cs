@@ -36,7 +36,8 @@ public sealed class ScenarioDialogueTests
                     valeurs?.GetValueOrDefault(definition.Code),
                     propositions?.GetValueOrDefault(definition.Code)))),
             ListeImmuable<string>.Vide,
-            prochaine);
+            prochaine,
+            ListeImmuable<string>.Vide);
 
     private static ReponseIA Lue(ContexteTour contexte) => Essais.Valeur(ReponseIA.Lire(ScenarioDialogue.Repondre(contexte)));
 

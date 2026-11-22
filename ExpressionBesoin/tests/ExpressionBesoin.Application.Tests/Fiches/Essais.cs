@@ -92,9 +92,9 @@ internal static class Essais
     public const string ReponseSansProposition = """{ "message": "Pouvez-vous préciser ?" }""";
 
     /// <summary>
-    /// Message composé pour <see cref="ReponseAvecPropositions"/> sur un brouillon vierge : phrase de l'IA, puis question
-    /// type de la situation actuelle (application et intitulé proposés, donc sautés).
+    /// Message composé pour <see cref="ReponseAvecPropositions"/> sur un brouillon vierge : phrase de l'IA, puis libellé
+    /// et question type de la situation actuelle (application et intitulé proposés, donc sautés ; aucune candidate).
     /// </summary>
     public const string MessageComposeAvecPropositions =
-        "J'ai noté l'outil de contrôle.\n\nQue se passe-t-il aujourd'hui, concrètement ?";
+        "J'ai noté l'outil de contrôle.\n\nSituation actuelle : Que se passe-t-il aujourd'hui, concrètement ?";
 }

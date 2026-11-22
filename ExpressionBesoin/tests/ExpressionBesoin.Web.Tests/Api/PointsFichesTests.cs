@@ -68,8 +68,10 @@ public sealed class PointsFichesTests(UsineWeb usine) : IClassFixture<UsineWeb>
         var id = await Creer(client);
         var (statut, tour) = await Appeler(client, HttpMethod.Post, $"/api/fiches/{id}/messages", new { message = "  " + Demande + " " });
         Assert.Equal(HttpStatusCode.OK, statut);
-        // DEB-Q100 : message de l'IA, puis la question type de la rubrique suivante, posée par l'application.
-        const string compose = "Je propose votre demande comme intitulé.\n\nQuelle application ou quel équipement est concerné ?";
+        // DEB-Q100 : message de l'IA, puis la question type de la rubrique suivante, posée par l'application, précédée
+        // de son libellé (A7, DEB-Q118 ; l'IA scénarisée ne rédige aucune question candidate).
+        const string compose =
+            "Je propose votre demande comme intitulé.\n\nApplication ou service concerné : Quelle application ou quel équipement est concerné ?";
         Assert.Equal(compose, tour.GetProperty("message").GetString());
         Assert.False(tour.GetProperty("horsPerimetre").GetBoolean());
         Assert.Equal(0, tour.GetProperty("ecartees").GetArrayLength());

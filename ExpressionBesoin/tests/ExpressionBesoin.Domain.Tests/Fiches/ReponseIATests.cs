@@ -49,6 +49,58 @@ public sealed class ReponseIATests
         Assert.Equal(horsPerimetre, reponse.HorsPerimetre);
     }
 
+    // --- Questions candidates (lot A7, DEB-Q117, DEB-Q119) ---
+
+    [Fact]
+    public void Questions_candidates_lues_les_fautives_ignorees_la_premiere_d_une_rubrique_gardee()
+    {
+        const string json = """
+            {
+              "message": "J'ai noté votre demande.",
+              "propositions": [],
+              "questions": [
+                { "rubrique": "difficultes", "question": "  Que ne pouvez-vous plus faire ?  " },
+                "texte",
+                { "question": "Sans rubrique ?" },
+                { "rubrique": "inconnue", "question": "Rubrique inconnue ?" },
+                { "rubrique": "criteresReussite" },
+                { "rubrique": "criteresReussite", "question": "   " },
+                { "rubrique": "CriteresReussite", "question": "Que devrez-vous retrouver ?" },
+                { "rubrique": "difficultes", "question": "Doublon ?" },
+                { "rubrique": "resume", "question": "Voulez-vous le résumé ?" }
+              ],
+              "horsPerimetre": false
+            }
+            """;
+
+        var reponse = Valeur(ReponseIA.Lire(json));
+
+        Assert.Equal(
+            new[]
+            {
+                new QuestionCandidate(Rubrique.Difficultes, "Que ne pouvez-vous plus faire ?"),
+                new QuestionCandidate(Rubrique.CriteresReussite, "Que devrez-vous retrouver ?"),
+                new QuestionCandidate(Rubrique.Resume, "Voulez-vous le résumé ?"),
+            },
+            reponse.Questions.ToArray());
+        Assert.Empty(reponse.Ecartees);
+    }
+
+    /// <summary>Une forme inattendue de « questions » n'est jamais un refus : la question type la remplace (DEB-Q119).</summary>
+    [Theory]
+    [InlineData("{\"message\":\"Bonjour\"}")]
+    [InlineData("{\"message\":\"Bonjour\",\"questions\":null}")]
+    [InlineData("{\"message\":\"Bonjour\",\"questions\":[]}")]
+    [InlineData("{\"message\":\"Bonjour\",\"questions\":\"Quoi ?\"}")]
+    [InlineData("{\"message\":\"Bonjour\",\"questions\":{\"rubrique\":\"difficultes\",\"question\":\"Quoi ?\"}}")]
+    public void Questions_absentes_ou_mal_formees_aucune_question_sans_refus(string json)
+    {
+        var reponse = Valeur(ReponseIA.Lire(json));
+
+        Assert.Equal("Bonjour", reponse.Message);
+        Assert.Empty(reponse.Questions);
+    }
+
     [Theory]
     [InlineData("```json\n{\"message\":\"Bonjour\"}\n```")]
     [InlineData("```\n{\"message\":\"Bonjour\"}\n```")]

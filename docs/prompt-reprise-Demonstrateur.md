@@ -1,6 +1,6 @@
 # Prompt de reprise — Demonstrateur
 
-> Mis à jour le 22/11/2026 par le lot A5d (DEB-Q116 à DEB-Q120). Règles génériques : harnais central, `regles\regles-de-travail.md` (v5) ;
+> Mis à jour le 22/11/2026 par le lot A7a (DEB-Q121, DEB-Q122 ; A7 relivré). Règles génériques : harnais central, `regles\regles-de-travail.md` (v5) ;
 > modèle de projet : `regles\harnais-modele-generique.md` (v2) ; front : `regles\gabarit-frontend-vite-aspnet.md` ;
 > outillage : `C:\Dev\Harnais\docs\specification-harnais-central.md` (fait foi).
 > Historique détaillé : `docs/historique-Demonstrateur.md` (non envoyé par défaut). Documents hors dépôt dont dépend ce
@@ -8,21 +8,23 @@
 > `Expression_de_besoin_demonstrateur_IA_SICCRF.docx` (document de cadrage, novembre 2026). Le modèle `FEB.docx` est
 > versionné depuis I2, nettoyé de ses métadonnées (DEB-Q9, DEB-Q33).
 
-## ▶ ÉTAT AU 22/11/2026 (A5d : décisions du méta-prompt) — À LIRE D'ABORD
+## ▶ ÉTAT AU 22/11/2026 (A7 : question contextualisée) — À LIRE D'ABORD
 
-**Où on en est** : chantiers P, B, I, F, L clos ; HY1 à HY3 clos. Chantier A : A1 à A4, A5 (`bf75669`), A5b (`c30a13b`,
-DEB-A5 corrigée ; **726 mesurés**, 0 échec, session du 22/11/2026). DEB-Q116 tranchée (option 1 : question
-contextualisée), DEB-Q117 à DEB-Q120 actées (A5d) : questions candidates de l'IA, libellé en tête, garde-fous, sonde.
-**Prochaine action** : sonde hors dépôt `Sonder-Question.ps1` + `consignes-A7.txt` (livrés avec A5d, à poser dans
-`Téléchargements\Sonde-A7`) ; CSV jugé (colonnes Pertinente, Invention) et renvoyé ; seuil atteint → lot A7 ; puis
-critère d'A5 au navigateur, A6, publier, sauvegarder, R1.
+**Où on en est** : chantiers P, B, I, F, L clos ; HY1 à HY3 clos. Chantier A : A1 à A5b validés (726 mesurés le
+22/11/2026) ; sonde A7 jugée, seuil de DEB-Q120 atteint (DEB-Q121 : 26/26 acceptées, aucune invention) ; A7 refusé à la
+compilation (CS0315), sans commit ; **A7a livré** (A7 complet corrigé) :
+questions candidates de l'IA, garde-fous, libellé en tête, méta-prompt sondé plus DEB-Q122 (message sans annonce de la
+suite) ; comptes ESTIMÉS 768 (Domain 319, Application 68, Infrastructure 225, Web 133, Architecture 23).
+**Prochaine action** : appliquer A7a ; puis critère d'A7 au navigateur avec gemma (plan §7 : « PC ne s'allume plus » et
+e-commerce, questions contextualisées, aucune ne redemande une information donnée, aucun fait inventé, message sans
+annonce de la suite) ; puis A6, publier, sauvegarder, R1.
 **Ouverture de la session suivante** (site arrêté : il verrouille les DLL de `bin\Debug`) :
 
     Set-Location C:\Dev\Demonstrateur; . C:\Dev\Harnais\outillage\Charger-Harnais.ps1; Ouvrir-Session -BrancheAttendue main
     # attendu : « SESSION PRÉPARÉE : 8 pièce(s) dans C:\Dev\Sessions\Demonstrateur\<horodatage> » ; joindre toutes les
     # pièces et donner leur compte.
 
-**Décisions récentes** : DEB-Q112 à DEB-Q120. **Anomalies ouvertes** : DEB-A4 (close par le critère d'A5).
+**Décisions récentes** : DEB-Q116 à DEB-Q122. **Anomalies ouvertes** : DEB-A4 (close par le critère d'A5).
 **Questions ouvertes** : DEB-Q108, DEB-Q105 à DEB-Q107 (A6), DEB-Q109 à DEB-Q111 (V2).
 
 ## §0. Protocole (propre au projet)
@@ -39,7 +41,7 @@ critère d'A5 au navigateur, A6, publier, sauvegarder, R1.
 | Front | Node.js 26.13.1 LTS et son npm (DEB-D7) ; `node_modules` versionné (DEB-D6), Windows x64 ; `npm ci` seulement s'il manque ; versions exactes (`.npmrc`) |
 | Données | fictives, jamais réelles ; jeux d'essai hors dépôt ; base SQLite hors dépôt, clé `Fiches:Base` fixée par environnement (DEB-Q54, DEB-Q55) : poste `C:\Dev\Demonstrateur-data\fiches.db` (`appsettings.Localhost.json`) ; serveurs `appsettings.Staging.json`, `appsettings.Production.json` (`D:\Donnees\Demonstrateur-data[-staging]`, à confirmer) ; variable `Fiches__Base` prioritaire ; rien dans `appsettings.json` |
 | Dépôt distant | `https://github.com/falyanak/Demonstrateur.git`, **public**, branche `main` ; publication par le développeur seul (`Publier-Branche -Confirmer`, Git Credential Manager) |
-| Identifiants | `DEB-D…`, `DEB-A…`, `DEB-Q…`, `DEB-HY…` ; pris : DEB-D1 à DEB-D8, DEB-Q1 à DEB-Q120, DEB-A1 (close par F2), DEB-A2 (close par HY3), DEB-A3 (close par A3), DEB-A4 (ouverte, A4, A5), DEB-A5 (close par A5b), DEB-HY1 (close par HY1), DEB-HY2 (close par HY2) ; mutations M1 à M10, MF1 à MF30 (front) |
+| Identifiants | `DEB-D…`, `DEB-A…`, `DEB-Q…`, `DEB-HY…` ; pris : DEB-D1 à DEB-D8, DEB-Q1 à DEB-Q122, DEB-A1 (close par F2), DEB-A2 (close par HY3), DEB-A3 (close par A3), DEB-A4 (ouverte, A4, A5), DEB-A5 (close par A5b), DEB-HY1 (close par HY1), DEB-HY2 (close par HY2) ; mutations M1 à M10, MF1 à MF30 (front) |
 
 Ligne enchaînée du projet (zip portant `DEPOT.txt` = « Demonstrateur ») :
 
@@ -66,7 +68,7 @@ page de liste des fiches et de leur statut. Plan, périmètre et critère de fin
 | F — front | F1 (socle, API), F2 (Dialogue), F3 (Liste) | F1 clos le 21/11/2026 : F1 (`bfaaf97`), F1b (`fe31e69`), F1c (`3e45551`) ; F2 clos le 21/11/2026 : F2 (`ba3aafd`), F2c (`50ccdb4`) ; F3 clos le 21/11/2026 : F3 (`ce06fe6`), F3b ; `TestsFront` attendu d'OT2 |
 | Hygiène | HY1, HY1b (DEB-HY1 : NuGet, outils dotnet, SDK) ; HY2 (DEB-HY2 : dossier de données par environnement) ; HY3 (DEB-A2 : SDK depuis la racine) | HY1 clos le 21/11/2026 : HY1 (`d307a91`), HY1b ; HY2 clos le 21/11/2026 : HY2 (`9b21bdb`) ; HY3 clos le 21/11/2026 : HY3 (`fcdb37a`) |
 | L — cycle de vie | L1 (serveur), L2 (front) | ouvert le 21/11/2026 (DEB-Q65) ; clos le 21/11/2026 : L1 (`b275507`), L1b ; L2 (`ec192e6`), L2b |
-| A — IA réelle | A1 à A7 | ouvert le 21/11/2026 : Albert API (DEB-Q83) ; A1 (`27ec900`), A2 (`4afcbfe`), A3 (`e84710c`), A4 (`345a707`), A4b, A5 (`bf75669`), A5b (`c30a13b`), A5c, A5d ; A7 (question contextualisée) après sonde ; A6 (profils de fournisseur) à faire ; critère : plan §7 |
+| A — IA réelle | A1 à A7 | ouvert le 21/11/2026 : Albert API (DEB-Q83) ; A1 (`27ec900`), A2 (`4afcbfe`), A3 (`e84710c`), A4 (`345a707`), A4b, A5 (`bf75669`), A5b (`c30a13b`), A5c, A5d, A7 (échec de compilation), A7a (question contextualisée, livré) ; A6 (profils de fournisseur) à faire ; critère : plan §7 |
 | R — recette | R1 | à faire |
 
 Comptes mesurés, lot par lot : historique. Dernière mesure (A4, poste, 21/11/2026, Debug, `Compter-Tests`, 0 échec) :
@@ -77,7 +79,7 @@ SDK 10.0.403 depuis HY3 (DEB-A2).
 
 ## §2. Points ouverts
 
-1. Sonde DEB-Q120, lot A7, critère d'A5 au navigateur, puis A6 (plan §7) ; un écart = lot correctif.
+1. Appliquer A7a, critère d'A7 au navigateur (il couvre celui d'A5), puis A6 (plan §7) ; un écart = lot correctif.
 2. Publication et sauvegarde du dernier commit : exigées par le critère de fin de la V1 (R1).
 6. Chemins des serveurs (DEB-Q55) : `D:\Donnees\Demonstrateur-data\fiches.db` (Production) et
    `D:\Donnees\Demonstrateur-data-staging\fiches.db` (Staging), à confirmer avec l'exploitation avant toute
@@ -97,12 +99,9 @@ SDK 10.0.403 depuis HY3 (DEB-A2).
 | N° | Décision |
 | --- | --- |
 | DEB-Q1 à DEB-Q8 | Arbitrages du 20/11/2026, « recommandations ok » : plan §8. |
+| DEB-Q121, DEB-Q122 | Sonde A7 au seuil (« o » d'Invention = question inadaptée, pas un fait inventé) ; message de l'IA sans annonce de la suite (règle 6) : plan §8 (22/11/2026). |
 | DEB-Q116 à DEB-Q120 | Question contextualisée (option 1, A7 après sonde) : méta-prompt (nature de la demande pour adapter les questions, guide des rubriques, règles 12 à 17) ; champ `questions` sur les trois premières rubriques à questionner non proposées ; libellé en tête (`RubriqueQuestionnee`) ; garde-fous purs, sinon question type ; seuil 80 %, aucune invention : plan §8 (22/11/2026). |
-| DEB-Q112 à DEB-Q115 | DEB-A5 (A5b) : réponse vide redemandée une fois puis panne 503 lisible ; corps de requête nettoyé comme CSAgent (`role`, `content` en chaîne) ; diagnostic au journal ; client HTTP brut (révision de DEB-D5) réexaminé à A6 : plan §8 (« recommandations ok », 22/11/2026). |
-| DEB-Q109 à DEB-Q111 | POSÉES (finalité helpdesk N1 ; recommandations : compléter la FEB, V2 après R1, relance groupée en V2) : plan §8. |
-| DEB-Q108 | POSÉE (A5 ; recommandation : garder) : réponse hors périmètre vide une fois ses questions retirées → message fixe « Cette demande ne relève pas du service informatique. » (`Dialogue.HorsPerimetre`) : plan §8. |
-| DEB-Q95 à DEB-Q104, DEB-D8 | Modèles mesurés (gpt-oss écarté) ; question DÉTERMINISTE au `Catalogue` (A5), garde-fou « ? », `gemma-4-31b-it` figé ; bascule de fournisseur par `appsettings` (A6) : plan §8. |
-| DEB-Q91 à DEB-Q94 | DEB-A4 corrigée maintenant (A4) ; rôle et question type de chaque rubrique dans `PromptFiche.Guide`, pas dans le Domaine (révisé par DEB-Q101) ; dix rubriques obligatoires pour une panne aussi en V1 ; modèle inchangé, prompt d'abord : plan §8 (« recommandations ok », 21/11/2026). |
+| DEB-Q91 à DEB-Q115, DEB-D8 | DEB-A4 corrigée (A4) ; modèles mesurés, gpt-oss écarté, `gemma-4-31b-it` figé ; question DÉTERMINISTE au `Catalogue` (A5), garde-fou « ? » ; DEB-Q105 à DEB-Q111 POSÉES (A6, V2) ; DEB-A5 (A5b) : réponse vide redemandée une fois puis 503, corps nettoyé comme CSAgent, diagnostic au journal ; bascule de fournisseur par `appsettings` (A6) : plan §8. |
 | DEB-Q89, DEB-Q90 | Objet élargi à toute demande au service informatique (assistance, exploitation, réseau, applications, développement) : l'IA réelle nomme la prestation repérée, hors périmètre = demande non informatique ; IA scénarisée sans liste de mots ; révise DEB-Q41, DEB-Q64 et le critère d'A1 ; catégorie distincte et rubriques selon la catégorie en V2 : plan §8. |
 | DEB-Q83 à DEB-Q88 | IA réelle (A1) : Albert API sondée ; `json_schema` strict ; configuration par environnement, clé `ALBERT_API_KEY`, arrêt au démarrage si incomplet ; proxy, 60 s, un nouvel essai sur 429 ; prompt pur testé : plan §8. |
 | DEB-Q2, DEB-Q64 | Fournisseur de l'IA réelle : Albert API si le ministère y a accès, sinon API Mistral, accès vérifié à l'ouverture d'A1 ; repli hors réseau : IA scénarisée. Demandes d'assistance validées au parcours de F3 (« pc ne démarre plus ») : limite connue de l'IA scénarisée, non corrigée ; détection jugée dans le critère d'A1 : plan §7, §8 (« recommandations ok », 21/11/2026). |
@@ -197,7 +196,7 @@ ExpressionBesoin/
 | Contrat | Forme | Figé par |
 | --- | --- | --- |
 | `GET api/sante` | `{ "etat": "ok", "version": "<informative>", "demarrage": "<ISO 8601>", "dureeSecondes": <entier ≥ 0> }`, exactement ces champs, dans cet ordre | `SanteContratTests`, `DiagnosticSanteTests` |
-| Réponse de l'IA | plan §2 ; tolérances DEB-Q19 ; codes de rubrique de `Catalogue.cs` ; refus `reponseIA.jsonInvalide`, `reponseIA.formeInvalide` ; écarts `MotifEcart` | `ReponseIATests` (B1) |
+| Réponse de l'IA | plan §2 (`questions` depuis A7, jamais un refus) ; tolérances DEB-Q19 ; codes de rubrique de `Catalogue.cs` ; refus `reponseIA.jsonInvalide`, `reponseIA.formeInvalide` ; écarts `MotifEcart` | `ReponseIATests` (B1) |
 | Codes de refus du Domaine | `fiche.nonModifiable`, `proposition.absente`, `cycle.transitionInterdite`, `soumission.{confirmationAbsente,incomplete,propositionsEnAttente}`, `decision.commentaireObligatoire`, `numerotation.{annee,illisible,anneeAnterieure,epuisee}` | tests de B1 |
 | Stockage des fiches | JSON v1 (DEB-Q28) ; schéma SQLite `user_version = 2` (DEB-Q29, DEB-Q76 : migration depuis 1), tables `Fiches`, `Echanges`, `Transitions` (CHECK : six transitions du cycle) | `CodecFicheTests` (JSON de référence à l'octet), `DepotFichesSqliteTests`, `SchemaFichesTests` (I1) |
 | API des fiches | plan §5 (route `reprendre` comprise) ; refus `fiche.introuvable`, `agent.inconnu`, `rubrique.inconnue`, `message.vide`, `document.nonValidee`, `decision.inconnue` ; 404 / 409 / 422, panne 503 `panne.technique` (DEB-Q42) ; en-tête `X-Agent` | tests de B2 ; `PointsFichesTests`, `ParcoursFicheTests`, `StatutHttpTests` (F1) |
@@ -205,8 +204,8 @@ ExpressionBesoin/
 | JSON de l'API | projections de `Web/Api/Vues.cs`, camelCase, énumérations par leur nom, encodeur relâché (`ContratJson`) ; fiche : `id, numero, statut, enTete, rubriques, obligatoires, remplies, complete, modifiable, prochaineRubrique, confirmeeLe, decisions` | `FicheVueTests` (octets de `ClientApp/tests/contrats/{fiche,consultation,tour,liste}-reference.json`, réplique Python) et `contrats.test.ts` (Vitest) |
 | Pages | `GET /` (accueil : « Nouvelle fiche » et liste, `data-page="liste"`, F3) ; `GET /Home/Dialogue/{id}` → `<div id="app" data-page="dialogue" data-fiche="{id}">`, 404 sans Guid non vide (DEB-Q48) | `PointsFichesTests` (F2) |
 | IA scénarisée | réponse au contrat du plan §2 (`ScenarioDialogue`, DEB-Q41) | `ScenarioDialogueTests` (F1) |
-| Message d'un tour | message de l'IA sans ses phrases en « ? », puis question type de la prochaine rubrique APRÈS la fusion, ou relance fixe (DEB-Q102) ; hors périmètre : sans relance ; c'est lui qui est enregistré (A5) | `DialogueTests`, `DecisionsFichesTests` |
-| IA réelle | `POST {IA:Point}/chat/completions`, modèle `IA:Modele`, consignes système fixes, `response_format` `json_schema` strict `reponse_fiche` (DEB-Q85) ; messages `role` + `content` en chaîne (DEB-Q113) ; 429 : DEB-Q87 ; réponse vide : DEB-Q112 | `PromptFicheTests`, `AssistantIAAlbertTests`, `CorpsRequeteTests` |
+| Message d'un tour | message de l'IA sans ses phrases en « ? », puis, pour la prochaine rubrique APRÈS la fusion, « Libellé : » et la candidate de l'IA si elle passe les garde-fous (DEB-Q119), sinon la question type ; ou relance fixe (DEB-Q102) ; hors périmètre : sans relance ; c'est lui qui est enregistré (A5, A7) | `DialogueTests`, `DecisionsFichesTests` |
+| IA réelle | `POST {IA:Point}/chat/completions`, modèle `IA:Modele`, consignes système fixes, `response_format` `json_schema` strict `reponse_fiche` (DEB-Q85, `questions` en A7) ; consignes = méta-prompt sondé plus DEB-Q122, empreinte figée ; dernier message avec « Rubriques à questionner » ; messages `role` + `content` en chaîne (DEB-Q113) ; 429 : DEB-Q87 ; réponse vide : DEB-Q112 | `PromptFicheTests`, `AssistantIAAlbertTests`, `CorpsRequeteTests` |
 | Document .docx | modèle FEB embarqué (empreinte figée) ; placement DEB-Q35 ; contenu DEB-Q36 ; octets stables DEB-Q37 | `ContenuDocumentTests`, `GabaritFebTests`, `GenerateurDocumentFebTests` (55 paragraphes attendus, I2) |
 
 ## §6. Reliquat, hygiène, leçons
@@ -219,9 +218,8 @@ s'ajoute ici.
 
 ## §7. Prochaine session
 
-Acquis : plan v1.25 ; socle P0, Domaine B1, Application B2, Infrastructure I1, I2, front F1 à F3, HY1 à HY3, cycle de
-vie L1, L2, IA réelle A1 à A3 validés sur le poste ; A5 (`bf75669`), A5b (`c30a13b`, DEB-A5 corrigée au poste) ; sondes de modèles (historique du 21/11/2026),
-hors dépôt dans les Téléchargements du développeur.
+Acquis : plan v1.28 ; socle, Domaine, Application, Infrastructure, front F1 à F3, HY1 à HY3, cycle de vie L1, L2, IA
+réelle A1 à A5b validés sur le poste ; sonde A7 jugée (DEB-Q121) ; A7a livré, non vérifié.
 Audit honnête : chez l'assistant, ni SDK .NET ni NuGet (tree-sitter, répliques Python) ; `Appliquer-Lot` tranche ; la
-qualité de l'IA ne se juge qu'au navigateur. Plan ordonné : sonde (DEB-Q120), A7, critère d'A5, A6, publier, sauvegarder, R1. Pièces :
-celles d'`Ouvrir-Session` (8), avec leur compte, et les sorties de la sonde ; réponses à DEB-Q105 à DEB-Q111.
+qualité de l'IA ne se juge qu'au navigateur. Plan ordonné : appliquer A7a, critère d'A7 au navigateur, A6, publier, sauvegarder, R1. Pièces :
+celles d'`Ouvrir-Session` (8), avec leur compte ; sortie d'`Appliquer-Lot A7a` ; constats du navigateur ; réponses à DEB-Q105 à DEB-Q111.

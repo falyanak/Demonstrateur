@@ -58,13 +58,20 @@ internal static class DecisionsFiches
             .Bind(trouvee => Fiche.AppliquerPropositions(trouvee, ListeImmuable<PropositionRubrique>.Vide))
             .Map(modifiable => new TourPrepare(
                 modifiable,
-                new ContexteTour(texte, historique, EtatRubriques(modifiable), Manquantes(modifiable), ProchaineRubrique(modifiable))));
+                new ContexteTour(
+                    texte,
+                    historique,
+                    EtatRubriques(modifiable),
+                    Manquantes(modifiable),
+                    ProchaineRubrique(modifiable),
+                    AQuestionner(modifiable))));
     }
 
     /// <summary>
     /// Après l'appel de l'IA : réponse relue (refus → rien à écrire, DEB-Q22) ; hors périmètre → propositions ignorées
     /// (DEB-Q23) ; sinon fusion du Domaine. Le message rendu est COMPOSÉ sur la fiche fusionnée (lot A5, DEB-Q100 à
-    /// DEB-Q103, <see cref="Dialogue.Composer"/>) : message de l'IA sans ses questions, puis la question de l'application.
+    /// DEB-Q103, <see cref="Dialogue.Composer"/>) : message de l'IA sans ses questions, puis la question de l'application,
+    /// rédigée par l'IA pour la rubrique choisie si elle passe les garde-fous, sinon la question type (lot A7, DEB-Q117).
     /// C'est lui qui est enregistré : l'historique montre à l'IA la question réellement posée. Deux échanges à ajouter :
     /// l'agent à <paramref name="debut"/>, l'IA à <paramref name="fin"/>.
     /// </summary>
@@ -75,7 +82,7 @@ internal static class DecisionsFiches
                     reponse.HorsPerimetre ? ListeImmuable<PropositionRubrique>.Vide : reponse.Propositions)
                 .Map(fiche =>
                 {
-                    var message = Dialogue.Composer(reponse.Message, reponse.HorsPerimetre, fiche);
+                    var message = Dialogue.Composer(reponse.Message, reponse.HorsPerimetre, fiche, reponse.Questions);
                     return new IssueTour(
                         fiche,
                         ListeImmuable<Echange>.Vide
@@ -132,4 +139,7 @@ internal static class DecisionsFiches
 
     internal static string? ProchaineRubrique(FicheBesoin fiche) =>
         Dialogue.ProchaineRubrique(fiche) is { } rubrique ? Catalogue.Definition(rubrique).Code : null;
+
+    internal static ListeImmuable<string> AQuestionner(FicheBesoin fiche) =>
+        ListeImmuable<string>.De(Dialogue.AQuestionner(fiche).Select(rubrique => Catalogue.Definition(rubrique).Code));
 }
