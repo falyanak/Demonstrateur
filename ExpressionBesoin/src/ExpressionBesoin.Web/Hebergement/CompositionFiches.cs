@@ -34,7 +34,7 @@ public static class CompositionFiches
         services.AddSingleton<IReferentielOrganisation, ReferentielOrganisationFictif>();
         // Un seul exemplaire : le gabarit est lu, décompressé et vérifié une fois (plan §4, performance).
         services.AddSingleton<IGenerateurDocument>(_ => GenerateurDocumentFeb.DepuisRessource());
-        // IA réelle (Albert API, lot A1) ou scénarisée (hors réseau, DEB-Q41), selon IA:Fournisseur (DEB-Q86).
+        // IA compatible OpenAI (Albert API, lot A1 ; Claude, A6) ou scénarisée (hors réseau, DEB-Q41), selon IA:Profil (A6).
         services.AddSingleton<IAssistantIA>(fournisseur => CompositionIA.Creer(
             fournisseur.GetRequiredService<IConfiguration>(),
             fournisseur.GetRequiredService<ILogger<AssistantIAAlbert>>()));

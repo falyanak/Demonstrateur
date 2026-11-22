@@ -20,8 +20,16 @@ public sealed class AssistantIAAlbertTests
         "{\"message\":\"Comment les contrôles se déroulent-ils aujourd'hui ?\",\"propositions\":[{\"rubrique\":\"application\","
         + "\"valeur\":\"SORA\",\"justification\":\"L'agent cite SORA.\"}],\"horsPerimetre\":false}";
 
-    /// <summary>Fausse clé construite par concaténation : une archive ne la masque pas (règles §13).</summary>
-    private static readonly OptionsIA Options = new(new Uri("https://albert.test/v1"), "openweight-medium", "cle-" + "essai");
+    /// <summary>
+    /// Profil Albert (température 0,1, sans plafond de jetons). Fausse clé construite par concaténation : une archive ne la
+    /// masque pas (règles §13).
+    /// </summary>
+    private static readonly OptionsIA Options =
+        new(new Uri("https://albert.test/v1"), "openweight-medium", "cle-" + "essai") { Temperature = 0.1f };
+
+    /// <summary>Profil à la manière de Claude (lot A6, DEB-Q105, DEB-Q128) : sans température, plafond de jetons.</summary>
+    private static readonly OptionsIA OptionsClaude =
+        new(new Uri("https://anthropic.test/v1"), "claude-essai", "cle-" + "claude") { JetonsMax = 4096 };
 
     private readonly List<TimeSpan> _attentes = [];
 
@@ -40,9 +48,9 @@ public sealed class AssistantIAAlbertTests
             "application",
             ListeImmuable<string>.De(new[] { "application" }));
 
-    private AssistantIAAlbert Assistant(FauxFournisseurIA faux) =>
+    private AssistantIAAlbert Assistant(FauxFournisseurIA faux, OptionsIA? options = null) =>
         AssistantIAAlbert.Creer(
-            Options,
+            options ?? Options,
             faux,
             (attente, _) =>
             {
@@ -56,6 +64,15 @@ public sealed class AssistantIAAlbertTests
         contenu.ValueKind == JsonValueKind.String
             ? contenu.GetString()!
             : string.Concat(contenu.EnumerateArray().Select(partie => partie.GetProperty("text").GetString()));
+
+    /// <summary>
+    /// Plafond de jetons envoyé, <c>null</c> s'il est absent : <c>max_completion_tokens</c> (client OpenAI .NET 2) ou
+    /// <c>max_tokens</c>, tous deux acceptés par Albert et par la couche compatible d'Anthropic.
+    /// </summary>
+    private static int? Jetons(JsonElement racine) =>
+        racine.TryGetProperty("max_completion_tokens", out var plafond) || racine.TryGetProperty("max_tokens", out plafond)
+            ? plafond.GetInt32()
+            : null;
 
     [Fact]
     public async Task Requete_au_contrat_et_texte_rendu_tel_quel()
@@ -74,6 +91,7 @@ public sealed class AssistantIAAlbertTests
         var racine = corps.RootElement;
         Assert.Equal("openweight-medium", racine.GetProperty("model").GetString());
         Assert.Equal(0.1, racine.GetProperty("temperature").GetDouble(), 3);
+        Assert.Null(Jetons(racine));
         Assert.Equal(
             new[]
             {
@@ -101,6 +119,31 @@ public sealed class AssistantIAAlbertTests
     /// DEB-Q113 (lot A5b) : ce qui part sur le réseau est le corps nettoyé, comme CSAgent : chaque message n'a que
     /// <c>role</c> et <c>content</c>, en chaîne, quelle que soit la forme produite par le client OpenAI .NET.
     /// </summary>
+    /// <summary>
+    /// Profil sans température (Claude 4.7 et suivants refusent toute valeur inférieure à 1, DEB-Q105) et avec plafond de
+    /// jetons (DEB-Q128) : le champ <c>temperature</c> est ABSENT de la requête, le plafond présent ; le reste du contrat
+    /// (modèle, clé, schéma strict) est celui du profil Albert.
+    /// </summary>
+    [Fact]
+    public async Task Profil_sans_temperature_avec_plafond_de_jetons()
+    {
+        var faux = new FauxFournisseurIA(() => FauxFournisseurIA.Completion(Reponse));
+        using var assistant = Assistant(faux, OptionsClaude);
+
+        Assert.Equal(Reponse, await assistant.Repondre(Contexte(), Essais.Annulation));
+
+        var requete = Assert.Single(faux.Requetes);
+        Assert.Equal(new Uri("https://anthropic.test/v1/chat/completions"), requete.Adresse);
+        Assert.Equal("Bearer cle-claude", requete.Autorisation);
+        using var corps = JsonDocument.Parse(requete.Corps!);
+        var racine = corps.RootElement;
+        Assert.Equal("claude-essai", racine.GetProperty("model").GetString());
+        Assert.False(racine.TryGetProperty("temperature", out _));
+        Assert.Equal(4096, Jetons(racine));
+        var schema = racine.GetProperty("response_format").GetProperty("json_schema");
+        Assert.Equal(("reponse_fiche", true), (schema.GetProperty("name").GetString(), schema.GetProperty("strict").GetBoolean()));
+    }
+
     [Fact]
     public async Task Messages_envoyes_role_et_contenu_en_chaine_seulement()
     {
@@ -227,10 +270,12 @@ public sealed class AssistantIAAlbertTests
     [Fact]
     public void Options_d_un_tour_neuves_a_chaque_appel()
     {
-        var options = AssistantIAAlbert.OptionsTour();
+        var options = AssistantIAAlbert.OptionsTour(Options);
+        var claude = AssistantIAAlbert.OptionsTour(OptionsClaude);
 
-        Assert.NotSame(options, AssistantIAAlbert.OptionsTour());
-        Assert.Equal(0.1f, options.Temperature);
+        Assert.NotSame(options, AssistantIAAlbert.OptionsTour(Options));
+        Assert.Equal(((float?)0.1f, (int?)null), (options.Temperature, options.MaxOutputTokens));
+        Assert.Equal(((float?)null, (int?)4096), (claude.Temperature, claude.MaxOutputTokens));
         Assert.Equal(true, options.AdditionalProperties![AssistantIAAlbert.CleStrict]);
         Assert.Equal(new[] { TimeSpan.FromSeconds(60), TimeSpan.FromSeconds(60) }, new[] { OptionsIA.DelaiParDefaut, Options.Delai });
     }
@@ -239,6 +284,6 @@ public sealed class AssistantIAAlbertTests
     public void Delai_reglable()
     {
         var options = new OptionsIA(new Uri("https://albert.test/v1"), "m", "cle-" + "essai") { Delai = TimeSpan.FromSeconds(5) };
-        Assert.Equal(TimeSpan.FromSeconds(5), options.Delai);
+        Assert.Equal((TimeSpan.FromSeconds(5), (float?)null, (int?)null), (options.Delai, options.Temperature, options.JetonsMax));
     }
 }

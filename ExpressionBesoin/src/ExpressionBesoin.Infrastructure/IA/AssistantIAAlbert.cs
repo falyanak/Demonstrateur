@@ -13,7 +13,8 @@ namespace ExpressionBesoin.Infrastructure.IA;
 /// <summary>
 /// Adaptateur d'<see cref="IAssistantIA"/> vers l'IA réelle (lot A1, DEB-D5, DEB-Q83 à DEB-Q88) : un agent Microsoft
 /// Agent Framework (<see cref="ChatClientAgent"/>, sans outils ni session) sur l'<see cref="IChatClient"/> OpenAI de
-/// Microsoft.Extensions.AI, pointé sur Albert API. Coquille sans décision : le prompt est <see cref="PromptFiche"/>, le
+/// Microsoft.Extensions.AI, pointé sur l'API compatible OpenAI du profil courant (Albert API ; Claude par la couche
+/// compatible d'Anthropic : lot A6, DEB-Q105, DEB-Q106). Coquille sans décision : le prompt est <see cref="PromptFiche"/>, le
 /// nouvel essai <see cref="GestionnaireLimiteDebit"/>, le corps nettoyé par <see cref="GestionnaireCorpsRequete"/> (A5b) ;
 /// le texte rendu est relu par <c>ReponseIA.Lire</c>. Une panne (réseau, délai, statut d'échec, deux réponses vides de
 /// suite : DEB-A5, DEB-Q112) lève une exception : 503 (DEB-Q22).
@@ -21,9 +22,6 @@ namespace ExpressionBesoin.Infrastructure.IA;
 public sealed class AssistantIAAlbert : IAssistantIA, IDisposable
 {
     public const string NomAgent = "AssistantFicheBesoin";
-
-    /// <summary>Température de la sonde du 21/11/2026 (DEB-Q84) : réponses stables, peu d'écart aux mots de l'agent.</summary>
-    public const float Temperature = 0.1f;
 
     /// <summary>Clé des options lue par Microsoft.Extensions.AI.OpenAI : schéma de réponse strict (DEB-Q85).</summary>
     public const string CleStrict = "strict";
@@ -38,10 +36,13 @@ public sealed class AssistantIAAlbert : IAssistantIA, IDisposable
 
     private readonly ChatClientAgent _agent;
 
-    private AssistantIAAlbert(HttpClient http, ChatClientAgent agent)
+    private readonly OptionsIA _options;
+
+    private AssistantIAAlbert(HttpClient http, ChatClientAgent agent, OptionsIA options)
     {
         _http = http;
         _agent = agent;
+        _options = options;
     }
 
     /// <summary>
@@ -79,7 +80,7 @@ public sealed class AssistantIAAlbert : IAssistantIA, IDisposable
                 NetworkTimeout = options.Delai,
             });
         var agent = new ChatClientAgent(client.GetChatClient(options.Modele).AsIChatClient(), PromptFiche.Consignes, NomAgent);
-        return new AssistantIAAlbert(http, agent);
+        return new AssistantIAAlbert(http, agent, options);
     }
 
     /// <summary>
@@ -92,7 +93,7 @@ public sealed class AssistantIAAlbert : IAssistantIA, IDisposable
         {
             // Messages et options neufs à chaque appel : le nouvel essai envoie la même requête.
             List<ChatMessage> messages = [.. PromptFiche.Messages(contexte).Select(Convertir)];
-            var reponse = await _agent.RunAsync(messages, null, new ChatClientAgentRunOptions(OptionsTour()), annulation)
+            var reponse = await _agent.RunAsync(messages, null, new ChatClientAgentRunOptions(OptionsTour(_options)), annulation)
                 .ConfigureAwait(false);
             if (!string.IsNullOrWhiteSpace(reponse.Text))
             {
@@ -103,11 +104,15 @@ public sealed class AssistantIAAlbert : IAssistantIA, IDisposable
         throw new InvalidOperationException(MessageReponsesVides);
     }
 
-    /// <summary>Options d'un tour, neuves à chaque appel : température, réponse contrainte par le schéma, strict.</summary>
-    internal static ChatOptions OptionsTour() =>
+    /// <summary>
+    /// Options d'un tour, neuves à chaque appel : température et plafond de jetons du profil (absents de la requête quand ils
+    /// sont <c>null</c>, DEB-Q105, DEB-Q128), réponse contrainte par le schéma, strict.
+    /// </summary>
+    internal static ChatOptions OptionsTour(OptionsIA options) =>
         new()
         {
-            Temperature = AssistantIAAlbert.Temperature,
+            Temperature = options.Temperature,
+            MaxOutputTokens = options.JetonsMax,
             ResponseFormat = ChatResponseFormat.ForJsonSchema(PromptFiche.Schema, PromptFiche.NomSchema),
             AdditionalProperties = new() { [CleStrict] = true },
         };

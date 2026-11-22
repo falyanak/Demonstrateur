@@ -1,9 +1,9 @@
 namespace ExpressionBesoin.Infrastructure.IA;
 
 /// <summary>
-/// Réglages de l'IA réelle (DEB-Q86) : adresse compatible OpenAI, modèle (DEB-Q84), clé lue dans la variable
-/// d'environnement par la composition, délai borné (DEB-Q87). Une classe et non un record : un record écrirait la clé
-/// dans son <c>ToString</c>, donc dans un journal.
+/// Réglages d'une IA compatible OpenAI, tirés du profil courant (lot A6, DEB-Q105) : adresse, modèle, clé lue dans la
+/// variable d'environnement du profil par la composition, délai borné (DEB-Q87), température et plafond de jetons
+/// facultatifs. Une classe et non un record : un record écrirait la clé dans son <c>ToString</c>, donc dans un journal.
 /// </summary>
 public sealed class OptionsIA(Uri point, string modele, string cle)
 {
@@ -17,4 +17,13 @@ public sealed class OptionsIA(Uri point, string modele, string cle)
     public string Cle { get; } = cle;
 
     public TimeSpan Delai { get; init; } = DelaiParDefaut;
+
+    /// <summary>
+    /// Température envoyée au modèle ; <c>null</c> → champ absent de la requête : Claude 4.7 et suivants refusent toute
+    /// valeur inférieure à 1 par la couche compatible OpenAI (DEB-Q105). Profil Albert : 0,1 (sonde du 21/11/2026, DEB-Q84).
+    /// </summary>
+    public float? Temperature { get; init; }
+
+    /// <summary>Plafond de jetons de la réponse ; <c>null</c> → champ absent de la requête (DEB-Q128).</summary>
+    public int? JetonsMax { get; init; }
 }

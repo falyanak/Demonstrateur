@@ -802,3 +802,21 @@
 - DEB-Q125 « ok » : la ligne enchaînée du projet mesure la couverture avant le commit (prompt §0) ; leçon (e) pour le
   harnais central (prompt §2, point 5).
 - A7c : documents seuls (prompt, plan v1.30, historique).
+
+## 22/11/2026 — Ouverture d'A6 ; DEB-Q105 à DEB-Q108, DEB-Q126 à DEB-Q129 ; lot A6
+
+- Session ouverte sur `fc15530` (A7c) : 8 pièces reçues, tailles et SHA-256 conformes à `PIECES.txt`, archive de
+  180 entrées comme `MASQUAGE.txt`, aucune valeur masquée ; 770 tests mesurés par `Compter-Tests`, 0 échec.
+- Couche compatible OpenAI d'Anthropic vérifiée sur sa documentation : `json_schema` strict seul accepté ; température
+  inférieure à 1 refusée (400) par Claude 4.7 et suivants : `AssistantIAAlbert.Temperature = 0.1f`, fixé en dur, aurait
+  rendu chaque tour en 503 ; pas de valeur par défaut documentée pour le plafond de jetons. Schéma de `PromptFiche` dans
+  les limites des sorties structurées.
+- DEB-Q105 à DEB-Q108, DEB-Q126, DEB-Q127 « recommandations ok » ; DEB-Q115 sans objet ; DEB-Q129 : le développeur
+  poursuit avec gemma, l'accès à Claude viendra plus tard ; DEB-Q128 posée par le lot.
+- Lot A6 : `CompositionIA.Lire` pur sur une fonction de lecture de clé (profil, catalogue, variable de la clé,
+  température et plafond facultatifs), `OptionsIA.Temperature` et `JetonsMax`, `AssistantIAAlbert.OptionsTour(options)` ;
+  catalogue Albert, Claude, Scénarisé dans `appsettings.json`, `IA:Profil = Albert` par environnement ; usine de test à
+  profils propres (variable `DEB_CLE_IA_ESSAI`). Messages d'erreur recalculés par une réplique Python (32 cas, 0 écart ;
+  un attendu faussé est détecté). Comptes ESTIMÉS : Infrastructure 228, Web 161, total 799. Non vérifié : compilation,
+  tests, couverture (aucun SDK .NET chez l'assistant), nom JSON du plafond (`max_completion_tokens` attendu, `max_tokens`
+  toléré par le test).
