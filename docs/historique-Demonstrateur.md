@@ -768,3 +768,25 @@
   Relecture sémantique des autres fichiers (contraintes génériques, surcharges, nullabilité), toujours sans compilateur :
   les paquets .NET sont inaccessibles depuis l'environnement de l'assistant. Leçon du projet : un type générique de
   l'application porte ses contraintes ; les relire avant de l'instancier sur un nouveau type.
+
+## 22/11/2026 — A7a appliqué ; couverture ; DEB-A6 ; DEB-Q123 à DEB-Q125 ; A7b
+
+- `Appliquer-Lot A7a` (après remise de l'arbre à HEAD) : 16 fichiers, compilation Release, 768 tests MESURÉS (Domain 319,
+  Application 68, Infrastructure 225, Web 133, Architecture 23), 0 échec ; commit `868f549`. Les comptes ESTIMÉS sont
+  confirmés.
+- Au navigateur, juste après : 1er tour conforme (prestation nommée, symptôme dans la situation actuelle, « Difficultés
+  rencontrées : Quelles difficultés rencontrez-vous actuellement à cause de ce virus ? ») ; 2e tour en 503 « Service
+  momentanément indisponible ; réessayer. », deux fois, deux fiches, scénario du virus, site lancé hors journal :
+  anomalie DEB-A6. Site relancé par `dotnet run … | Tee-Object` : deux parcours complets sans panne (`site-A7a.log` :
+  9 tours, 3,8 à 10,3 s ; `site-A7a-virus.log` : scénario du virus, 10 tours, 2,4 à 8,2 s, compléments, reprise,
+  validation, `EB-2026-0014.docx`), aucune ligne « Panne » ni « Réponse vide ». IA jugée cohérente par le développeur.
+- `Lancer-Couverture` : lignes 2302/2302, branches 869/871 (99,77 %), NON CONFORME. Classes d'A7 à 100 % ; branches
+  manquantes, relevées sur les pages du rapport : `SchemaFiches.Planifier` (5/6 : `switch` sur un `long`, sortie par
+  défaut de la table de saut inatteignable après le contrôle d'intervalle, alors que 0, 1, 2, 3 et −1 sont testés) ;
+  `CorpsRequete.Message` (9/10 : `tool_calls` non tableau jamais essayé). Antérieures à A7 (A5b, L1) : la couverture
+  n'avait plus été mesurée sur le poste depuis HY1, `Appliquer-Lot` ne la mesure pas.
+- DEB-Q123, DEB-Q124 « recommandations ok » ; DEB-Q125 posée (couverture dans la ligne enchaînée du projet).
+- Lot A7b : `Planifier` en suite de `if` (même comportement, six branches toutes parcourues par les tests existants) ;
+  `CorpsRequeteTests.Nettoyer_outils_non_tableau_recopies` (objet, texte ; attendus recalculés par une réplique Python,
+  qui retire bien un tableau vide). Comptes ESTIMÉS : Infrastructure 227, total 770. Non vérifié : compilation, tests,
+  couverture (aucun SDK .NET chez l'assistant).

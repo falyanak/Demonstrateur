@@ -53,6 +53,18 @@ public sealed class CorpsRequeteTests
             "{\"messages\":[{\"role\":\"user\",\"content\":" + attendu + "}]}",
             Nettoye("{\"messages\":[{\"role\":\"user\",\"content\":" + contenu + "}]}"));
 
+    /// <summary>
+    /// Lot A7b : seul un <c>tool_calls</c> TABLEAU vide est retiré ; sous une autre forme (objet, texte), il est recopié
+    /// tel quel (branche « non tableau » de <c>Message</c>, jamais parcourue jusqu'ici).
+    /// </summary>
+    [Theory]
+    [InlineData("{\"id\":\"t1\"}")]
+    [InlineData("\"aucun\"")]
+    public void Nettoyer_outils_non_tableau_recopies(string outils) =>
+        Assert.Equal(
+            "{\"messages\":[{\"role\":\"assistant\",\"tool_calls\":" + outils + ",\"content\":\"\"}]}",
+            Nettoye("{\"messages\":[{\"role\":\"assistant\",\"tool_calls\":" + outils + "}]}"));
+
     [Theory]
     [InlineData("")]
     [InlineData("pas du json")]

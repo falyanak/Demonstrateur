@@ -126,15 +126,28 @@ internal static class SchemaFiches
     /// <summary>
     /// Version lue → mise à niveau (DEB-Q76) : 0 (base neuve) → création, mode WAL ; 1 → migration ;
     /// <see cref="Version"/> → rien (<c>null</c>) ; toute autre valeur (base d'une version inconnue, plus récente par
-    /// exemple) lève, plutôt que d'écrire dans un schéma inconnu.
+    /// exemple) lève, plutôt que d'écrire dans un schéma inconnu. Suite de tests plutôt qu'un <c>switch</c> (lot A7b) :
+    /// sur un <c>long</c>, le compilateur traduit le <c>switch</c> en un contrôle d'intervalle puis une table de saut dont
+    /// la sortie par défaut est inatteignable, comptée comme une branche jamais parcourue (5 sur 6 au rapport).
     /// </summary>
-    public static PlanSchema? Planifier(long versionLue) =>
-        versionLue switch
+    public static PlanSchema? Planifier(long versionLue)
+    {
+        if (versionLue == 0)
         {
-            0 => new PlanSchema(true, Creation),
-            1 => new PlanSchema(false, Migration1Vers2),
-            Version => null,
-            _ => throw new InvalidOperationException(
-                $"Base de fiches au schéma {versionLue} : seuls les schémas 1 et {Version} sont connus de cette version."),
-        };
+            return new PlanSchema(true, Creation);
+        }
+
+        if (versionLue == 1)
+        {
+            return new PlanSchema(false, Migration1Vers2);
+        }
+
+        if (versionLue == Version)
+        {
+            return null;
+        }
+
+        throw new InvalidOperationException(
+            $"Base de fiches au schéma {versionLue} : seuls les schémas 1 et {Version} sont connus de cette version.");
+    }
 }
