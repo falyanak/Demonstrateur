@@ -1,6 +1,6 @@
 # Plan du démonstrateur « Expression de besoin » (version simplifiée)
 
-> Version 1.25 du 22/11/2026 (lot A5b ; 1.24 au lot A5 ; 1.23 au lot A4b ; 1.22 au lot A4 ; 1.21 au lot A3, 1.20 au lot A2, 1.19 au lot A1, 1.18 au lot L2, 1.17 au lot L1, 1.16 au lot F3b, 1.15 au lot F3, 1.14 au lot F2c, 1.13 au lot HY2, 1.12 au lot F2, 1.11 au lot HY1b, 1.10 au lot HY1, 1.9 au lot F1, 1.8 au lot I2b, 1.7 au lot I2, 1.6 au lot I1, 1.5 au lot B2, 1.4 au lot B1b, 1.3 au lot B1, 1.2 au lot P0c, 1.1 au
+> Version 1.26 du 22/11/2026 (lot A5c ; 1.25 au lot A5b ; 1.24 au lot A5 ; 1.23 au lot A4b ; 1.22 au lot A4 ; 1.21 au lot A3, 1.20 au lot A2, 1.19 au lot A1, 1.18 au lot L2, 1.17 au lot L1, 1.16 au lot F3b, 1.15 au lot F3, 1.14 au lot F2c, 1.13 au lot HY2, 1.12 au lot F2, 1.11 au lot HY1b, 1.10 au lot HY1, 1.9 au lot F1, 1.8 au lot I2b, 1.7 au lot I2, 1.6 au lot I1, 1.5 au lot B2, 1.4 au lot B1b, 1.3 au lot B1, 1.2 au lot P0c, 1.1 au
 > lot P0, 1.0 au lot P0a). Arbitrages DEB-Q1 à DEB-Q8, DEB-Q11 à DEB-Q32 : « recommandations ok » (20/11/2026) ; DEB-Q9 :
 > « ok » (20/11/2026) ; DEB-Q33 à DEB-Q37 : « recommandations ok » (21/11/2026) ;
 > DEB-Q38 à DEB-Q44 : « recommandations ok » (21/11/2026) ; DEB-Q45, DEB-Q46 : « recommandations ok »
@@ -315,5 +315,6 @@ sont lancés à la main (`npm test`) et leur sortie jointe au compte rendu.
 | DEB-Q113 | (22/11/2026, « recommandations ok ») Mesures DEB-A5 : 35 requêtes reconstituées (contenus en texte ou en tableau, historique en rôles ou à plat), 0 réponse vide, alors que l'application échoue à chaque 2e tour ; relais local sans capture. Corps nettoyé avant envoi, comme CSAgent (`LlmClient.SanitizeMessages`, appelé par FlowPortal) : messages réduits à `role`, `content` en chaîne et outils non vides, sans valeur nulle (`CorpsRequete`, pur ; `GestionnaireCorpsRequete`) |
 | DEB-Q114 | (22/11/2026, « recommandations ok ») Réponse vide → journal du site (avertissement) : corps de la requête envoyée (sans la clé, qui est dans un en-tête) et de la réponse |
 | DEB-Q115 | (22/11/2026, « recommandations ok ») Client HTTP brut à la place de MAF et du SDK OpenAI (révision de DEB-D5) : pas dans A5b (une variable à la fois), réexaminé à l'ouverture d'A6 |
+| DEB-Q116 | (22/11/2026, POSÉE ; recommandation : option 1 en V1) Constat au poste après A5b : les questions types, posées dans l'ordre sans égard à ce qui est dit, donnent une impression d'absence de compréhension (« À quoi verrez-vous que c'est réglé ? » pour un PC qui ne s'allume plus). Option 1 : question CONTEXTUALISÉE ; l'application choisit toujours la rubrique (DEB-Q100) ; l'IA rédige la question pour cette rubrique dans un champ `question` du schéma, d'après ce qui est déjà dit ; garde-fous purs (une phrase, finit par « ? »), sinon question type ; sonde avant le lot (A7). Option 2 : rubriques déduites proposées par l'IA (risque règle 1) : V2. Option 3 : questions selon la catégorie (DEB-Q90, DEB-Q110) : V2 |
 
-Questions ouvertes : DEB-Q108 (A5), DEB-Q105 à DEB-Q107 (A6), DEB-Q109 à DEB-Q111 (V2).
+Questions ouvertes : DEB-Q116, DEB-Q108 (A5), DEB-Q105 à DEB-Q107 (A6), DEB-Q109 à DEB-Q111 (V2).

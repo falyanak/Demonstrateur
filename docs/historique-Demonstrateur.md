@@ -703,3 +703,14 @@
 - Vérifié chez l'assistant : syntaxe C# (tree-sitter) ; attendus du nettoyage recalculés par une réplique Python ;
   octets (CRLF sans BOM) ; prompt ≤ 30 720 octets. Non vérifié : compilation (dont la référence transitive à
   `Microsoft.Extensions.Logging.Abstractions` dans l'Infrastructure), tests, couverture, effet sur Albert.
+
+## 22/11/2026 — A5b appliqué ; DEB-A5 corrigée ; DEB-Q116 ; clôture A5c
+
+- A5b appliqué et commité (`c30a13b`). Site lancé par `dotnet run`, sortie enregistrée (`site-A5b.txt`) : 7 tours de
+  dialogue en 200 (2,2 à 2,8 s ; deux à 19,7 et 20,4 s, non expliqués : attente du 429 ou lenteur d'Albert, noté pour
+  R1), aucune ligne « Réponse vide de l'IA (DEB-A5) » : DEB-A5 corrigée par le nettoyage du corps (DEB-Q113), sans
+  nouvel essai. Cause précise non capturée (champ du message produit par le client OpenAI .NET, probable).
+- Constat du développeur : « pas de blocage, c'est mieux, mais les questions posées indiquent qu'il n'y a pas de réelle
+  compréhension » : questions types fixes, sans égard au contexte (panne de PC : résultat recherché, critères de
+  réussite, bénéfices attendus évidents ou déjà dits). DEB-Q116 posée (recommandation : question contextualisée).
+- A5c : clôture de session (documents seuls) ; plan v1.26.
