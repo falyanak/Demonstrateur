@@ -1,6 +1,6 @@
 # Plan du démonstrateur « Expression de besoin » (version simplifiée)
 
-> Version 1.29 du 22/11/2026 (lot A7b ; 1.28 au lot A7a, A7 relivré ; 1.27 au lot A5d ; 1.26 au lot A5c ; 1.25 au lot A5b ; 1.24 au lot A5 ; 1.23 au lot A4b ; 1.22 au lot A4 ; 1.21 au lot A3, 1.20 au lot A2, 1.19 au lot A1, 1.18 au lot L2, 1.17 au lot L1, 1.16 au lot F3b, 1.15 au lot F3, 1.14 au lot F2c, 1.13 au lot HY2, 1.12 au lot F2, 1.11 au lot HY1b, 1.10 au lot HY1, 1.9 au lot F1, 1.8 au lot I2b, 1.7 au lot I2, 1.6 au lot I1, 1.5 au lot B2, 1.4 au lot B1b, 1.3 au lot B1, 1.2 au lot P0c, 1.1 au
+> Version 1.30 du 22/11/2026 (lot A7c ; 1.29 au lot A7b ; 1.28 au lot A7a, A7 relivré ; 1.27 au lot A5d ; 1.26 au lot A5c ; 1.25 au lot A5b ; 1.24 au lot A5 ; 1.23 au lot A4b ; 1.22 au lot A4 ; 1.21 au lot A3, 1.20 au lot A2, 1.19 au lot A1, 1.18 au lot L2, 1.17 au lot L1, 1.16 au lot F3b, 1.15 au lot F3, 1.14 au lot F2c, 1.13 au lot HY2, 1.12 au lot F2, 1.11 au lot HY1b, 1.10 au lot HY1, 1.9 au lot F1, 1.8 au lot I2b, 1.7 au lot I2, 1.6 au lot I1, 1.5 au lot B2, 1.4 au lot B1b, 1.3 au lot B1, 1.2 au lot P0c, 1.1 au
 > lot P0, 1.0 au lot P0a). Arbitrages DEB-Q1 à DEB-Q8, DEB-Q11 à DEB-Q32 : « recommandations ok » (20/11/2026) ; DEB-Q9 :
 > « ok » (20/11/2026) ; DEB-Q33 à DEB-Q37 : « recommandations ok » (21/11/2026) ;
 > DEB-Q38 à DEB-Q44 : « recommandations ok » (21/11/2026) ; DEB-Q45, DEB-Q46 : « recommandations ok »
@@ -9,7 +9,7 @@
 > avant F3 » (21/11/2026) ; DEB-Q59 à DEB-Q63 : « recommandations ok » (21/11/2026) ; DEB-Q2, DEB-Q64 : « recommandations ok » (21/11/2026) ;
 > DEB-Q65, DEB-Q66 : « recommandations ok », DEB-Q67 à DEB-Q72 rendues sans objet par DEB-Q73 ; DEB-Q73 à DEB-Q78 :
 > « accord » du développeur (21/11/2026) ; DEB-Q79 à DEB-Q82 : « recommandations ok » (21/11/2026) ; DEB-Q83 : accès confirmé par le développeur, DEB-Q84 à DEB-Q88 :
-> « recommandations ok » après la sonde (21/11/2026) ; DEB-Q89, DEB-Q90 : « recommandations ok » (21/11/2026) ; DEB-Q91 à DEB-Q94 : « recommandations ok » (21/11/2026) ; DEB-Q95 à DEB-Q104 : mesures et « recommandations ok », DEB-D8 : demande du développeur (21/11/2026) ; DEB-Q116 : « option 1 », DEB-Q117 à DEB-Q120 : « recommandations ok » (22/11/2026) ; DEB-Q121, DEB-Q122 : « recommandations ok » (22/11/2026) ; DEB-Q123, DEB-Q124 : « recommandations ok » (22/11/2026). Décisions : §8. Document d'origine **hors
+> « recommandations ok » après la sonde (21/11/2026) ; DEB-Q89, DEB-Q90 : « recommandations ok » (21/11/2026) ; DEB-Q91 à DEB-Q94 : « recommandations ok » (21/11/2026) ; DEB-Q95 à DEB-Q104 : mesures et « recommandations ok », DEB-D8 : demande du développeur (21/11/2026) ; DEB-Q116 : « option 1 », DEB-Q117 à DEB-Q120 : « recommandations ok » (22/11/2026) ; DEB-Q121, DEB-Q122 : « recommandations ok » (22/11/2026) ; DEB-Q123, DEB-Q124 : « recommandations ok », DEB-Q125 : « ok » (22/11/2026). Décisions : §8. Document d'origine **hors
 > dépôt** (DEB-D2) : cahier des charges « Document de cadrage » (novembre 2026), tenu par le développeur ; le modèle de
 > fiche (FEB) est versionné, nettoyé de ses métadonnées (DEB-Q9, DEB-Q33).
 
@@ -330,6 +330,6 @@ sont lancés à la main (`npm test`) et leur sortie jointe au compte rendu.
 | DEB-Q122 | (22/11/2026, « recommandations ok ») Le message de l'IA n'annonce jamais la suite (sonde : « je vous propose maintenant de définir une date limite » quand l'application relançait sur le résumé) : phrase ajoutée à la règle 6 des consignes d'A7, sans garde-fou mécanique (tournures trop variées) ; vérifié au navigateur |
 | DEB-Q123 | (22/11/2026, « recommandations ok ») Critère qualitatif d'A7 prouvé sur les parcours joués au navigateur après A7a (virus détecté, avec retour pour complément, reprise, validation et .docx ; un second parcours complet), IA jugée cohérente par le développeur ; le scénario e-commerce est joué en R1 (critère de fin de la V1) |
 | DEB-Q124 | (22/11/2026, « recommandations ok ») Anomalie DEB-A6 (503 au 2e tour, deux fois, scénario du virus, juste après A7a) non reproduite sur 19 tours journalisés : gardée en observation ; site lancé avec son journal (`Tee-Object`) pendant A6 et R1 ; close à R1 si elle ne réapparaît pas |
-| DEB-Q125 | (22/11/2026, POSÉE ; recommandation : oui) `Appliquer-Lot` ne mesure pas la couverture : le recul de deux branches (`CorpsRequete`, A5b ; `SchemaFiches`, L1) n'a été vu qu'à la mesure d'A7a. Ligne enchaînée du projet : `Lancer-Couverture` entre l'application et le commit ; leçon versée au harnais central (mesure dans `Appliquer-Lot`) |
+| DEB-Q125 | (22/11/2026, « ok ») `Appliquer-Lot` ne mesure pas la couverture : le recul de deux branches (`CorpsRequete`, A5b ; `SchemaFiches`, L1) n'a été vu qu'à la mesure d'A7a. Ligne enchaînée du projet : `Lancer-Couverture` entre l'application et le commit ; leçon versée au harnais central (mesure dans `Appliquer-Lot`) |
 
-Questions ouvertes : DEB-Q108 (A5), DEB-Q105 à DEB-Q107 (A6), DEB-Q109 à DEB-Q111 (V2), DEB-Q125.
+Questions ouvertes : DEB-Q108 (A5), DEB-Q105 à DEB-Q107 (A6), DEB-Q109 à DEB-Q111 (V2).

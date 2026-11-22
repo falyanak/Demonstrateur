@@ -790,3 +790,15 @@
   `CorpsRequeteTests.Nettoyer_outils_non_tableau_recopies` (objet, texte ; attendus recalculés par une réplique Python,
   qui retire bien un tableau vide). Comptes ESTIMÉS : Infrastructure 227, total 770. Non vérifié : compilation, tests,
   couverture (aucun SDK .NET chez l'assistant).
+
+## 22/11/2026 — A7b validé ; critère d'A7 atteint ; A7c (clôture)
+
+- `Appliquer-Lot A7b; if ($?) { Lancer-Couverture; if ($?) { … commit } }` : 5 fichiers, compilation Release, 770 tests
+  MESURÉS (Domain 319, Application 68, Infrastructure 227, Web 133, Architecture 23), 0 échec ; couverture lignes
+  2307/2307, branches 871/871 = 100 %, « COUVERTURE CONFORME », base inchangée ; commit `79f5eb8`. Comptes ESTIMÉS
+  confirmés ; le diagnostic des deux branches (table de saut inatteignable, `tool_calls` non tableau) est confirmé.
+- Critère d'A7 atteint : A7a et A7b verts et commités, couverture 100 / 100, IA cohérente au navigateur sur des
+  parcours complets (DEB-Q123). Objectif atteint, on arrête : reste A6 au chantier A.
+- DEB-Q125 « ok » : la ligne enchaînée du projet mesure la couverture avant le commit (prompt §0) ; leçon (e) pour le
+  harnais central (prompt §2, point 5).
+- A7c : documents seuls (prompt, plan v1.30, historique).
