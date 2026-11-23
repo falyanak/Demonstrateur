@@ -1,6 +1,6 @@
 # Prompt de reprise — Demonstrateur
 
-> Mis à jour le 22/11/2026 par le lot S1 (dictée ; application conditionnée par DEB-Q134). Règles génériques : harnais central, `regles\regles-de-travail.md` (v5) ;
+> Mis à jour le 23/11/2026 par le lot S1b (clôture de S1 et du chantier S). Règles génériques : harnais central, `regles\regles-de-travail.md` (v5) ;
 > modèle de projet : `regles\harnais-modele-generique.md` (v2) ; front : `regles\gabarit-frontend-vite-aspnet.md` ;
 > outillage : `C:\Dev\Harnais\docs\specification-harnais-central.md` (fait foi).
 > Historique détaillé : `docs/historique-Demonstrateur.md` (non envoyé par défaut). Documents hors dépôt dont dépend ce
@@ -8,22 +8,22 @@
 > `Expression_de_besoin_demonstrateur_IA_SICCRF.docx` (document de cadrage, novembre 2026). Le modèle `FEB.docx` est
 > versionné depuis I2, nettoyé de ses métadonnées (DEB-Q9, DEB-Q33).
 
-## ▶ ÉTAT AU 22/11/2026 (lot S1 livré, à appliquer) — À LIRE D'ABORD
+## ▶ ÉTAT AU 23/11/2026 (chantier S clos) — À LIRE D'ABORD
 
-**Où on en est** : chantiers P, B, I, F, L, A clos ; HY1 à HY3 clos ; `93bac51` publié et sauvegardé (799 MESURÉS,
-couverture 100 / 100). Chantier S, dictée (DEB-Q130, exception au gel) : lot S1 livré, comptes ESTIMÉS 879, Vitest 313
-vérifié sur une réplique. **S1 ne s'applique que si DEB-Q134 est acceptée** (sonde : 89 % de mots retrouvés sur le
-texte court, écarts de graphie seuls).
-**Prochaine action** : DEB-Q134 ; puis ligne enchaînée `S1`, `npm test`, critère de S1 au navigateur (plan §7) ; puis
-R1 (fiche de recette livrée après S1 ; site journalisé, DEB-Q124).
+**Où on en est** : chantiers P, B, I, F, L, A, S clos ; HY1 à HY3 clos. S1 validé (`e19ad55`, non publié) : **879
+MESURÉS**, 0 échec ; couverture lignes 2519/2519, branches 991/991 ; Vitest 313 sur le poste ; critère de S1 prouvé au
+navigateur (dictée du message et d'une rubrique avec le profil `Albert`, aucun bouton avec `Scenarise`).
+**Prochaine action** : R1, la fiche de recette (scénario e-commerce, retour pour complément, un message dicté ; site
+journalisé, DEB-Q124), puis publier et sauvegarder (critère de la V1).
 **Ouverture de la session suivante** (site arrêté : il verrouille les DLL de `bin\Debug`) :
 
     Set-Location C:\Dev\Demonstrateur; . C:\Dev\Harnais\outillage\Charger-Harnais.ps1; Ouvrir-Session -BrancheAttendue main
     # attendu : « SESSION PRÉPARÉE : 8 pièce(s) dans C:\Dev\Sessions\Demonstrateur\<horodatage> » ; joindre toutes les
     # pièces et donner leur compte.
 
-**Décisions récentes** : DEB-Q130 à DEB-Q133. **Anomalies ouvertes** : DEB-A6 (observation jusqu'à R1, DEB-Q124).
-**Questions ouvertes** : DEB-Q134 (S1), DEB-Q128 (appliquée, à confirmer), DEB-Q109 à DEB-Q111 (V2).
+**Décisions récentes** : DEB-Q130 à DEB-Q134. **Anomalies ouvertes** : DEB-A6 (observation jusqu'à R1, DEB-Q124),
+DEB-A7 (dictée au milieu d'une phrase, DEB-Q135). **Questions ouvertes** : DEB-Q135 (recommandation : V2), DEB-Q128
+(appliquée, à confirmer), DEB-Q109 à DEB-Q111 (V2).
 
 ## §0. Protocole (propre au projet)
 
@@ -39,7 +39,7 @@ R1 (fiche de recette livrée après S1 ; site journalisé, DEB-Q124).
 | Front | Node.js 26.13.1 LTS et son npm (DEB-D7) ; `node_modules` versionné (DEB-D6), Windows x64 ; `npm ci` seulement s'il manque ; versions exactes (`.npmrc`) |
 | Données | fictives, jamais réelles ; jeux d'essai hors dépôt ; base SQLite hors dépôt, clé `Fiches:Base` fixée par environnement (DEB-Q54, DEB-Q55) : poste `C:\Dev\Demonstrateur-data\fiches.db` (`appsettings.Localhost.json`) ; serveurs `appsettings.Staging.json`, `appsettings.Production.json` (`D:\Donnees\Demonstrateur-data[-staging]`, à confirmer) ; variable `Fiches__Base` prioritaire ; rien dans `appsettings.json` |
 | Dépôt distant | `https://github.com/falyanak/Demonstrateur.git`, **public**, branche `main` ; publication par le développeur seul (`Publier-Branche -Confirmer`, Git Credential Manager) |
-| Identifiants | `DEB-D…`, `DEB-A…`, `DEB-Q…`, `DEB-HY…` ; pris : DEB-D1 à DEB-D8, DEB-Q1 à DEB-Q134, DEB-A1 (close par F2), DEB-A2 (close par HY3), DEB-A3 (close par A3), DEB-A4 (ouverte, A4, A5), DEB-A5 (close par A5b), DEB-A6 (ouverte, observation), DEB-HY1 (close par HY1), DEB-HY2 (close par HY2) ; mutations M1 à M10, MF1 à MF38 (front) |
+| Identifiants | `DEB-D…`, `DEB-A…`, `DEB-Q…`, `DEB-HY…` ; pris : DEB-D1 à DEB-D8, DEB-Q1 à DEB-Q135, DEB-A1 (close par F2), DEB-A2 (close par HY3), DEB-A3 (close par A3), DEB-A4 (close par A7), DEB-A5 (close par A5b), DEB-A6 (ouverte, observation), DEB-A7 (ouverte, DEB-Q135), DEB-HY1 (close par HY1), DEB-HY2 (close par HY2) ; mutations M1 à M10, MF1 à MF38 (front) |
 
 Ligne enchaînée du projet (zip portant `DEPOT.txt` = « Demonstrateur ») ; couverture mesurée avant le commit (DEB-Q125 ;
 site arrêté) ; un lot de documents seuls peut s'en passer :
@@ -69,20 +69,18 @@ page de liste des fiches et de leur statut. Plan, périmètre et critère de fin
 | Hygiène | HY1, HY1b (DEB-HY1 : NuGet, outils dotnet, SDK) ; HY2 (DEB-HY2 : dossier de données par environnement) ; HY3 (DEB-A2 : SDK depuis la racine) | HY1 clos le 21/11/2026 : HY1 (`d307a91`), HY1b ; HY2 clos le 21/11/2026 : HY2 (`9b21bdb`) ; HY3 clos le 21/11/2026 : HY3 (`fcdb37a`) |
 | L — cycle de vie | L1 (serveur), L2 (front) | ouvert le 21/11/2026 (DEB-Q65) ; clos le 21/11/2026 : L1 (`b275507`), L1b ; L2 (`ec192e6`), L2b |
 | A — IA réelle | A1 à A7 | ouvert le 21/11/2026 : Albert API (DEB-Q83) ; A1 (`27ec900`), A2 (`4afcbfe`), A3 (`e84710c`), A4 (`345a707`), A4b, A5 (`bf75669`), A5b (`c30a13b`), A5c, A5d, A7 (échec de compilation), A7a (`868f549`), A7b (`79f5eb8`), A7c : A7 clos le 22/11/2026 ; A6 (`3b81591`), A6b : chantier A clos le 22/11/2026 ; critère : plan §7 |
-| S — saisie vocale | S1 | ouvert le 22/11/2026 (DEB-Q130, exception au gel) : S1 livré, application conditionnée par DEB-Q134 |
-| R — recette | R1 | à faire, après S1 |
+| S — saisie vocale | S1 | ouvert le 22/11/2026 (DEB-Q130, exception au gel) ; clos le 23/11/2026 : S1 (`e19ad55`), S1b |
+| R — recette | R1 | à faire |
 
-Comptes mesurés, lot par lot : historique. Dernière mesure (A6, poste, 22/11/2026, Release, `Appliquer-Lot`, 0 échec) :
-Domain 319, Application 68, Infrastructure 228, Web 161, Architecture 23, **total 799** ; Vitest **249**, 8 fichiers
-(L2, inchangé depuis) ; couverture A6 : lignes 2354/2354, branches 899/899 ; cliquet 100 / 100.
-SDK 10.0.403 depuis HY3 (DEB-A2). S1, ESTIMÉS : Application 106, Infrastructure 247, Web 184, total 879 ; Vitest 313,
-10 fichiers, MESURÉ sur une réplique (Node 22), couverture du front 100 %.
+Comptes mesurés, lot par lot : historique. Dernière mesure (S1, poste, 23/11/2026, `Compter-Tests`, 0 échec) :
+Domain 319, Application 106, Infrastructure 247, Web 184, Architecture 23, **total 879** ; Vitest **313**, 10 fichiers ;
+couverture lignes 2519/2519, branches 991/991 ; cliquet 100 / 100. SDK 10.0.403 depuis HY3 (DEB-A2).
 
 ## §2. Points ouverts
 
-1. DEB-Q134 (seuil de la sonde de la dictée) : acceptée → S1 appliqué, puis son critère au navigateur ; refusée → S1
-   écarté (nouveau lot qui le retire de la feuille de route), dictée en V2.
-2. R1 (plan §7), après S1 ; republier et resauvegarder ensuite (critère de la V1). Sauvegarde : dossier
+1. DEB-Q135 (DEB-A7) : corriger la ponctuation d'une dictée insérée au milieu d'une phrase maintenant (lot S1c, front)
+   ou en V2 (recommandation) ; sans effet sur R1, qui dicte des messages entiers.
+2. R1 (plan §7) ; republier et resauvegarder ensuite (critère de la V1). Sauvegarde : dossier
    `C:\Dev\Sauvegardes` encore « provisoire » au journal ; dossier définitif à fixer côté harnais.
 3. Profil Claude essayé quand la clé et l'accord arrivent (DEB-Q107, DEB-Q129), sans conditionner R1 ; DEB-Q128 à
    confirmer.
@@ -98,7 +96,7 @@ SDK 10.0.403 depuis HY3 (DEB-A2). S1, ESTIMÉS : Application 106, Infrastructure
 
 | N° | Décision |
 | --- | --- |
-| DEB-Q130 à DEB-Q133 | Dictée (S1, exception au gel) : WAV canonique produit par le navigateur (sans ffmpeg), `POST api/dictee`, `TranscripteurWhisper` sur le point et la clé du profil (`ModeleTranscription`, Albert : `whisper-large-v3`), sinon dictée indisponible ; bouton « 🎙 Dicter » du message et des rubriques, texte inséré au curseur, jamais envoyé de lui-même : plan §8 (22/11/2026). |
+| DEB-Q130 à DEB-Q134 | Dictée (S1, exception au gel ; sonde jugée au seuil) : WAV canonique produit par le navigateur (sans ffmpeg), `POST api/dictee`, `TranscripteurWhisper` sur le point et la clé du profil (`ModeleTranscription`, Albert : `whisper-large-v3`), sinon dictée indisponible ; bouton « 🎙 Dicter » du message et des rubriques, texte inséré au curseur, jamais envoyé de lui-même : plan §8 (22/11/2026). |
 | DEB-Q1 à DEB-Q8 | Arbitrages du 20/11/2026, « recommandations ok » : plan §8. |
 | DEB-Q105 à DEB-Q108, DEB-Q115, DEB-Q126 à DEB-Q129 | Profils de l'IA (A6) : `IA:Profil` par environnement (`IA__Profil`), catalogue `IA:Profils` dans `appsettings.json` seul ; Claude par la couche compatible OpenAI (sans température, 4096 jetons), essayé plus tard ; MAF gardé : plan §8 (22/11/2026). |
 | DEB-Q123, DEB-Q124 | Critère qualitatif d'A7 prouvé sur les parcours joués après A7a, e-commerce en R1 ; DEB-A6 en observation, site journalisé pendant A6 et R1 : plan §8 (22/11/2026). |
@@ -216,7 +214,7 @@ ExpressionBesoin/
 
 ## §6. Reliquat, hygiène, leçons
 
-Anomalies : DEB-A6 ouverte (503 au 2e tour juste après A7a, non reproduite : observation jusqu'à R1, DEB-Q124) ; DEB-A4 close par le critère d'A7 ; DEB-A3 close par A3 (« dernière question » déduite à tort) ; DEB-A1 close par F2, DEB-A2 close par HY3 (`global.json` à la racine, garde DEB0001) : historique. **Évolutions V2** (hors V1, DEB-D4 ; ouvertes seulement par décision du développeur) :
+Anomalies : DEB-A6 ouverte (503 au 2e tour juste après A7a, non reproduite : observation jusqu'à R1, DEB-Q124) ; DEB-A7 ouverte (dictée au milieu d'une phrase : majuscule et point final de Whisper, mot court perdu ; DEB-Q135) ; DEB-A4 close par le critère d'A7 ; DEB-A3 close par A3 (« dernière question » déduite à tort) ; DEB-A1 close par F2, DEB-A2 close par HY3 (`global.json` à la racine, garde DEB0001) : historique. **Évolutions V2** (hors V1, DEB-D4 ; ouvertes seulement par décision du développeur) :
 courriel au chef de service, habilitations, instruction XA / SICCRF, rapprochement de demandes, tableau de bord,
 synthèse CODIR / COPIL, export PDF, dictée sur un serveur (micro : HTTPS exigé), renommage d'`AssistantIAAlbert` (sert tout profil compatible OpenAI depuis A6), version optimiste des fiches (DEB-Q26), journal technique Serilog structuré
 (DEB-Q73), adaptateur natif Claude par le SDK `Anthropic` (DEB-Q106), catégorie de la demande et rubriques obligatoires selon la catégorie (DEB-Q90) ; toute idée née pendant la V1
@@ -224,8 +222,8 @@ s'ajoute ici.
 
 ## §7. Prochaine session
 
-Acquis : plan v1.32 ; chantiers P, B, I, F, L, A et HY validés sur le poste (799 mesurés, couverture 100 / 100) ; S1
-livré, non appliqué. Audit honnête : chez l'assistant, ni SDK .NET ni NuGet (tree-sitter, répliques Python, réplique
-Vitest) ; `Appliquer-Lot` et `Lancer-Couverture` tranchent ; micro et qualité de l'IA ne se jugent qu'au navigateur.
-Plan ordonné : DEB-Q134, S1 (ligne enchaînée, `npm test`, navigateur), puis R1. Pièces : celles d'`Ouvrir-Session` (8),
-avec leur compte ; sorties d'`Appliquer-Lot S1`, de `Lancer-Couverture` et de `npm test`.
+Acquis : plan v1.33 ; chantiers P, B, I, F, L, A, S et HY validés sur le poste (879 mesurés, couverture 100 / 100,
+Vitest 313). Audit honnête : chez l'assistant, ni SDK .NET ni NuGet (tree-sitter, répliques Python, réplique Vitest) ;
+`Appliquer-Lot` et `Lancer-Couverture` tranchent ; micro et qualité de l'IA ne se jugent qu'au navigateur. Plan
+ordonné : R1 (fiche de recette, puis parcours au navigateur), publier, sauvegarder : objectif de la V1. Pièces : celles
+d'`Ouvrir-Session` (8), avec leur compte ; réponse à DEB-Q135.

@@ -860,3 +860,21 @@
   8 ; syntaxe C# des 20 fichiers par tree-sitter (faute volontaire détectée) ; table de vérité de l'en-tête et octets
   WAV attendus recalculés par une réplique Python. Non vérifié : compilation C#, tests xUnit, couverture .NET (branches
   des `await` notamment), micro au navigateur. Comptes ESTIMÉS : Application 106, Infrastructure 247, Web 184, total 879.
+
+## 23/11/2026 — S1 validé ; critère de S1 atteint ; chantier S clos ; S1b (clôture)
+
+- Ligne enchaînée `S1` appliquée et commitée (`e19ad55`, non publié). `Lancer-Couverture` : lignes 2519/2519, branches
+  991/991 = 100 %, « COUVERTURE CONFORME ». `Compter-Tests` : 879 MESURÉS (Domain 319, Application 106, Infrastructure
+  247, Web 184, Architecture 23), 0 échec : comptes ESTIMÉS confirmés. `npm test` : 313 tests, 10 fichiers, verts. Les
+  branches des `await` des nouvelles coquilles n'ont pas fait reculer la couverture. DEB-Q134 acceptée de fait.
+- Critère de S1, profil `Albert` (`site-S1-albert.log`) : `api/sante` « ok », `data-dictee="oui"`, corps non WAV → 422 ;
+  18 dictées (17 en 200, transcription en 0,24 à 0,65 s jusqu'à 33 s d'audio, 1,7 s pour environ 118 s ; une en 422 :
+  essai sans parole), message dicté relu puis envoyé (tours de l'IA en 4,1 à 7,2 s) ; aucune ligne « Panne » ni
+  « Réponse vide » (DEB-A6 non réapparue). Rubrique (`site-S1-albert-rubrique.log`) : dictée en 200 puis
+  `PUT …/champs/exempleRepresentatif` en 200. Profil `Scenarise` : `data-dictee="non"`, `api/dictee` → 422.
+- Observation du développeur, étape « insertion au curseur » : « Le copieur Bureau 1A. est en panne. » pour « du bureau
+  1A » dicté après « copieur » : insertion et espaces justes, texte de Whisper ponctué comme une phrase, « du » perdu.
+  Anomalie DEB-A7, DEB-Q135 posée (recommandation : V2). Objectif atteint, on arrête : chantier S clos.
+- `Remove-Item Env:IA__Profil` en échec dans une autre console que celle du site : sans effet (variable propre à la
+  console où elle a été posée).
+- S1b : documents seuls (prompt, plan v1.33, historique).
