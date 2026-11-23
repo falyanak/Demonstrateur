@@ -878,3 +878,17 @@
 - `Remove-Item Env:IA__Profil` en échec dans une autre console que celle du site : sans effet (variable propre à la
   console où elle a été posée).
 - S1b : documents seuls (prompt, plan v1.33, historique).
+
+## 23/11/2026 — Session : pièces contrôlées ; DEB-Q135 à DEB-Q137 ; lot R1 (fiche de recette)
+
+- Session contrôlée : 8 pièces conformes à `PIECES.txt` (tailles et SHA-256), archive de 196 entrées (= Totaux de
+  `MASQUAGE.txt`, aucun fichier masqué), commit `390922e` (S1b) ; `Compter-Tests` : 879, 0 échec. Points d'attention
+  attendus : 2 commits à publier, non sauvegardés (S1, S1b), publiés et sauvegardés au terme de R1.
+- Plan de la fiche de recette soumis, « recommandations ok » : DEB-Q135 (DEB-A7 en V2, aucun lot S1c), DEB-Q136
+  (critère « sans information inventée » jugé sur la fiche finale), DEB-Q137 (réponses de l'agent écrites dans la fiche).
+- R1 (documents seuls) : `specifications/recette-R1.md` (préalables, réponses de l'agent, scénario A nominal avec
+  premier message dicté, grille des inventions, scénario B retour pour complément et six transitions, clôture) ; plan
+  v1.34 ; prompt. Libellés de la fiche relevés dans le code à HEAD (`Catalogue`, `ReferentielOrganisationFictif`,
+  `statuts.ts`, `vue.ts`, `PageDialogue.ts`) ; motifs du journal (`Panne pendant`, `DEB-A5`) relevés dans
+  `PointsFiches.cs` et `CorpsRequete.cs`. Vérifié chez l'assistant : octets (UTF-8 sans BOM, CRLF seuls), taille du
+  prompt (< 30 720). Non vérifié : le parcours lui-même (navigateur, micro, IA réelle, Word), objet de la recette.
